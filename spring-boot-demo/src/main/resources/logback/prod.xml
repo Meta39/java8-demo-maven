@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="60 seconds" debug="false">
+    <!-- 应用名称 -->
+    <springProperty scope="context" name="springApplicationName" source="spring.application.name" defaultValue="spring"/>
+    <!-- 环境 -->
+    <springProperty scope="context" name="springProfilesActive" source="spring.profiles.active" defaultValue="prod"/>
+    <!-- 重启后是否删除日志 -->
+    <springProperty scope="context" name="cleanHistoryOnStart" source="logging.logback.rollingpolicy.clean-history-on-start" defaultValue="false"/>
+    <!-- 单个日志文件的大小 -->
+    <springProperty scope="context" name="maxFileSize" source="logging.logback.rollingpolicy.max-file-size" defaultValue="10MB"/>
+    <!-- 日志总文件最大值 -->
+    <springProperty scope="context" name="totalSizeCap" source="logging.logback.rollingpolicy.total-size-cap" defaultValue="50GB"/>
+    <!-- 日志保留时长 (天) -->
+    <springProperty scope="context" name="maxHistory" source="logging.logback.rollingpolicy.max-history" defaultValue="30"/>
+    <!-- 日志文件路径 -->
+    <springProperty scope="context" name="path" source="logging.file.path" defaultValue="./log/${springApplicationName}/${springProfilesActive}"/>
+
+    <contextName>${springApplicationName}</contextName>
+
+    <property name="PATTERN_FILE" value="[%d{MM-dd HH:mm:ss} %p %.10t] %C{39}\.%M\\(\\): %m%n"/>
+
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${path}/%d{yyyy-MM-dd}/%i.log</fileNamePattern>
+            <totalSizeCap>${totalSizeCap}</totalSizeCap>
+            <maxHistory>${maxHistory}</maxHistory>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>${maxFileSize}</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <!-- 重启项目后删除日志 -->
+            <cleanHistoryOnStart>${cleanHistoryOnStart}</cleanHistoryOnStart>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${PATTERN_FILE}</pattern>
+        </encoder>
+    </appender>
+
+    <root level="ERROR">
+        <appender-ref ref="FILE" />
+    </root>
+
+</configuration>

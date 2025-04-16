@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fu.springbootdemo.mapper.UserMapper">
+
+    <insert id="importExcel">
+        INSERT INTO user (username,salt,pwd,nickname,sex,create_time,update_time,is_ban,is_delete)
+        VALUES
+        <foreach collection="userCachedList" item="item" index="index" separator=",">
+            (#{item.username},#{item.salt},#{item.pwd},#{item.nickname},#{item.sex},#{item.createTime},#{item.updateTime},#{item.isBan},#{item.isDelete})
+        </foreach>
+    </insert>
+</mapper>

@@ -1,0 +1,15 @@
+server:
+  port: 8088
+
+spring:
+  application:
+    name: spring-boot-feign-seata1
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    # 数据库必须包含 undo_log 表，如果没有则用 resources 目录下的undo_log.sql 创建
+    url: jdbc:mysql://127.0.0.1:3306/dynamic?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&useSSL=false&serverTimezone=Asia/Shanghai
+    username: root
+    password: 123456
+
+seata:
+  tx-service-group: my_test_tx_group

@@ -1,0 +1,78 @@
+package ${package}.controller;
+
+import ${package}.entity.${className};
+import ${package}.service.${className}Service;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import javax.validation.Valid;
+import java.util.List;
+
+/**
+ * 用户 控制层
+ *
+ * @author 钟永福
+ * @since 2023-07-08 22:07:31
+ */
+@RestController
+@RequestMapping("${classname}")
+@RequiredArgsConstructor
+public class ${className}Controller {
+    private final ${className}Service ${classname}Service;
+
+    /**
+     * 新增/更新用户
+     *
+     * @param ${classname} 用户实体类
+     */
+    @PostMapping("save")
+    public Integer save${className}(@RequestBody @Valid ${className} ${classname}) {
+        return this.${classname}Service.save${className}(${classname});
+    }
+
+    /**
+     * 根据ID查询用户
+     *
+     * @param id ID
+     */
+    @GetMapping("{id}")
+    public ${className} select${className}ById(@PathVariable("id") Integer id) {
+        return this.${classname}Service.select${className}ById(id);
+    }
+
+    /**
+     * 查询用户 分页数据
+     */
+    @GetMapping("paging")
+    public Page<${className}> select${className}Page(@RequestParam(required = false, defaultValue = "1") Long page, @RequestParam(required = false, defaultValue = "10") Long size) {
+        return this.${classname}Service.select${className}Page(page, size);
+    }
+
+    /**
+     * 查询用户 列表
+     */
+    @GetMapping("selectList")
+    public List<${className}> select${className}List() {
+        return this.${classname}Service.select${className}List();
+    }
+
+    /**
+     * 根据ID删除用户
+     *
+     * @param id ID
+     */
+    @DeleteMapping("{id}")
+    public Integer delete${className}(@PathVariable Integer id) {
+        return this.${classname}Service.delete${className}ById(id);
+    }
+
+    /**
+     * 根据ID集合批量删除用户
+     */
+    @PostMapping("deleteBatch")
+    public Integer delete${className}s(@RequestBody List<Integer> ids) {
+        return this.${classname}Service.delete${className}ByIds(ids);
+    }
+
+}

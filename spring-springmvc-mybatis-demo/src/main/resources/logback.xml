@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="60 seconds" debug="false">    <!-- 控制台彩色日志格式，注意：%L打印行号对性能有影响，因此不建议在生产环境使用。 -->
+    <!-- 不同环境配置不同的日志输出 -->
+    <property resource="environment/${spring.profiles.active}.properties"/>
+    <property name="CONSOLE_LOG_PATTERN" value="[%d{HH:mm:ss} %p %.10t] %C{39}\.%M\\(\\): %m%n"/>
+
+    <!--输出到控制台-->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder" charset="UTF-8">
+            <!-- 输出到控制台的日志格式 -->
+            <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 输出到文件 -->
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${logging.path}/%d{yyyy-MM-dd}/%i.log</fileNamePattern>
+            <totalSizeCap>${logging.totalSizeCap}</totalSizeCap>
+            <maxHistory>${logging.maxHistory}</maxHistory>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>${logging.maxFileSize}</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <!-- 重启项目后删除日志 -->
+            <cleanHistoryOnStart>${logging.cleanHistoryOnStart}</cleanHistoryOnStart>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 配置了MyBatisSQLInterceptor，则这里不需要配置。 -->
+    <logger name="com.fu.ssm.mapper" level="${logging.SQL.level}" />
+
+    <root level="${logging.level}" >
+        <appender-ref ref="CONSOLE" />
+        <appender-ref ref="FILE" />
+    </root>
+
+</configuration>

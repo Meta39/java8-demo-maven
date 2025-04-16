@@ -1,0 +1,24 @@
+fu:
+  authentication:
+    token-timeout: 7200
+
+server:
+  port: 81
+
+spring:
+  task:
+    execution:
+      pool:
+        core-size: 16
+        max-size: 32
+        queue-capacity: 2000
+        keep-alive: 120
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:13306/spring_boot_demo?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&useSSL=false&serverTimezone=Asia/Shanghai
+    username: root
+    password: 123456
+  redis:
+    host: localhost
+    port: 16379
+    password: 12345678

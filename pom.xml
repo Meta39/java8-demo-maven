@@ -1,0 +1,353 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.fu</groupId>
+    <artifactId>java8-demo-maven</artifactId>
+    <packaging>pom</packaging>
+    <version>1</version>
+
+    <!-- 子模块 -->
+    <modules>
+        <module>spring-boot-demo</module>
+        <module>base-demo</module>
+        <module>easy-es-demo</module>
+        <module>mybatis-plus-demo</module>
+        <module>minio-demo</module>
+        <module>xxl-job-demo</module>
+        <module>redis-demo</module>
+        <module>velocity-generate-code-demo</module>
+        <module>spring-boot-security-demo</module>
+        <module>spring-boot-jpa-demo</module>
+        <module>spring-boot-kafka-demo</module>
+        <module>spring-springmvc-mybatis-demo</module>
+        <module>spring-boot-dynamic-data-source</module>
+        <module>spring-boot-dynamic-data-source2</module>
+        <module>spring-boot-rocketmq</module>
+        <module>spring-boot-feign-seata-demo</module>
+        <module>spring-boot-readwrite-splitting-demo</module>
+        <module>spring-boot-starter-mybatis-sql-log</module>
+        <module>spring-boot-webservice-demo</module>
+    </modules>
+
+    <properties>
+        <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
+        <java.version>1.8</java.version>
+        <!-- maven.compiler.source 和 maven.compiler.target 这2个参数需要引入 apache maven-compiler-plugin 插件 -->
+        <maven.compiler.source>${java.version}</maven.compiler.source>
+        <maven.compiler.target>${java.version}</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <spring-boot-dependencies.version>2.7.18</spring-boot-dependencies.version>
+        <spring-cloud-dependencies.version>2021.0.9</spring-cloud-dependencies.version>
+        <spring-cloud-alibaba-dependencies.version>2021.1</spring-cloud-alibaba-dependencies.version>
+        <seata-spring-boot-starter.version>2.0.0</seata-spring-boot-starter.version>
+        <fastjson.version>1.2.83</fastjson.version>
+        <easyexcel.version>3.3.4</easyexcel.version>
+        <druid-spring-boot-starter.version>1.2.23</druid-spring-boot-starter.version>
+        <p6spy.version>3.9.1</p6spy.version>
+        <pagehelper.version>6.1.0</pagehelper.version>
+        <mybatis.version>3.5.16</mybatis.version>
+        <mybatis-spring.version>2.1.2</mybatis-spring.version>
+        <mybatis-spring-boot-starter.version>2.3.2</mybatis-spring-boot-starter.version>
+        <mybatis-plus-boot-starter.version>3.5.6</mybatis-plus-boot-starter.version>
+        <japidocs.version>1.4.4</japidocs.version>
+        <xxl-job-core.version>2.4.1</xxl-job-core.version>
+        <easy-es-boot-starter.version>1.1.1</easy-es-boot-starter.version>
+        <elasticsearch-rest-high-level-client.version>7.14.0</elasticsearch-rest-high-level-client.version>
+        <redisson-spring-boot-starter.version>3.45.1</redisson-spring-boot-starter.version>
+        <velocity-engine-core.version>2.3</velocity-engine-core.version>
+        <!-- 这玩意最好不动，每个版本的差异太大！ -->
+        <minio.version>7.1.0</minio.version>
+        <rocketmq-spring-boot-starter.version>2.3.3</rocketmq-spring-boot-starter.version>
+        <!-- java8 最后支持 2.X -->
+        <caffeine.version>2.9.3</caffeine.version>
+        <!-- java8 最后支持 3.5.X -->
+        <cxf-spring-boot-starter-jaxws.version>3.5.11</cxf-spring-boot-starter-jaxws.version>
+    </properties>
+
+    <!-- 必要依赖 -->
+    <dependencies>
+
+    </dependencies>
+
+    <!-- 非必要依赖，子项目可选 -->
+    <dependencyManagement>
+        <dependencies>
+            <!-- 如果这里填写了 spring-boot-dependencies 里包含的依赖，则会以当前配置的为准 -->
+            <!-- fastjson -->
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>fastjson</artifactId>
+                <version>${fastjson.version}</version>
+            </dependency>
+            <!-- easyExcel -->
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>easyexcel</artifactId>
+                <version>${easyexcel.version}</version>
+                <!-- 排除slf4j依赖，防止和springboot自带的slf4j依赖冲突 -->
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-api</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-simple</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <!-- druid 数据库连接池（Spring） -->
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>druid</artifactId>
+                <version>${druid-spring-boot-starter.version}</version>
+            </dependency>
+            <!-- druid 数据库连接池 （Spring Boot）-->
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>druid-spring-boot-starter</artifactId>
+                <version>${druid-spring-boot-starter.version}</version>
+            </dependency>
+            <!-- p6spy 数据库连接池 -->
+            <dependency>
+                <groupId>p6spy</groupId>
+                <artifactId>p6spy</artifactId>
+                <version>${p6spy.version}</version>
+            </dependency>
+            <!-- 分页插件 -->
+            <dependency>
+                <groupId>com.github.pagehelper</groupId>
+                <artifactId>pagehelper</artifactId>
+                <version>${pagehelper.version}</version>
+            </dependency>
+            <!-- mybatis Spring 开始 -->
+            <dependency>
+                <groupId>org.mybatis</groupId>
+                <artifactId>mybatis</artifactId>
+                <version>${mybatis.version}</version>
+                <scope>compile</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.mybatis</groupId>
+                <artifactId>mybatis-spring</artifactId>
+                <version>${mybatis-spring.version}</version>
+            </dependency>
+            <!-- mybatis Spring 结束 -->
+            <!-- MyBatis （Spring Boot） -->
+            <dependency>
+                <groupId>org.mybatis.spring.boot</groupId>
+                <artifactId>mybatis-spring-boot-starter</artifactId>
+                <version>${mybatis-spring-boot-starter.version}</version>
+            </dependency>
+            <!-- MyBatis-Plus -->
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-boot-starter</artifactId>
+                <version>${mybatis-plus-boot-starter.version}</version>
+            </dependency>
+            <!-- JApiDocs离线接口文档 -->
+            <dependency>
+                <groupId>io.github.yedaxia</groupId>
+                <artifactId>japidocs</artifactId>
+                <version>${japidocs.version}</version>
+            </dependency>
+            <!-- xxl-job -->
+            <dependency>
+                <groupId>com.xuxueli</groupId>
+                <artifactId>xxl-job-core</artifactId>
+                <version>${xxl-job-core.version}</version>
+            </dependency>
+            <!-- easy-es 开始 -->
+            <dependency>
+                <groupId>cn.easy-es</groupId>
+                <artifactId>easy-es-boot-starter</artifactId>
+                <version>${easy-es-boot-starter.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.elasticsearch.client</groupId>
+                <artifactId>elasticsearch-rest-high-level-client</artifactId>
+                <version>${elasticsearch-rest-high-level-client.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.elasticsearch</groupId>
+                <artifactId>elasticsearch</artifactId>
+                <version>${elasticsearch-rest-high-level-client.version}</version>
+            </dependency>
+            <!-- easy-es 结束 -->
+            <!--使用redisson作为分布式锁替换掉自定义分布式锁-->
+            <dependency>
+                <groupId>org.redisson</groupId>
+                <artifactId>redisson-spring-boot-starter</artifactId>
+                <version>${redisson-spring-boot-starter.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.seata</groupId>
+                <artifactId>seata-spring-boot-starter</artifactId>
+                <version>${seata-spring-boot-starter.version}</version>
+            </dependency>
+            <!-- apache apache模板引擎 -->
+            <dependency>
+                <groupId>org.apache.velocity</groupId>
+                <artifactId>velocity-engine-core</artifactId>
+                <version>${velocity-engine-core.version}</version>
+            </dependency>
+            <!-- minio【每个版本的兼容性不是很好，建议固定7.1.0】 -->
+            <dependency>
+                <groupId>io.minio</groupId>
+                <artifactId>minio</artifactId>
+                <version>${minio.version}</version>
+            </dependency>
+            <!-- RocketMQ -->
+            <dependency>
+                <groupId>org.apache.rocketmq</groupId>
+                <artifactId>rocketmq-spring-boot-starter</artifactId>
+                <version>${rocketmq-spring-boot-starter.version}</version>
+            </dependency>
+            <!-- caffeine 本地缓存 -->
+            <dependency>
+                <groupId>com.github.ben-manes.caffeine</groupId>
+                <artifactId>caffeine</artifactId>
+                <version>${caffeine.version}</version>
+            </dependency>
+            <!-- apache cxf -->
+            <dependency>
+                <groupId>org.apache.cxf</groupId>
+                <artifactId>cxf-spring-boot-starter-jaxws</artifactId>
+                <version>${cxf-spring-boot-starter-jaxws.version}</version>
+            </dependency>
+            <!-- Spring Boot 【放到最后面，因为前面定义了版本的话，就会覆盖Spring Boot自带的版本号】-->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring-boot-dependencies.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <!-- Spring Cloud -->
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud-dependencies.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <!-- Spring Cloud Alibaba -->
+            <dependency>
+                <groupId>com.alibaba.cloud</groupId>
+                <artifactId>spring-cloud-alibaba-dependencies</artifactId>
+                <version>${spring-cloud-alibaba-dependencies.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <finalName>${project.artifactId}-${spring.profiles.active}</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${spring-boot-dependencies.version}</version>
+                <configuration>
+                    <!-- 打包导入设置了 systemPath 的jar包 -->
+                    <includeSystemScope>true</includeSystemScope>
+                    <!-- 删除target/classes重复的资源 -->
+                    <addResources>true</addResources>
+                    <!-- 打包时排除依赖【如果子项目也引用了maven-compiler-plugin，则以子项目的配置为准】 -->
+                    <excludes>
+                        <!--不打包lombok，因为lombok只在编译时使用，编译后就没用了-->
+                        <exclude>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                        </exclude>
+                        <!--spring官方排除的依赖项-->
+                        <exclude>
+                            <groupId>org.springframework.boot</groupId>
+                            <artifactId>spring-boot-configuration-processor</artifactId>
+                        </exclude>
+                        <!-- 排除 test -->
+                        <exclude>
+                            <groupId>org.springframework.boot</groupId>
+                            <artifactId>spring-boot-starter-test</artifactId>
+                        </exclude>
+                        <!-- 排除 log4j -->
+                        <exclude>
+                            <groupId>org.apache.logging.log4j</groupId>
+                            <artifactId>log4j-api</artifactId>
+                        </exclude>
+                        <exclude>
+                            <groupId>org.apache.logging.log4j</groupId>
+                            <artifactId>log4j-to-slf4j</artifactId>
+                        </exclude>
+                    </excludes>
+                </configuration>
+                <!-- 解决打包没有把依赖Jar包打入springboot的jar包的问题 -->
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+        <resources>
+            <!-- 排除打包文件 -->
+            <resource>
+                <directory>src/main/resources</directory>
+                <excludes>
+                    <exclude>application*.yml</exclude>
+                    <exclude>application*.properties</exclude>
+                </excludes>
+            </resource>
+            <!-- 打包需要的文件 -->
+            <resource>
+                <directory>src/main/resources</directory>
+                <!-- 解决yml配置@spring.profiles.active@时编译后没有生成对应环境的问题 -->
+                <filtering>true</filtering>
+                <!-- 只打包具体的环境，不打包其它环境的配置文件 -->
+                <includes>
+                    <include>**/*.xml</include>
+                    <include>application.yml</include>
+                    <include>application-${spring.profiles.active}*.yml</include>
+                    <include>application.properties</include>
+                    <include>application-${spring.profiles.active}*.properties</include>
+                </includes>
+            </resource>
+        </resources>
+    </build>
+
+    <!-- 环境配置 -->
+    <profiles>
+        <profile>
+            <id>dev</id>
+            <activation>
+                <!--  默认激活-->
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <spring.profiles.active>dev</spring.profiles.active>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>prod</id>
+            <properties>
+                <spring.profiles.active>prod</spring.profiles.active>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>test</id>
+            <properties>
+                <spring.profiles.active>test</spring.profiles.active>
+            </properties>
+        </profile>
+    </profiles>
+
+</project>

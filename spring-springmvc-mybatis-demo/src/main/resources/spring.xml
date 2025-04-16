@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+    <!-- 配置数据源 -->
+    <bean id="druidDataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init">
+        <property name="driverClassName" value="${jdbc.driver}"/>
+        <property name="url" value="${jdbc.url}"/>
+        <property name="username" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+        <property name="testWhileIdle" value="false"/>
+    </bean>
+
+    <!-- 配置事务管理器（这个包在org.springframework.jdbc下，因此要导入spring-jdbc依赖） -->
+    <bean id="dataSourceTransactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="druidDataSource"/>
+    </bean>
+
+    <!-- 开启事务的注解驱动，将使用注解@Transactional标识的方法或类中所有的方法进行事务管理 -->
+    <tx:annotation-driven transaction-manager="dataSourceTransactionManager"/>
+
+    <!-- 配置SqlSessionFactoryBean(不需要配置id)，可以直接在Spring的IOC容器中获取SqlSessionFactory -->
+    <bean class="org.mybatis.spring.SqlSessionFactoryBean">
+        <!-- 设置数据源 -->
+        <property name="dataSource" ref="druidDataSource"/>
+        <!-- 设置类型别名路径 -->
+        <property name="typeAliasesPackage" value="com.fu.ssm.entity"/>
+        <!-- 设置映射文件路径(如果映射文件和Mapper接口文件路径一致，则可以不配置) -->
+        <property name="mapperLocations" value="classpath:mapper/*.xml"/>
+        <!-- 全局变量 -->
+        <property name="configurationProperties">
+            <props>
+                <!-- 驼峰式命名 -->
+                <prop key="mapUnderscoreToCamelCase">true</prop>
+                <prop key="jdbcTypeForNull">NULL</prop>
+                <!-- 配置SQL输出到控制台 -->
+<!--                <prop key="logImpl">STDOUT_LOGGING</prop>-->
+            </props>
+        </property>
+        <!-- 插件 -->
+        <property name="plugins">
+            <array>
+                <!-- 分页插件 -->
+                <bean class="com.github.pagehelper.PageInterceptor"/>
+            </array>
+        </property>
+    </bean>
+
+    <!-- 配置Mapper接口的扫描，可以将指定包下所以的Mapper接口，通过SqlSession创建代理实现类对象，并将这些对象交给IOC容器管理 -->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.fu.ssm.mapper"/>
+    </bean>
+
+</beans>

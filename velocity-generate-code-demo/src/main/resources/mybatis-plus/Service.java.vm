@@ -1,0 +1,51 @@
+package ${package}.service;
+
+import ${package}.entity.${className};
+import com.baomidou.mybatisplus.extension.service.IService;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+
+import java.util.List;
+
+/**
+ * 用户业务层接口
+ *
+ * @author 钟永福
+ * @since 2023-07-08 22:07:31
+ */
+public interface ${className}Service extends IService<${className}> {
+    /**
+     * 新增/更新用户
+     *
+     */
+    int save${className}(${className} ${classname});
+
+    /**
+     * 根据ID查询用户
+     *
+     */
+    ${className} select${className}ById(Integer id);
+
+    /**
+     * 分页查询用户
+     *
+     */
+    Page<${className}> select${className}Page(Long page, Long size);
+
+    /**
+     * 查询用户列表
+     *
+     */
+    List<${className}> select${className}List();
+
+    /**
+     * 根据ID删除用户
+     */
+    int delete${className}ById(Integer id);
+
+    /**
+     * 根据ID集合批量删除用户
+     *
+     */
+    int delete${className}ByIds(List<Integer> ids);
+
+}

@@ -1,0 +1,6 @@
+minio:
+  endpoint: http://127.0.0.1
+  port: 9000
+  secure: false
+  accessKey: minioadmin
+  secretKey: minioadmin

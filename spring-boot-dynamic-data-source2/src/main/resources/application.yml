@@ -1,0 +1,26 @@
+server:
+  port: 80
+
+logging:
+  level:
+    com.fu.springbootdynamicdatasource2.mapper: debug
+
+spring:
+  freemarker:
+    check-template-location: false
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    type: com.zaxxer.hikari.HikariDataSource
+    mysql1:
+      mapper-locations: "classpath:mapper/mysql1/*.xml"
+      jdbc-url: jdbc:mysql://localhost:3306/dynamic?useUnicode=true&characterEncoding=utf-8&useSSL=true&serverTimezone=Asia/Shanghai
+      username: root
+      password: 123456
+    mysql2:
+      mapper-locations: "classpath:mapper/mysql2/*.xml"
+      jdbc-url: jdbc:mysql://localhost:3306/dynamic2?useUnicode=true&characterEncoding=utf-8&useSSL=true&serverTimezone=Asia/Shanghai
+      username: root
+      password: 123456

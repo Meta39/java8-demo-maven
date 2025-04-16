@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.fu</groupId>
+        <artifactId>java8-demo-maven</artifactId>
+        <version>1</version>
+    </parent>
+
+    <artifactId>spring-boot-feign-seata-demo</artifactId>
+    <packaging>pom</packaging>
+    <description>
+        Spring Boot 集成 seata 分布式事务，通过 openfeign RPC 调用服务
+    </description>
+
+    <modules>
+        <module>spring-boot-feign-seata1</module>
+        <module>spring-boot-feign-seata2</module>
+    </modules>
+
+</project>
