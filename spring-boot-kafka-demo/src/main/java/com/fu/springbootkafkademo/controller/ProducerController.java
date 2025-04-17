@@ -13,6 +13,7 @@ public class ProducerController {
 
     /**
      * 往kafka topic为first发送消息msg
+     *
      * @param msg 消息
      */
     @GetMapping("send")

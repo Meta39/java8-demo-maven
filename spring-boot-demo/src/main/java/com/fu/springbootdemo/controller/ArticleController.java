@@ -68,7 +68,7 @@ public class ArticleController {
     public Page<Article> selectArticlePage(@RequestParam(required = false, defaultValue = "1") Long page,
                                            @RequestParam(required = false, defaultValue = "10") Long size,
                                            @RequestParam(required = false) String title) {
-        return this.articleService.selectArticlePage(page, size,title);
+        return this.articleService.selectArticlePage(page, size, title);
     }
 
     /**

@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 public class MainThread {
     private final AsyncThread asyncThread;
 
-    public String mainThread(){
+    public String mainThread() {
         log.info("主线程开始执行...");
         asyncThread.asyncThread();
         log.info("主线程执行结束...");

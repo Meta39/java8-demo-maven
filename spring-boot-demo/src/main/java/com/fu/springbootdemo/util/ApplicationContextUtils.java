@@ -10,13 +10,10 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class ApplicationContextUtils implements ApplicationContextAware {
-    //构造函数私有化，防止其它人实例化该对象
-    private ApplicationContextUtils(){}
     private static ApplicationContext applicationContext;
 
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        ApplicationContextUtils.applicationContext = applicationContext;
+    //构造函数私有化，防止其它人实例化该对象
+    private ApplicationContextUtils() {
     }
 
     //通过name获取 Bean.（推荐，因为bean的name是唯一的，出现重名的bean启动会报错。）
@@ -32,6 +29,11 @@ public class ApplicationContextUtils implements ApplicationContextAware {
     //通过name,以及Clazz返回指定的Bean（这个是最稳妥的）
     public static <T> T getBean(String name, Class<T> clazz) {
         return applicationContext.getBean(name, clazz);
+    }
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        ApplicationContextUtils.applicationContext = applicationContext;
     }
 
 }

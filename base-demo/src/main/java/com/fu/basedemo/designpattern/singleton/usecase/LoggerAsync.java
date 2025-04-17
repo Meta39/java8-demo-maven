@@ -35,10 +35,6 @@ public class LoggerAsync {
         // 私有构造函数，防止外部实例化
     }
 
-    private static final class LoggerHolder {
-        private static final LoggerAsync INSTANCE = new LoggerAsync();
-    }
-
     public static LoggerAsync getInstance() {
         return LoggerHolder.INSTANCE;
     }
@@ -61,5 +57,9 @@ public class LoggerAsync {
             executorService.shutdownNow();
             Thread.currentThread().interrupt();
         }
+    }
+
+    private static final class LoggerHolder {
+        private static final LoggerAsync INSTANCE = new LoggerAsync();
     }
 }

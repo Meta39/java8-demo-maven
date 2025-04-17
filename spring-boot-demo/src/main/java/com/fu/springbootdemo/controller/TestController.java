@@ -20,7 +20,7 @@ public class TestController {
 
     @ReturnMeta //返回原始数据，不用全局返回类封装。
     @GetMapping("hello")
-    public Integer hello(){
+    public Integer hello() {
         return CurrentLoginUserUtil.getUserId();
     }
 
@@ -28,7 +28,7 @@ public class TestController {
      * async异步线程
      */
     @GetMapping("async")
-    public String async(){
+    public String async() {
         return this.mainThread.mainThread();
     }
 
@@ -37,7 +37,7 @@ public class TestController {
      */
     @PreAuthorize("authorize")
     @GetMapping("authorize")
-    public String authorize(){
+    public String authorize() {
         return "超级管理员角色或配置'**'过滤地址跳过该鉴权注解";
     }
 }

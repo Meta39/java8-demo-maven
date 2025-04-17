@@ -9,14 +9,10 @@ import java.util.regex.Pattern;
 
 public class BCryptPasswordEncoderUtil {
     private final Logger log = LoggerFactory.getLogger(getClass());
-    private Pattern BCRYPT_PATTERN = Pattern.compile("\\A\\$2(a|y|b)?\\$(\\d\\d)\\$[./0-9A-Za-z]{53}");
-
-
     private final int strength;
-
     private final BCryptVersion version;
-
     private final SecureRandom random;
+    private Pattern BCRYPT_PATTERN = Pattern.compile("\\A\\$2(a|y|b)?\\$(\\d\\d)\\$[./0-9A-Za-z]{53}");
 
     public BCryptPasswordEncoderUtil() {
         this(-1);

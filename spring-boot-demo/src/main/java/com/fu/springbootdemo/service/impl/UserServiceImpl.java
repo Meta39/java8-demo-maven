@@ -55,7 +55,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         if (!StringUtils.hasLength(user.getPwd())) {
             new RuntimeException("密码不能为空");
         }
-        user.setPwd(RSAUtil.encrypt(GlobalVariable.RSA_TOKEN_PUBLIC_KEY,user.getPwd()));
+        user.setPwd(RSAUtil.encrypt(GlobalVariable.RSA_TOKEN_PUBLIC_KEY, user.getPwd()));
         return this.userMapper.insert(user);
     }
 
@@ -71,14 +71,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Override
-    public int shareRoles(Integer userId,List<Integer> roleIds) {
-        if (userId == 1){
+    public int shareRoles(Integer userId, List<Integer> roleIds) {
+        if (userId == 1) {
             new RuntimeException("不允许给超级用户分配其它角色");
         }
         //省事做法：不管之前有没有角色，都把之前的该用户的角色删光。再从新插入角色。
-        this.userRoleMapper.delete(new LambdaQueryWrapper<UserRole>().eq(UserRole::getUserId,userId));
-        if (!roleIds.isEmpty()){
-            roleIds.forEach(roleId ->{
+        this.userRoleMapper.delete(new LambdaQueryWrapper<UserRole>().eq(UserRole::getUserId, userId));
+        if (!roleIds.isEmpty()) {
+            roleIds.forEach(roleId -> {
                 UserRole userRole = new UserRole();
                 userRole.setUserId(userId);
                 userRole.setRoleId(roleId);
@@ -90,9 +90,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Override
     public int isBanUser(Integer id, Integer isBan) {
-        return this.userMapper.update(null,new LambdaUpdateWrapper<User>()
-                .eq(User::getId,id)
-                .set(User::getIsBan,isBan));
+        return this.userMapper.update(null, new LambdaUpdateWrapper<User>()
+                .eq(User::getId, id)
+                .set(User::getIsBan, isBan));
     }
 
     /**
@@ -110,17 +110,17 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      * 分页查询用户
      */
     @Override
-    public Page<User> selectUserPage(Long page, Long size,String username) {
+    public Page<User> selectUserPage(Long page, Long size, String username) {
         LambdaQueryWrapper<User> lqw = new LambdaQueryWrapper<>();
-        if (StringUtils.hasText(username)){
-            lqw.like(User::getUsername,username);
+        if (StringUtils.hasText(username)) {
+            lqw.like(User::getUsername, username);
         }
         Page<User> userPage = this.userMapper.selectPage(Page.of(page, size), lqw);
         userPage.getRecords().forEach(user -> {
             //获取用户列表对应的角色列表集合
             List<Integer> roleIds = this.userRoleMapper.selectList(new LambdaQueryWrapper<UserRole>().eq(UserRole::getUserId, user.getId())).stream()
                     .map(UserRole::getRoleId).collect(Collectors.toList());
-            if (!roleIds.isEmpty()){
+            if (!roleIds.isEmpty()) {
                 user.setRoles(new HashSet<>(this.roleMapper.selectBatchIds(roleIds)));
             }
         });
@@ -141,7 +141,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     @SneakyThrows
     public boolean importExcel(MultipartFile file) {
-        EasyExcel.read(file.getInputStream(),User.class,new UserReadListener(this.userMapper)).sheet().doRead();
+        EasyExcel.read(file.getInputStream(), User.class, new UserReadListener(this.userMapper)).sheet().doRead();
         return true;
     }
 
@@ -151,9 +151,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         EasyExcel.write(fileName, User.class)
                 .sheet()
                 .doWrite(() -> {
-                    if (userIds.isEmpty()){//全部数据
+                    if (userIds.isEmpty()) {//全部数据
                         return this.userMapper.selectList(null);
-                    }else {//选中的数据
+                    } else {//选中的数据
                         return this.userMapper.selectBatchIds(userIds);
                     }
                 });

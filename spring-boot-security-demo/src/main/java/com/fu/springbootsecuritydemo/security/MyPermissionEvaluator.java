@@ -15,11 +15,11 @@ public class MyPermissionEvaluator implements PermissionEvaluator {
 
     @Override
     public boolean hasPermission(Authentication authentication, Object targetDomainObject, Object permission) {
-        log.info("authentication:{}",authentication);
-        log.info("targetDomainObject:{}",targetDomainObject);
-        log.info("permission:{}",permission);
+        log.info("authentication:{}", authentication);
+        log.info("targetDomainObject:{}", targetDomainObject);
+        log.info("permission:{}", permission);
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
-        if (authorities != null && !authorities.isEmpty()){
+        if (authorities != null && !authorities.isEmpty()) {
             return authorities.stream().anyMatch(authorize -> authorize.toString().equals(permission));
         }
         return false;
@@ -30,10 +30,10 @@ public class MyPermissionEvaluator implements PermissionEvaluator {
      */
     @Override
     public boolean hasPermission(Authentication authentication, Serializable targetId, String targetType, Object permission) {
-        log.info("2authentication:{}",authentication);
-        log.info("targetId:{}",targetId);
-        log.info("targetType:{}",targetType);
-        log.info("2permission:{}",permission);
+        log.info("2authentication:{}", authentication);
+        log.info("targetId:{}", targetId);
+        log.info("targetType:{}", targetType);
+        log.info("2permission:{}", permission);
         return false;
     }
 }

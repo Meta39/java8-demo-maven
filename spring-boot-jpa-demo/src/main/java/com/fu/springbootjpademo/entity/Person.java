@@ -71,7 +71,6 @@ public class Person {
     private Long objectVersion;*/
 
     /**
-     *
      * 在 PersonDetails 实体中，我们使用 @JoinColumn 来指定外键列的名称关联 Person 的主键。
      * cascade = CascadeType.ALL 和 orphanRemoval = true 到 Person 实体中的 @OneToOne 注解。这意味着当删除一个 Person 时，它的 PersonDetails 也会被删除
      */

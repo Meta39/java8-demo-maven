@@ -8,7 +8,8 @@
     </resultMap>
 
     <sql id="baseColumn">
-        id,`name`
+        id
+        ,`name`
     </sql>
 
     <insert id="insert" parameterType="com.fu.springbootdynamicdatasource2.entity.User">
@@ -32,7 +33,9 @@
     </insert>
 
     <select id="selectById" resultType="com.fu.springbootdynamicdatasource2.entity.User">
-        select <include refid="baseColumn"/> from user
+        select
+        <include refid="baseColumn"/>
+        from user
         <where>
             <if test="id != null">
                 id = #{id}

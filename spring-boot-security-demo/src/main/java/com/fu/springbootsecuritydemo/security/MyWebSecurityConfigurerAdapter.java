@@ -31,13 +31,13 @@ public class MyWebSecurityConfigurerAdapter {
     private MyPermissionEvaluator myPermissionEvaluator;
 
     @Bean
-    public AuthenticationManager authenticationManager() throws Exception{
+    public AuthenticationManager authenticationManager() throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
     @Bean
-    public DefaultWebSecurityExpressionHandler defaultWebSecurityExpressionHandler(){
-        DefaultWebSecurityExpressionHandler defaultWebSecurityExpressionHandler =new DefaultWebSecurityExpressionHandler();
+    public DefaultWebSecurityExpressionHandler defaultWebSecurityExpressionHandler() {
+        DefaultWebSecurityExpressionHandler defaultWebSecurityExpressionHandler = new DefaultWebSecurityExpressionHandler();
         defaultWebSecurityExpressionHandler.setPermissionEvaluator(myPermissionEvaluator);
         return defaultWebSecurityExpressionHandler;
     }
@@ -51,7 +51,7 @@ public class MyWebSecurityConfigurerAdapter {
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http)throws Exception{
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         //1、关闭csrf，关闭Session
         http.csrf().disable().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         //2、设置不需要认证的URL

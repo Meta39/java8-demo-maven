@@ -1,7 +1,7 @@
 package com.fu.basedemo.designpattern.singleton.usecase;
 
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 单例模式缓存
@@ -11,10 +11,6 @@ public class SingletonCache {
 
     private SingletonCache() {
         cacheMap = new ConcurrentHashMap<>();
-    }
-
-    private static class SingletonHelper {
-        private static final SingletonCache INSTANCE = new SingletonCache();
     }
 
     private static SingletonCache getInstance() {
@@ -27,5 +23,9 @@ public class SingletonCache {
 
     public static Object get(String key) {
         return getInstance().cacheMap.get(key);
+    }
+
+    private static class SingletonHelper {
+        private static final SingletonCache INSTANCE = new SingletonCache();
     }
 }

@@ -24,10 +24,10 @@ import java.time.LocalTime;
  * MyBatisPlus分页、乐观锁插件
  */
 @Configuration
-public class MyBatisPlusConfig implements MetaObjectHandler{
+public class MyBatisPlusConfig implements MetaObjectHandler {
 
     @Bean
-    public MybatisPlusInterceptor mybatisPlusInterceptor(){
+    public MybatisPlusInterceptor mybatisPlusInterceptor() {
         MybatisPlusInterceptor mybatisPlusInterceptor = new MybatisPlusInterceptor();
         //添加分页插件。addInnerInterceptor设置数据库类型
         mybatisPlusInterceptor.addInnerInterceptor(new PaginationInnerInterceptor(DbType.MYSQL));

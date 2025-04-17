@@ -19,7 +19,7 @@ public class JavaFileCopyAndReadTest {
         //源文件路径
         String src = "E:/File/txt.txt";
         //复制后的文件存放路径
-        String dist =  "E:/File/txt2.txt";
+        String dist = "E:/File/txt2.txt";
         FileInputStream in = new FileInputStream(src);
         FileOutputStream out = new FileOutputStream(dist);
 
@@ -41,7 +41,7 @@ public class JavaFileCopyAndReadTest {
      */
     @Test
     @SneakyThrows
-    public void readFileContent(){
+    public void readFileContent() {
         //读取文件路径
         String filePath = "E:/File/txt2.txt";
         FileReader fileReader = new FileReader(filePath);

@@ -36,7 +36,7 @@ public class RoleController {
      */
     @PreAuthorize("role:select")
     @GetMapping("menu/{id}")
-    public Map<String,Object> selectRoleMenuById(@PathVariable("id") Integer id) {
+    public Map<String, Object> selectRoleMenuById(@PathVariable("id") Integer id) {
         return this.roleService.selectRoleMenuById(id);
     }
 
@@ -64,13 +64,14 @@ public class RoleController {
 
     /**
      * 绑定角色所对应的权限
-     * @param roleId 角色ID
+     *
+     * @param roleId       角色ID
      * @param authorizeIds 权限ID集合
      */
     @PreAuthorize("role:update")
     @PostMapping("roleMenu/{roleId}")
-    public Integer roleMenu(@PathVariable Integer roleId,@RequestBody List<Integer> authorizeIds){
-        return this.roleService.roleMenu(roleId,authorizeIds);
+    public Integer roleMenu(@PathVariable Integer roleId, @RequestBody List<Integer> authorizeIds) {
+        return this.roleService.roleMenu(roleId, authorizeIds);
     }
 
     /**
@@ -92,7 +93,7 @@ public class RoleController {
     public Page<Role> selectRolePage(@RequestParam(required = false, defaultValue = "1") Long page,
                                      @RequestParam(required = false, defaultValue = "10") Long size,
                                      @RequestParam("roleName") String roleName) {
-        return this.roleService.selectRolePage(page, size , roleName);
+        return this.roleService.selectRolePage(page, size, roleName);
     }
 
     /**

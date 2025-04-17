@@ -11,7 +11,7 @@ public class VelocityGenerateCodeDemoApplicationTests {
     private TablesService tablesService;
 
     @Test
-    void test(){
+    void test() {
         tablesService.selectTables();
     }
 

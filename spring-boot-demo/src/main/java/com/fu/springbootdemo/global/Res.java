@@ -20,7 +20,6 @@ public class Res<T> implements Serializable {
 
     /**
      * 成功（前端没有特别要求状态码，无参数返回，直接用这个。）
-     *
      */
     public static <T> Res<T> ok() {
         return ok("success", null);
@@ -57,8 +56,8 @@ public class Res<T> implements Serializable {
     /**
      * 全局捕获异常（注意：前端要求状态码为其它的才使用这个，否则不使用。）
      *
-     * @param code         状态码（注意：前端无特殊要求不要使用这个！就算要使用也要在Code枚举类里枚举出来，方便到时候统一修改！）
-     * @param msg 错误信息
+     * @param code 状态码（注意：前端无特殊要求不要使用这个！就算要使用也要在Code枚举类里枚举出来，方便到时候统一修改！）
+     * @param msg  错误信息
      */
     public static <T> Res<T> err(Integer code, String msg) {
         return new Res<>(code, msg, null);

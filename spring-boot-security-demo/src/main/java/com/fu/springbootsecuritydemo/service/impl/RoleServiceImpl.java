@@ -31,7 +31,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
      */
     @Override
     public Role selectRoleById(Integer id) {
-        if (id == 1){
+        if (id == 1) {
             throw new RuntimeException("超级管理员默认拥有全权限，无需查询");
         }
         Role role = this.roleMapper.selectById(id);

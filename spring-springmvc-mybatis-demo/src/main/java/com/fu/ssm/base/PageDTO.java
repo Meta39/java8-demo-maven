@@ -12,9 +12,9 @@ public class PageDTO implements IPage {
     /**
      * 初始化的时候就设置默认参数，如果不传则默认起始页为1，条数为10。
      */
-    public PageDTO(){
-        this.page=1;
-        this.size=10;
+    public PageDTO() {
+        this.page = 1;
+        this.size = 10;
     }
 
     @Override

@@ -15,13 +15,14 @@ public class StrategyController {
 
     /**
      * 登录接口
+     *
      * @param strategy 策略名称，即：XXXStrategyImpl的@Component("name")的name。
      * @param username 用户名（这里是为了策略而策略，所以假设用户名不同端存在不同的数据库中）
      * @param password 用户密码（这里是为了策略而策略，所以假设密码不同端存在不同的数据库中）
      */
     @GetMapping("{strategy}")
-    public Object login(@PathVariable String strategy, @RequestParam("username") String username,@RequestParam("password") String password){
+    public Object login(@PathVariable String strategy, @RequestParam("username") String username, @RequestParam("password") String password) {
         //根据前端传递的strategy策略参数，通过Spring的Bean的name去执行具体的策略。
-        return this.executeStrategy.executeStrategy(strategy,username,password);
+        return this.executeStrategy.executeStrategy(strategy, username, password);
     }
 }

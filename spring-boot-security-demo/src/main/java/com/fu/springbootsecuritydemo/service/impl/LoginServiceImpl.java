@@ -14,7 +14,8 @@ import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.Duration;
-import java.util.*;
+import java.util.Objects;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -29,7 +30,7 @@ public class LoginServiceImpl implements LoginService {
 
     @Override
     public String login(String name, String password) {
-        log.info("密码加密后的值：{}",bCryptPasswordEncoder.encode(password));
+        log.info("密码加密后的值：{}", bCryptPasswordEncoder.encode(password));
 
         /**
          * 因为我使用了全局异常处理，GobalExceptionHandler会自动捕获controller层抛出的异常
@@ -60,7 +61,7 @@ public class LoginServiceImpl implements LoginService {
         User securityUser = (User) authentication.getPrincipal();
         String username = securityUser.getUsername();
         String token = request.getHeader("token");
-        if (Boolean.TRUE.equals(redisTemplate.hasKey(token))){
+        if (Boolean.TRUE.equals(redisTemplate.hasKey(token))) {
             redisTemplate.delete(token);
         }
         //清除上下文

@@ -14,7 +14,7 @@ import java.util.Set;
 public class User implements Serializable {
 
     private static final long serialVersionUID = 8020157434124014604L;
-    @TableId(type = IdType.AUTO,value = "id")
+    @TableId(type = IdType.AUTO, value = "id")
     private Integer id; //id
 
     @TableField("username")
@@ -29,10 +29,10 @@ public class User implements Serializable {
     @TableField("sex")
     private Integer sex; //性别（0：女 1：男）
 
-    @TableField(value = "create_time",fill = FieldFill.INSERT)
+    @TableField(value = "create_time", fill = FieldFill.INSERT)
     private Date createTime; //创建时间
 
-    @TableField(value = "update_time",fill = FieldFill.INSERT_UPDATE)
+    @TableField(value = "update_time", fill = FieldFill.INSERT_UPDATE)
     private Date updateTime; //更新时间
 
     @TableField("last_login_time")
@@ -42,7 +42,7 @@ public class User implements Serializable {
     private Integer isBan; //禁用（0：否 1：是）
 
     //特殊逻辑删除，0未删除，NULL为已删除。数据库username和is_delete为组合唯一索引，解决逻辑删除后username同名唯一索引的问题
-    @TableLogic(value = "0",delval = "NULL")
+    @TableLogic(value = "0", delval = "NULL")
     @TableField("is_delete")
     private Integer isDelete; //删除（0：否 1：是）
 

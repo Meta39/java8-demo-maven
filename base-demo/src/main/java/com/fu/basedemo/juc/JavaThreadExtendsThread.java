@@ -4,7 +4,7 @@ package com.fu.basedemo.juc;
 /**
  * 多线程之继承Thread，重写run方法，该方法无返回值。
  */
-public class JavaThreadExtendsThread extends Thread{
+public class JavaThreadExtendsThread extends Thread {
 
     @Override
     public void run() {

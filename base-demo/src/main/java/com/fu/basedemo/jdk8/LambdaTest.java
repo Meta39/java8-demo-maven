@@ -11,7 +11,7 @@ public class LambdaTest {
      * 实例方法
      */
     @Test
-    public void test1(){
+    public void test1() {
         //原始写法
         Consumer<String> con1 = new Consumer<String>() {
             @Override
@@ -34,18 +34,18 @@ public class LambdaTest {
      * 静态方法
      */
     @Test
-    public void test2(){
+    public void test2() {
         //原始写法
         Comparator<Integer> com1 = new Comparator<Integer>() {
             @Override
             public int compare(Integer i1, Integer i2) {
-                return Integer.compare(i1,i2);
+                return Integer.compare(i1, i2);
             }
         };
         System.out.println(com1.compare(1, 2));
 
         //lambda写法
-        Comparator<Integer> com2 = (Integer i1,Integer i2) -> Integer.compare(i1,i2);
+        Comparator<Integer> com2 = (Integer i1, Integer i2) -> Integer.compare(i1, i2);
         System.out.println(com2.compare(1, 2));
 
         //方法引用
@@ -57,7 +57,7 @@ public class LambdaTest {
      * 类（比较难理解）
      */
     @Test
-    public void test3(){
+    public void test3() {
         //原始写法
         Comparator<String> com1 = new Comparator<String>() {
             @Override
@@ -68,7 +68,7 @@ public class LambdaTest {
         System.out.println(com1.compare("abc", "bcd"));
 
         //lambda写法
-        Comparator<String> com2 = (String s1,String s2) -> s1.compareTo(s2);
+        Comparator<String> com2 = (String s1, String s2) -> s1.compareTo(s2);
         System.out.println(com2.compare("abc", "bcd"));
 
         //方法引用

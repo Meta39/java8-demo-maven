@@ -11,7 +11,8 @@ public interface RoleService {
      * 根据ID查询角色
      */
     Role selectRoleById(Integer id);
-    Map<String,Object> selectRoleMenuById(Integer id);
+
+    Map<String, Object> selectRoleMenuById(Integer id);
 
     /**
      * 新增角色
@@ -23,7 +24,7 @@ public interface RoleService {
      */
     int updateRole(Role role);
 
-    int roleMenu(Integer roleId,List<Integer> authorizeIds);
+    int roleMenu(Integer roleId, List<Integer> authorizeIds);
 
     /**
      * 根据ID删除角色
@@ -33,7 +34,7 @@ public interface RoleService {
     /**
      * 分页查询角色
      */
-    Page<Role> selectRolePage(Long page, Long size,String roleName);
+    Page<Role> selectRolePage(Long page, Long size, String roleName);
 
     /**
      * 查询角色

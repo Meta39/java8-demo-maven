@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 public class DataBasePasswordEncryptTests {
 
     @Test
-    public void test(){
+    public void test() {
         String encryptPassword = RSAUtil.encrypt("user", "salt");
         String decryptPassword = RSAUtil.decrypt(encryptPassword, "salt");
         System.out.println(encryptPassword);

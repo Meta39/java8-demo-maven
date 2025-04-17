@@ -16,18 +16,17 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 
-import static com.fu.springbootdemo.global.GlobalVariable.*;
+import static com.fu.springbootdemo.global.GlobalVariable.ENCRYPT_TYPE;
 
 /**
  * 数据库密码加密工具类
  */
 public abstract class RSAUtil {
+    private static final Logger log = LoggerFactory.getLogger(RSAUtil.class);
+    private static final int KEY_SIZE = 1024; //密钥长度 于原文长度对应 以及越长速度越慢，推荐：1024或2048
     //私有化构造方法，防止其它人实例化
     private RSAUtil() {
     }
-
-    private static final Logger log = LoggerFactory.getLogger(RSAUtil.class);
-    private static final int KEY_SIZE = 1024; //密钥长度 于原文长度对应 以及越长速度越慢，推荐：1024或2048
 
     /**
      * 生成数据库密钥对（databaseRASPublicKey、databaseRASPrivateKey），生成以后就不需要再生成了。

@@ -1,7 +1,6 @@
 package com.fu.basedemo.designpattern.strategyenum;
 
 
-
 import java.util.Objects;
 
 /**

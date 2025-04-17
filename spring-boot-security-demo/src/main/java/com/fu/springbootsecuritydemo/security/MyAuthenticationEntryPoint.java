@@ -16,7 +16,7 @@ public class MyAuthenticationEntryPoint implements AuthenticationEntryPoint {
     private static final Logger log = LoggerFactory.getLogger(MyAuthenticationEntryPoint.class);
 
     @Override
-    public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException{
+    public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException {
         String errMsg;
         if (authException instanceof AccountExpiredException) {
             errMsg = "账号过期";
@@ -36,7 +36,7 @@ public class MyAuthenticationEntryPoint implements AuthenticationEntryPoint {
             errMsg = "其他错误";
         }
 
-        log.error("AuthenticationException：",authException);
+        log.error("AuthenticationException：", authException);
         ResponseException.returnException(response, errMsg);//错误信息返回给前端
     }
 }

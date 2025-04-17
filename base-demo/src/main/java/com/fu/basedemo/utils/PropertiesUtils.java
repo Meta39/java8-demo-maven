@@ -12,13 +12,15 @@ import java.util.Properties;
  */
 public class PropertiesUtils {
     /**
-     * 私有化构造函数
-     */
-    private PropertiesUtils(){}
-    /**
      * 路径配置错误会抛出空指针异常
      */
     private static final String TEST_PROPERTIES_URI = "/properties/test.properties";
+
+    /**
+     * 私有化构造函数
+     */
+    private PropertiesUtils() {
+    }
 
     /**
      * 获取test.properties

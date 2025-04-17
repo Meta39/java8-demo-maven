@@ -60,12 +60,12 @@ public class ArticleServiceImpl implements ArticleService {
      * 分页查询文章
      */
     @Override
-    public Page<Article> selectArticlePage(Long page, Long size,String title) {
+    public Page<Article> selectArticlePage(Long page, Long size, String title) {
         LambdaQueryWrapper<Article> lqw = new LambdaQueryWrapper<>();
-        lqw.eq(Article::getUserId,CurrentLoginUserUtil.getUserId())
+        lqw.eq(Article::getUserId, CurrentLoginUserUtil.getUserId())
                 .orderByDesc(Article::getCreateTime);
-        if (StringUtils.hasText(title)){
-            lqw.like(Article::getTitle,title);
+        if (StringUtils.hasText(title)) {
+            lqw.like(Article::getTitle, title);
         }
         return this.articleMapper.selectPage(Page.of(page, size), lqw);
     }

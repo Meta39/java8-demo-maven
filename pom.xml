@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
@@ -11,61 +11,59 @@
 
     <!-- 子模块 -->
     <modules>
-        <module>spring-boot-demo</module>
         <module>base-demo</module>
-        <module>easy-es-demo</module>
-        <module>mybatis-plus-demo</module>
-        <module>minio-demo</module>
-        <module>xxl-job-demo</module>
-        <module>redis-demo</module>
-        <module>velocity-generate-code-demo</module>
-        <module>spring-boot-security-demo</module>
-        <module>spring-boot-jpa-demo</module>
-        <module>spring-boot-kafka-demo</module>
-        <module>spring-springmvc-mybatis-demo</module>
+        <module>spring-boot-demo</module>
         <module>spring-boot-dynamic-data-source</module>
         <module>spring-boot-dynamic-data-source2</module>
-        <module>spring-boot-rocketmq</module>
         <module>spring-boot-feign-seata-demo</module>
+        <module>spring-boot-jpa-demo</module>
+        <module>spring-boot-kafka-demo</module>
+        <module>spring-boot-minio-demo</module>
+        <module>spring-boot-mybatis-plus-demo</module>
         <module>spring-boot-readwrite-splitting-demo</module>
+        <module>spring-boot-redis-demo</module>
+        <module>spring-boot-rocketmq-demo</module>
+        <module>spring-boot-security-demo</module>
         <module>spring-boot-starter-mybatis-sql-log</module>
         <module>spring-boot-webservice-demo</module>
+        <module>spring-boot-xxl-job-demo</module>
+        <module>spring-springmvc-mybatis-demo</module>
+        <module>velocity-generate-code-demo</module>
     </modules>
 
     <properties>
-        <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
         <java.version>1.8</java.version>
         <!-- maven.compiler.source 和 maven.compiler.target 这2个参数需要引入 apache maven-compiler-plugin 插件 -->
+        <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <spring-boot-dependencies.version>2.7.18</spring-boot-dependencies.version>
         <spring-cloud-dependencies.version>2021.0.9</spring-cloud-dependencies.version>
-        <spring-cloud-alibaba-dependencies.version>2021.1</spring-cloud-alibaba-dependencies.version>
+        <spring-cloud-alibaba-dependencies.version>2021.0.6.0</spring-cloud-alibaba-dependencies.version>
         <seata-spring-boot-starter.version>2.0.0</seata-spring-boot-starter.version>
         <fastjson.version>1.2.83</fastjson.version>
-        <easyexcel.version>3.3.4</easyexcel.version>
-        <druid-spring-boot-starter.version>1.2.23</druid-spring-boot-starter.version>
+        <easyexcel.version>4.0.3</easyexcel.version>
+        <druid-spring-boot-starter.version>1.2.24</druid-spring-boot-starter.version>
         <p6spy.version>3.9.1</p6spy.version>
         <pagehelper.version>6.1.0</pagehelper.version>
-        <mybatis.version>3.5.16</mybatis.version>
+        <mybatis.version>3.5.19</mybatis.version>
         <mybatis-spring.version>2.1.2</mybatis-spring.version>
         <mybatis-spring-boot-starter.version>2.3.2</mybatis-spring-boot-starter.version>
-        <mybatis-plus-boot-starter.version>3.5.6</mybatis-plus-boot-starter.version>
+        <mybatis-plus.version>3.5.9</mybatis-plus.version>
         <japidocs.version>1.4.4</japidocs.version>
-        <xxl-job-core.version>2.4.1</xxl-job-core.version>
-        <easy-es-boot-starter.version>1.1.1</easy-es-boot-starter.version>
-        <elasticsearch-rest-high-level-client.version>7.14.0</elasticsearch-rest-high-level-client.version>
+        <xxl-job-core.version>2.5.0</xxl-job-core.version>
         <redisson-spring-boot-starter.version>3.45.1</redisson-spring-boot-starter.version>
-        <velocity-engine-core.version>2.3</velocity-engine-core.version>
         <!-- 这玩意最好不动，每个版本的差异太大！ -->
         <minio.version>7.1.0</minio.version>
         <rocketmq-spring-boot-starter.version>2.3.3</rocketmq-spring-boot-starter.version>
-        <!-- java8 最后支持 2.X -->
+        <!-- java8 最后支持 2.3.* -->
+        <velocity-engine-core.version>2.3</velocity-engine-core.version>
+        <!-- java8 最后支持 2.* -->
         <caffeine.version>2.9.3</caffeine.version>
-        <!-- java8 最后支持 3.5.X -->
-        <cxf-spring-boot-starter-jaxws.version>3.5.11</cxf-spring-boot-starter-jaxws.version>
+        <!-- java8 最后支持 3.5.* -->
+        <cxf-spring-boot-starter-jaxws.version>3.6.6</cxf-spring-boot-starter-jaxws.version>
     </properties>
 
     <!-- 必要依赖 -->
@@ -146,8 +144,10 @@
             <!-- MyBatis-Plus -->
             <dependency>
                 <groupId>com.baomidou</groupId>
-                <artifactId>mybatis-plus-boot-starter</artifactId>
-                <version>${mybatis-plus-boot-starter.version}</version>
+                <artifactId>mybatis-plus-bom</artifactId>
+                <version>${mybatis-plus.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
             <!-- JApiDocs离线接口文档 -->
             <dependency>
@@ -161,29 +161,13 @@
                 <artifactId>xxl-job-core</artifactId>
                 <version>${xxl-job-core.version}</version>
             </dependency>
-            <!-- easy-es 开始 -->
-            <dependency>
-                <groupId>cn.easy-es</groupId>
-                <artifactId>easy-es-boot-starter</artifactId>
-                <version>${easy-es-boot-starter.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.elasticsearch.client</groupId>
-                <artifactId>elasticsearch-rest-high-level-client</artifactId>
-                <version>${elasticsearch-rest-high-level-client.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.elasticsearch</groupId>
-                <artifactId>elasticsearch</artifactId>
-                <version>${elasticsearch-rest-high-level-client.version}</version>
-            </dependency>
-            <!-- easy-es 结束 -->
             <!--使用redisson作为分布式锁替换掉自定义分布式锁-->
             <dependency>
                 <groupId>org.redisson</groupId>
                 <artifactId>redisson-spring-boot-starter</artifactId>
                 <version>${redisson-spring-boot-starter.version}</version>
             </dependency>
+            <!-- 分布式事务 -->
             <dependency>
                 <groupId>io.seata</groupId>
                 <artifactId>seata-spring-boot-starter</artifactId>

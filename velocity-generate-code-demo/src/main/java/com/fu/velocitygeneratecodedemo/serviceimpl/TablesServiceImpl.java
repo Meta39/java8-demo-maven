@@ -15,6 +15,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class TablesServiceImpl implements TablesService {
     private final JdbcTemplate jdbcTemplate;
+
     @Override
     public List<Tables> selectTables() {
         String table = "spring_boot_demo";

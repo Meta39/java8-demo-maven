@@ -37,6 +37,7 @@ public class MultiDataSourceTransactionalAspect {
      * 事务声明
      */
     private final DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+
     {
         // 非只读模式
         def.setReadOnly(false);

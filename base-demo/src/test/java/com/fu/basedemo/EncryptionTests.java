@@ -31,6 +31,181 @@ import java.util.zip.GZIPOutputStream;
 public class EncryptionTests {
 
     /**
+     * 生成AES对称密钥
+     * AES（Advanced Encryption Standard）支持三种密钥长度：128位、192位和256位。
+     * 一般来说，更长的密钥长度提供了更高的安全性，因为它们增加了密码破解所需的时间和计算资源。
+     * 128位密钥长度通常被认为是安全的，并且在许多情况下被广泛使用。它提供了足够的安全性，适用于大多数应用场景。
+     * 192位和256位密钥长度提供了更高级别的安全性，但也需要更多的计算资源来加密和解密数据。这些长度通常用于对高度敏感的数据进行加密，或者在对抗更强大的攻击者时需要更高级别的安全性。
+     * 因此，选择哪个密钥长度取决于您的安全需求和性能考量。对于大多数情况，128位的密钥长度已经足够安全。
+     */
+    private static SecretKey generateAESKey() throws Exception {
+        KeyGenerator keyGenerator = KeyGenerator.getInstance("AES");
+        keyGenerator.init(128);
+        return keyGenerator.generateKey();
+    }
+
+    /**
+     * 生成RSA非对称密钥对
+     * RSA（Rivest-Shamir-Adleman）是一种非对称加密算法，它使用公钥和私钥进行加密和解密。
+     * 1024位：不推荐使用，因为它的安全性已经较低，容易受到现代计算能力的攻击。
+     * 2048位：目前被认为是最低安全性要求的长度，适用于大多数情况。
+     * 3072位或4096位：提供更高级别的安全性，适用于对安全性要求较高的场景，如对长期数据保密性要求较高的情况。
+     * 综上所述，对于大多数情况，2048位的RSA密钥长度是一个合适的选择，它提供了较高的安全性并且在性能方面也具有良好的平衡。如果您对安全性要求更高，可以考虑使用更长的密钥长度。
+     */
+    private static KeyPair generateRSAKeyPair() throws Exception {
+        KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
+        keyPairGenerator.initialize(2048);
+        return keyPairGenerator.generateKeyPair();
+    }
+
+    /**
+     * 压缩数据
+     *
+     * @param data 数据byte[]
+     * @return 压缩后的数据byte[]
+     */
+    private static byte[] compress(byte[] data) throws IOException {
+        ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
+        try (GZIPOutputStream gzipStream = new GZIPOutputStream(byteStream)) {
+            gzipStream.write(data);
+        }
+        return byteStream.toByteArray();
+    }
+
+    /**
+     * 解压缩数据
+     *
+     * @param compressedData 压缩数据byte[]
+     * @return 解压缩后的数据byte[]
+     */
+    private static byte[] decompress(byte[] compressedData) throws IOException {
+        ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
+        try (GZIPInputStream gzipStream = new GZIPInputStream(new ByteArrayInputStream(compressedData))) {
+            byte[] buffer = new byte[1024];
+            int len;
+            while ((len = gzipStream.read(buffer)) > 0) {
+                byteStream.write(buffer, 0, len);
+            }
+        }
+        return byteStream.toByteArray();
+    }
+
+    /**
+     * 用AES密钥对数据进行AES对称加密
+     *
+     * @param data 数据
+     * @param key  AES生成的对称密钥
+     */
+    private static byte[] encryptAES(byte[] data, SecretKey key) throws Exception {
+        Cipher cipher = Cipher.getInstance("AES");
+        cipher.init(Cipher.ENCRYPT_MODE, key);
+        return cipher.doFinal(data);
+    }
+
+    /**
+     * 用RSA公钥对 AES 密钥进行加密
+     *
+     * @param data aesKey.getEncoded()
+     * @param key  RSA 公钥
+     */
+    private static byte[] encryptRSA(byte[] data, PublicKey key) throws Exception {
+        Cipher cipher = Cipher.getInstance("RSA");
+        cipher.init(Cipher.ENCRYPT_MODE, key);
+        return cipher.doFinal(data);
+    }
+
+    /**
+     * 用 RSA 私钥解密获取AES密钥
+     *
+     * @param data RSA公钥加密后的byte[]
+     * @param key  RSA私钥
+     */
+    private static byte[] decryptRSA(byte[] data, PrivateKey key) throws Exception {
+        Cipher cipher = Cipher.getInstance("RSA");
+        cipher.init(Cipher.DECRYPT_MODE, key);
+        return cipher.doFinal(data);
+    }
+
+    /**
+     * 用 AES 密钥对数据进行解密
+     *
+     * @param data AES加密数据
+     * @param key  AES密钥
+     */
+    private static byte[] decryptAES(byte[] data, byte[] key) throws Exception {
+        SecretKey secretKey = new SecretKeySpec(key, "AES");
+        Cipher cipher = Cipher.getInstance("AES");
+        cipher.init(Cipher.DECRYPT_MODE, secretKey);
+        return cipher.doFinal(data);
+    }
+
+    /**
+     * byte[] 转 String，用于获取密钥aesKey.getEncoded()的byte[]后转为字符串
+     *
+     * @param bytes 密钥.getEncoded()
+     * @return 密钥字符串
+     */
+    private static String bytesToHex(byte[] bytes) {
+        StringBuilder result = new StringBuilder();
+        for (byte b : bytes) {
+            result.append(String.format("%02X", b));
+        }
+        return result.toString();
+    }
+
+    /**
+     * 把AES字符串密钥转为 AES 密钥对象（SecretKey）
+     *
+     * @param keyString AES字符串
+     * @return AES 密钥对象（SecretKey）
+     */
+    private static SecretKey stringToAESKey(String keyString) {
+        byte[] keyBytes = hexToBytes(keyString);
+        return new SecretKeySpec(keyBytes, "AES");
+    }
+
+    /**
+     * 把 RSA 公钥字符串转为 RSA 公钥对象（PublicKey）
+     *
+     * @param keyString RSA 公钥字符串
+     * @return RSA 公钥对象（PublicKey）
+     */
+    private static PublicKey stringToRSAPublicKey(String keyString) throws Exception {
+        byte[] keyBytes = hexToBytes(keyString);
+        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+        X509EncodedKeySpec keySpec = new X509EncodedKeySpec(keyBytes);
+        return keyFactory.generatePublic(keySpec);
+    }
+
+    /**
+     * 把 RSA 私钥字符串转为 RSA 私钥对象（PrivateKey）
+     *
+     * @param keyString RSA 私钥字符串
+     * @return RSA 私钥对象（PrivateKey）
+     */
+    private static PrivateKey stringToRSAPrivateKey(String keyString) throws Exception {
+        byte[] keyBytes = hexToBytes(keyString);
+        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+        PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(keyBytes);
+        return keyFactory.generatePrivate(keySpec);
+    }
+
+    /**
+     * 把对应类型的密钥字符串转为byte[]
+     *
+     * @param hexString 对应密钥的字符串
+     * @return 对应类型密钥byte[]
+     */
+    private static byte[] hexToBytes(String hexString) {
+        int len = hexString.length();
+        byte[] data = new byte[len / 2];
+        for (int i = 0; i < len; i += 2) {
+            data[i / 2] = (byte) ((Character.digit(hexString.charAt(i), 16) << 4) + Character.digit(hexString.charAt(i + 1), 16));
+        }
+        return data;
+    }
+
+    /**
      * 数据量小的时候，压缩后的内容可能比压缩前还大
      */
     @SneakyThrows
@@ -82,170 +257,6 @@ public class EncryptionTests {
         String decryptedData = new String(decompressData, StandardCharsets.UTF_8);
 
         System.out.println("解密数据: \n" + decryptedData);
-    }
-
-    /**
-     * 生成AES对称密钥
-     * AES（Advanced Encryption Standard）支持三种密钥长度：128位、192位和256位。
-     * 一般来说，更长的密钥长度提供了更高的安全性，因为它们增加了密码破解所需的时间和计算资源。
-     * 128位密钥长度通常被认为是安全的，并且在许多情况下被广泛使用。它提供了足够的安全性，适用于大多数应用场景。
-     * 192位和256位密钥长度提供了更高级别的安全性，但也需要更多的计算资源来加密和解密数据。这些长度通常用于对高度敏感的数据进行加密，或者在对抗更强大的攻击者时需要更高级别的安全性。
-     * 因此，选择哪个密钥长度取决于您的安全需求和性能考量。对于大多数情况，128位的密钥长度已经足够安全。
-     */
-    private static SecretKey generateAESKey() throws Exception {
-        KeyGenerator keyGenerator = KeyGenerator.getInstance("AES");
-        keyGenerator.init(128);
-        return keyGenerator.generateKey();
-    }
-
-    /**
-     * 生成RSA非对称密钥对
-     * RSA（Rivest-Shamir-Adleman）是一种非对称加密算法，它使用公钥和私钥进行加密和解密。
-     * 1024位：不推荐使用，因为它的安全性已经较低，容易受到现代计算能力的攻击。
-     * 2048位：目前被认为是最低安全性要求的长度，适用于大多数情况。
-     * 3072位或4096位：提供更高级别的安全性，适用于对安全性要求较高的场景，如对长期数据保密性要求较高的情况。
-     * 综上所述，对于大多数情况，2048位的RSA密钥长度是一个合适的选择，它提供了较高的安全性并且在性能方面也具有良好的平衡。如果您对安全性要求更高，可以考虑使用更长的密钥长度。
-     */
-    private static KeyPair generateRSAKeyPair() throws Exception {
-        KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
-        keyPairGenerator.initialize(2048);
-        return keyPairGenerator.generateKeyPair();
-    }
-
-    /**
-     * 压缩数据
-     * @param data 数据byte[]
-     * @return 压缩后的数据byte[]
-     */
-    private static byte[] compress(byte[] data) throws IOException {
-        ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-        try (GZIPOutputStream gzipStream = new GZIPOutputStream(byteStream)) {
-            gzipStream.write(data);
-        }
-        return byteStream.toByteArray();
-    }
-
-    /**
-     * 解压缩数据
-     * @param compressedData 压缩数据byte[]
-     * @return 解压缩后的数据byte[]
-     */
-    private static byte[] decompress(byte[] compressedData) throws IOException {
-        ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-        try (GZIPInputStream gzipStream = new GZIPInputStream(new ByteArrayInputStream(compressedData))) {
-            byte[] buffer = new byte[1024];
-            int len;
-            while ((len = gzipStream.read(buffer)) > 0) {
-                byteStream.write(buffer, 0, len);
-            }
-        }
-        return byteStream.toByteArray();
-    }
-
-    /**
-     * 用AES密钥对数据进行AES对称加密
-     * @param data 数据
-     * @param key AES生成的对称密钥
-     */
-    private static byte[] encryptAES(byte[] data, SecretKey key) throws Exception {
-        Cipher cipher = Cipher.getInstance("AES");
-        cipher.init(Cipher.ENCRYPT_MODE, key);
-        return cipher.doFinal(data);
-    }
-
-    /**
-     * 用RSA公钥对 AES 密钥进行加密
-     * @param data aesKey.getEncoded()
-     * @param key RSA 公钥
-     */
-    private static byte[] encryptRSA(byte[] data, PublicKey key) throws Exception {
-        Cipher cipher = Cipher.getInstance("RSA");
-        cipher.init(Cipher.ENCRYPT_MODE, key);
-        return cipher.doFinal(data);
-    }
-
-    /**
-     * 用 RSA 私钥解密获取AES密钥
-     * @param data RSA公钥加密后的byte[]
-     * @param key RSA私钥
-     */
-    private static byte[] decryptRSA(byte[] data, PrivateKey key) throws Exception {
-        Cipher cipher = Cipher.getInstance("RSA");
-        cipher.init(Cipher.DECRYPT_MODE, key);
-        return cipher.doFinal(data);
-    }
-
-    /**
-     * 用 AES 密钥对数据进行解密
-     * @param data AES加密数据
-     * @param key AES密钥
-     */
-    private static byte[] decryptAES(byte[] data, byte[] key) throws Exception {
-        SecretKey secretKey = new SecretKeySpec(key, "AES");
-        Cipher cipher = Cipher.getInstance("AES");
-        cipher.init(Cipher.DECRYPT_MODE, secretKey);
-        return cipher.doFinal(data);
-    }
-
-    /**
-     * byte[] 转 String，用于获取密钥aesKey.getEncoded()的byte[]后转为字符串
-     * @param bytes 密钥.getEncoded()
-     * @return 密钥字符串
-     */
-    private static String bytesToHex(byte[] bytes) {
-        StringBuilder result = new StringBuilder();
-        for (byte b : bytes) {
-            result.append(String.format("%02X", b));
-        }
-        return result.toString();
-    }
-
-    /**
-     * 把AES字符串密钥转为 AES 密钥对象（SecretKey）
-     * @param keyString AES字符串
-     * @return AES 密钥对象（SecretKey）
-     */
-    private static SecretKey stringToAESKey(String keyString) {
-        byte[] keyBytes = hexToBytes(keyString);
-        return new SecretKeySpec(keyBytes, "AES");
-    }
-
-    /**
-     * 把 RSA 公钥字符串转为 RSA 公钥对象（PublicKey）
-     * @param keyString RSA 公钥字符串
-     * @return RSA 公钥对象（PublicKey）
-     */
-    private static PublicKey stringToRSAPublicKey(String keyString) throws Exception {
-        byte[] keyBytes = hexToBytes(keyString);
-        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-        X509EncodedKeySpec keySpec = new X509EncodedKeySpec(keyBytes);
-        return keyFactory.generatePublic(keySpec);
-    }
-
-    /**
-     * 把 RSA 私钥字符串转为 RSA 私钥对象（PrivateKey）
-     * @param keyString RSA 私钥字符串
-     * @return RSA 私钥对象（PrivateKey）
-     */
-    private static PrivateKey stringToRSAPrivateKey(String keyString) throws Exception {
-        byte[] keyBytes = hexToBytes(keyString);
-        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-        PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(keyBytes);
-        return keyFactory.generatePrivate(keySpec);
-    }
-
-    /**
-     * 把对应类型的密钥字符串转为byte[]
-     * @param hexString 对应密钥的字符串
-     * @return 对应类型密钥byte[]
-     */
-    private static byte[] hexToBytes(String hexString) {
-        int len = hexString.length();
-        byte[] data = new byte[len / 2];
-        for (int i = 0; i < len; i += 2) {
-            data[i / 2] = (byte) ((Character.digit(hexString.charAt(i), 16) << 4) + Character.digit(hexString.charAt(i + 1), 16));
-        }
-        return data;
     }
 
 }

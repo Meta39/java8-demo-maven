@@ -14,13 +14,13 @@ import javax.xml.ws.soap.SOAPBinding;
  */
 @Slf4j
 @Service
-@WebService
+@WebService(targetNamespace = "http://ws.springbootwebservicedemo.fu.com/")
 //主要是下面这行，并且这行要配合 Spring 的 @Component、@Service 类似的注入注解才能使 SOAP 1.2 生效
 @BindingType(value = SOAPBinding.SOAP12HTTP_BINDING)
 public class WebServiceEntry12 {
     /*
         请求示例：
-        POST：http://localhost:8080/services/WebServiceEntry12?wsdl
+        POST：http://localhost:95/services/WebServiceEntry12?wsdl
         入参：
         <soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope" xmlns:tem="http://ws.springbootwebservicedemo.fu.com/">
            <soap:Header/>

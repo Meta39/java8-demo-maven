@@ -11,6 +11,7 @@ public class AppStringUtils {
     /**
      * 对包含数值字符串进行递增操作。
      * 例子：0、000000000001、Abc000000000001
+     *
      * @param original 原始包含数值字符串
      * @return 递增后的数值字符串
      */

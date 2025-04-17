@@ -21,7 +21,7 @@ import java.util.Set;
 @JsonIgnoreProperties(allowSetters = true, value = {"pwd"})//盐、密码不允许序列化成json字符串返回给前端
 public class User implements Serializable {
     private static final long serialVersionUID = -45656328374893341L;
-    @TableId(type = IdType.AUTO,value = "id")
+    @TableId(type = IdType.AUTO, value = "id")
     @ExcelIgnore //不导出Excel
     private Integer id; //id    
 
@@ -47,11 +47,11 @@ public class User implements Serializable {
     @TableField("remark")
     private String remark; //备注
 
-    @TableField(value = "create_time",fill = FieldFill.INSERT)
+    @TableField(value = "create_time", fill = FieldFill.INSERT)
     @ExcelProperty(value = "创建时间")
     private LocalDateTime createTime; //创建时间
 
-    @TableField(value = "update_time",fill = FieldFill.INSERT_UPDATE)
+    @TableField(value = "update_time", fill = FieldFill.INSERT_UPDATE)
     @ExcelProperty(value = "更新时间")
     private LocalDateTime updateTime; //更新时间
 
@@ -65,7 +65,7 @@ public class User implements Serializable {
     private Integer isBan; //禁用（0：否 1：是）
 
     //特殊逻辑删除，0未删除，NULL为已删除。数据库username和is_delete为组合唯一索引，解决逻辑删除后username同名唯一索引的问题
-    @TableLogic(value = "0",delval = "NULL")
+    @TableLogic(value = "0", delval = "NULL")
     @TableField("is_delete")
     @ExcelIgnore //不导出Excel
     private Integer isDelete; //删除（0：否 1：是）

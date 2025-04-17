@@ -13,9 +13,10 @@ public class BlockingQueueTests {
 
     //创建一个定长的阻塞队列
     private static final BlockingQueue<String> blockingQueue = new ArrayBlockingQueue<>(3);
+
     //抛出异常
     @Test
-    public void test(){
+    public void test() {
         System.out.println(blockingQueue.add("a"));
         System.out.println(blockingQueue.add("b"));
         System.out.println(blockingQueue.add("c"));
@@ -29,7 +30,7 @@ public class BlockingQueueTests {
 
     //特殊值
     @Test
-    public void test2(){
+    public void test2() {
         System.out.println(blockingQueue.offer("a"));
         System.out.println(blockingQueue.offer("b"));
         System.out.println(blockingQueue.offer("c"));
@@ -59,8 +60,8 @@ public class BlockingQueueTests {
         System.out.println(blockingQueue.offer("a"));
         System.out.println(blockingQueue.offer("b"));
         System.out.println(blockingQueue.offer("c"));
-        System.out.println(blockingQueue.offer("d",3, TimeUnit.SECONDS)); //往队列里面添加元素，如果队列已满，则等待指定时间再次往队列里面设置元素，设置成功返回true，失败返回false。
-        System.out.println(blockingQueue.poll(3,TimeUnit.SECONDS)); //移除队列里面的元素，如果队列里面有元素，则返回元素，没有则等待指定时间再次移除队列里面的元素，如果有元素则返回元素，没有则返回null
+        System.out.println(blockingQueue.offer("d", 3, TimeUnit.SECONDS)); //往队列里面添加元素，如果队列已满，则等待指定时间再次往队列里面设置元素，设置成功返回true，失败返回false。
+        System.out.println(blockingQueue.poll(3, TimeUnit.SECONDS)); //移除队列里面的元素，如果队列里面有元素，则返回元素，没有则等待指定时间再次移除队列里面的元素，如果有元素则返回元素，没有则返回null
     }
 
 }

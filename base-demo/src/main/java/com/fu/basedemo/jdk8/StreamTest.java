@@ -18,14 +18,14 @@ import java.util.stream.Collectors;
  */
 public class StreamTest {
 
-    private static List<User> getData(){
+    private static List<User> getData() {
         return new ArrayList<>();
     }
 
     // 筛选与切片
     @Test
     public void filter() {
-        List<Integer> list = Arrays.asList(1,1,22,31,14,65,14,72,81,91,22);
+        List<Integer> list = Arrays.asList(1, 1, 22, 31, 14, 65, 14, 72, 81, 91, 22);
         System.out.println("获取集合中大于50的数据");
         list.stream().filter(i -> i > 50).forEach(System.out::println);
         //截断流：limit(n)。
@@ -43,32 +43,32 @@ public class StreamTest {
     // 映射
     @Test
     public void mapper() {
-        List<String> list = Arrays.asList("aa","bb","cc","dd","abc","def","jkl");
+        List<String> list = Arrays.asList("aa", "bb", "cc", "dd", "abc", "def", "jkl");
         System.out.println("把集合里面的字符串全部转为大写");
         //lambda写法：list.stream().map(str -> str.toUpperCase()).forEach(System.out::println);
         //方法引用
         list.stream().map(String::toUpperCase).forEach(System.out::println);
         System.out.println("获取用户名称长度大于3的姓名");
         //lambda写法：getData().stream().map(user -> user.getName()).filter(name -> name.length() >3).forEach(System.out::println);
-        getData().stream().map(User::getName).filter(name -> name.length() >3).forEach(System.out::println);
+        getData().stream().map(User::getName).filter(name -> name.length() > 3).forEach(System.out::println);
     }
 
     // 排序
     @Test
     public void sort() {
-        List<Integer> list = Arrays.asList(1,1,22,31,14,65,14,72,81,91,22);
+        List<Integer> list = Arrays.asList(1, 1, 22, 31, 14, 65, 14, 72, 81, 91, 22);
         System.out.println("自然排序（升序）");
         list.stream().sorted().forEach(System.out::println);
         System.out.println("定制排序（降序）");
-        list.stream().sorted((i1,i2) -> -i1 - i2).forEach(System.out::println);
+        list.stream().sorted((i1, i2) -> -i1 - i2).forEach(System.out::println);
     }
 
     //----------------------------------- Stream API --------------------------------------------------
 
     //终止操作
     @Test
-    public void stop(){
-        List<Integer> list = Arrays.asList(1,1,22,31,14,65,14,72,81,91,22);
+    public void stop() {
+        List<Integer> list = Arrays.asList(1, 1, 22, 31, 14, 65, 14, 72, 81, 91, 22);
         System.out.println("终止操作：allMatch（boolean）完全匹配");
         System.out.println(list.stream().allMatch(i -> i > 90));
         System.out.println("终止操作：anyMatch（boolean）至少匹配一个");

@@ -7,6 +7,7 @@ public interface IStrategyEnum<T> {
 
     /**
      * 执行策略
+     *
      * @param type 类型
      */
     T execute(Integer type);

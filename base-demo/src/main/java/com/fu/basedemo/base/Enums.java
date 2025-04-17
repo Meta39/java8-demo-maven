@@ -11,7 +11,7 @@ public enum Enums {
 
     private final String name;
 
-    Enums(String name){
+    Enums(String name) {
         this.name = name;
     }
 

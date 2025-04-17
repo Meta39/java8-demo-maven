@@ -18,7 +18,7 @@ import javax.xml.ws.soap.SOAPBinding;
  */
 @Slf4j
 @Service
-@WebService
+@WebService(targetNamespace = "http://ws.springbootwebservicedemo.fu.com/")
 //主要是下面这行，并且这行要配合 Spring 的 @Component、@Service 类似的注入注解才能使 SOAP 1.1 生效（当前Apache CXF 默认是 SOAP 1.1）
 @BindingType(value = SOAPBinding.SOAP11HTTP_BINDING)
 public class WebServiceEntry {
@@ -28,6 +28,26 @@ public class WebServiceEntry {
      *
      * @param service   bean name
      * @param parameter XML 字符串请求参数
+     */
+    /*
+        请求示例：
+        POST：http://localhost:95/services/WebServiceEntry?wsdl
+        入参：
+        <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ws="http://ws.springbootwebservicedemo.fu.com/">
+            <soapenv:Header/>
+            <soapenv:Body>
+                <ws:invoke>
+                    <service>Hello</service>
+                    <parameter>
+                        <![CDATA[
+                    <Params><Name>哈哈</Name><Works><Work><WorkName>Java</WorkName></Work>
+                        </Works>
+                    </Params>
+                ]]>
+            </parameter>
+        </ws:invoke>
+        </soapenv:Body>
+        </soapenv:Envelope>
      */
     @WebMethod
     @SuppressWarnings("unchecked")

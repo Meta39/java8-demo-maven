@@ -11,6 +11,7 @@ public interface UserService {
      * 根据ID查询用户
      */
     User selectUserById(Integer id);
+
     User getUserInfoByToken();
 
 
@@ -24,9 +25,9 @@ public interface UserService {
      */
     int updateUser(User user);
 
-    int shareRoles(Integer userId,List<Integer> roleIds);
+    int shareRoles(Integer userId, List<Integer> roleIds);
 
-    int isBanUser(Integer id,Integer isBan);
+    int isBanUser(Integer id, Integer isBan);
 
     /**
      * 根据ID删除用户
@@ -36,7 +37,7 @@ public interface UserService {
     /**
      * 分页查询用户
      */
-    Page<User> selectUserPage(Long page, Long size,String username);
+    Page<User> selectUserPage(Long page, Long size, String username);
 
     /**
      * 根据ID集合批量删除用户

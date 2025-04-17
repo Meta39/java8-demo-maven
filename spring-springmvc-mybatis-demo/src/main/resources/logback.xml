@@ -30,11 +30,11 @@
     </appender>
 
     <!-- 配置了MyBatisSQLInterceptor，则这里不需要配置。 -->
-    <logger name="com.fu.ssm.mapper" level="${logging.SQL.level}" />
+    <logger name="com.fu.ssm.mapper" level="${logging.SQL.level}"/>
 
-    <root level="${logging.level}" >
-        <appender-ref ref="CONSOLE" />
-        <appender-ref ref="FILE" />
+    <root level="${logging.level}">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE"/>
     </root>
 
 </configuration>

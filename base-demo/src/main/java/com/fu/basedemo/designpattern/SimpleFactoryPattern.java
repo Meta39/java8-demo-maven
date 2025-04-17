@@ -2,6 +2,12 @@ package com.fu.basedemo.designpattern;
 
 import org.junit.jupiter.api.Test;
 
+//3.创建enum枚举类
+enum SimpleFactoryEnum {
+    ProductA, ProductB, ProductC
+
+}
+
 /**
  * 简单工厂模式
  */
@@ -11,7 +17,7 @@ public interface SimpleFactoryPattern {
 }
 
 //2.产品A实现简单工厂接口
-class ProductA implements  SimpleFactoryPattern{
+class ProductA implements SimpleFactoryPattern {
 
     @Override
     public String factoryFunction() {
@@ -20,7 +26,7 @@ class ProductA implements  SimpleFactoryPattern{
 }
 
 //2.产品B实现简单工厂接口
-class ProductB implements  SimpleFactoryPattern{
+class ProductB implements SimpleFactoryPattern {
 
     @Override
     public String factoryFunction() {
@@ -28,20 +34,14 @@ class ProductB implements  SimpleFactoryPattern{
     }
 }
 
-//3.创建enum枚举类
-enum SimpleFactoryEnum{
-    ProductA,ProductB,ProductC
-
-}
-
 //4.创建简单工厂类根据传参调用具体的产品
 class SimpleFactory {
 
     //虽然返回值是抽象接口，但是内部方法是返回的实现接口类
-    public static SimpleFactoryPattern getProduct(SimpleFactoryEnum productName){
-        if (productName == SimpleFactoryEnum.ProductA){
+    public static SimpleFactoryPattern getProduct(SimpleFactoryEnum productName) {
+        if (productName == SimpleFactoryEnum.ProductA) {
             return new ProductA();
-        } else if (productName == SimpleFactoryEnum.ProductB){
+        } else if (productName == SimpleFactoryEnum.ProductB) {
             return new ProductB();
         }
         throw new RuntimeException("没有此产品");
@@ -49,10 +49,10 @@ class SimpleFactory {
 }
 
 //5.测试
-class SimpleFactoryPatternTest{
+class SimpleFactoryPatternTest {
 
     @Test
-    public void test(){
+    public void test() {
         //调用产品A
         SimpleFactoryPattern productA = SimpleFactory.getProduct(SimpleFactoryEnum.ProductA);
         System.out.println(productA.factoryFunction());

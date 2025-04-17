@@ -4,7 +4,6 @@ import java.lang.annotation.*;
 
 /**
  * 多数据源事务注解
- *
  */
 @Target({ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)

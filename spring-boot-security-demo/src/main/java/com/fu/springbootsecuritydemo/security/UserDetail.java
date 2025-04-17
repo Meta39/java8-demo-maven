@@ -11,23 +11,30 @@ import java.util.Set;
 
 public class UserDetail extends User implements UserDetails {
     private static final long serialVersionUID = -5140637827121772520L;
+    private static final UserDetail userDetail = new UserDetail();
     private Set<GrantedAuthority> authorities;
+
+    //创建饿汉式单例模式
+    private UserDetail() {
+    }
 
     /**
      * 把User浅拷贝到UserDetail
      */
-    public static UserDetail copyUser(User user){
+    public static UserDetail copyUser(User user) {
         UserDetail instance = getInstance();
         //把user浅拷贝到instance
-        BeanUtils.copyProperties(user,instance);
+        BeanUtils.copyProperties(user, instance);
         return instance;
     }
 
-    //创建饿汉式单例模式
-    private UserDetail(){}
-    private static final UserDetail userDetail = new UserDetail();
-    public static UserDetail getInstance(){
+    public static UserDetail getInstance() {
         return userDetail;
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return this.authorities;
     }
 
     /**
@@ -35,11 +42,6 @@ public class UserDetail extends User implements UserDetails {
      */
     public void setAuthorities(Set<GrantedAuthority> authorities) {
         this.authorities = authorities;
-    }
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return this.authorities;
     }
 
     @Override

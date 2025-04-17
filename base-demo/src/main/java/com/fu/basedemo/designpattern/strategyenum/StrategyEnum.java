@@ -13,19 +13,19 @@ public enum StrategyEnum {
     private final int type;//类型
     private final String value;//实现类名（此名称必须和反射名称相同且区分大小写）
 
+    StrategyEnum(int type, String value) {
+        this.type = type;
+        this.value = value;
+    }
+
     //根据类型返回该枚举类型
     public static StrategyEnum value(int type) {
-        for(StrategyEnum strategyEnum : StrategyEnum.values()) {
+        for (StrategyEnum strategyEnum : StrategyEnum.values()) {
             if (strategyEnum.getType() == type) {
                 return strategyEnum;
             }
         }
         return null;
-    }
-
-    StrategyEnum(int type, String value) {
-        this.type = type;
-        this.value = value;
     }
 
     public int getType() {

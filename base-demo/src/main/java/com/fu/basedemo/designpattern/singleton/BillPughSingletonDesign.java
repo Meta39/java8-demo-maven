@@ -27,14 +27,14 @@ public class BillPughSingletonDesign implements Serializable {
         }*/
     }
 
-    //静态内部类
-    private static class SingletonHolder {
-        private static final BillPughSingletonDesign INSTANCE = new BillPughSingletonDesign();
-    }
-
     //获取实例
     public static BillPughSingletonDesign getInstance() {
         return SingletonHolder.INSTANCE;
+    }
+
+    //静态内部类
+    private static class SingletonHolder {
+        private static final BillPughSingletonDesign INSTANCE = new BillPughSingletonDesign();
     }
 
 }

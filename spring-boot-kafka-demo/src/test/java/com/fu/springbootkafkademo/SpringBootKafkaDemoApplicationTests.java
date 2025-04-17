@@ -7,7 +7,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 public class SpringBootKafkaDemoApplicationTests {
 
     @Test
-    void test(){
+    void test() {
 
     }
 

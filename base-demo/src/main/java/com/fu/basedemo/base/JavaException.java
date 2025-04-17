@@ -11,17 +11,18 @@ public class JavaException extends Exception {
 
     private static final long serialVersionUID = 801342581753517148L;
 
-    public JavaException(){}
+    public JavaException() {
+    }
 
-    public JavaException(String message){
+    public JavaException(String message) {
         super(message);
     }
 
-    public JavaException(String message, Throwable throwable){
-        super(message,throwable);
+    public JavaException(String message, Throwable throwable) {
+        super(message, throwable);
     }
 
-    public JavaException(Throwable throwable){
+    public JavaException(Throwable throwable) {
         super(throwable);
     }
 }

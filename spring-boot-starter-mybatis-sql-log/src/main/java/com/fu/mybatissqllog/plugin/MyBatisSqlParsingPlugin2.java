@@ -43,6 +43,10 @@ public final class MyBatisSqlParsingPlugin2 implements Interceptor {
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
+    private static String formatString(String str) {
+        return "'" + str + "'";
+    }
+
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
         // 通过反射获取 StatementHandler 的 MetaObject
@@ -173,10 +177,6 @@ public final class MyBatisSqlParsingPlugin2 implements Interceptor {
         }
         // 默认行为：直接转换为字符串
         return object.toString();
-    }
-
-    private static String formatString(String str) {
-        return "'" + str + "'";
     }
 
     private String formatDate(Date date) {

@@ -13,40 +13,6 @@ public class SortTest {
     private static int[] arr = new int[]{1, 10, 2, 9, 8, 3, 7, 5, 6, 4};
 
     /**
-     * 冒泡排序（稳定）
-     * 每次比较2个数，大的就交换位置
-     */
-    @Test
-    public void bubbleSort() {
-        boolean finish;//结束标识
-        int i, j, temp;//初始化变量
-        for (i = 0; i < arr.length - 1; i++) {
-            finish = true;
-            for (j = 0; j < arr.length - 1 - i; j++) {
-                if (arr[j] > arr[j + 1]) {
-                    temp = arr[j];
-                    arr[j] = arr[j + 1];
-                    arr[j + 1] = temp;
-                    finish = false;
-                }
-            }
-            if (finish) {
-                break;
-            }
-            System.out.println("第" + (i + 1) + "次排序：" + Arrays.toString(arr));
-        }
-    }
-
-    /**
-     * 快速排序（不稳定）
-     */
-    @Test
-    public void quicksort() {
-        quickSort(arr, 0, arr.length - 1);//数组下标是从0开始的，所以长度减1才是最后一个元素的下标
-        System.out.println(Arrays.toString(arr));
-    }
-
-    /**
      * 快速排序（推荐）
      *
      * @param arr  需要排序的数组
@@ -87,6 +53,40 @@ public class SortTest {
         quickSort(arr, low, j - 1);
         //递归调用右半数组
         quickSort(arr, j + 1, high);
+    }
+
+    /**
+     * 冒泡排序（稳定）
+     * 每次比较2个数，大的就交换位置
+     */
+    @Test
+    public void bubbleSort() {
+        boolean finish;//结束标识
+        int i, j, temp;//初始化变量
+        for (i = 0; i < arr.length - 1; i++) {
+            finish = true;
+            for (j = 0; j < arr.length - 1 - i; j++) {
+                if (arr[j] > arr[j + 1]) {
+                    temp = arr[j];
+                    arr[j] = arr[j + 1];
+                    arr[j + 1] = temp;
+                    finish = false;
+                }
+            }
+            if (finish) {
+                break;
+            }
+            System.out.println("第" + (i + 1) + "次排序：" + Arrays.toString(arr));
+        }
+    }
+
+    /**
+     * 快速排序（不稳定）
+     */
+    @Test
+    public void quicksort() {
+        quickSort(arr, 0, arr.length - 1);//数组下标是从0开始的，所以长度减1才是最后一个元素的下标
+        System.out.println(Arrays.toString(arr));
     }
 
 }

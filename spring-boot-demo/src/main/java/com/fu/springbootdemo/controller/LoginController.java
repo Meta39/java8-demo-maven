@@ -42,7 +42,7 @@ public class LoginController {
      * 修改当前登录用户密码
      */
     @PostMapping("updatePwd")
-    public Boolean updatePwd(@RequestBody UpdatePwdDTO updatePwdDTO){
+    public Boolean updatePwd(@RequestBody UpdatePwdDTO updatePwdDTO) {
         return this.loginService.updatePwd(updatePwdDTO);
     }
 
@@ -50,7 +50,7 @@ public class LoginController {
      * 续期token：前端判断token是否快到期，快到期就调这个接口续期。
      */
     @PostMapping("refreshToken")
-    public Boolean token(HttpServletRequest request){
+    public Boolean token(HttpServletRequest request) {
         return this.loginService.token(request);
     }
 

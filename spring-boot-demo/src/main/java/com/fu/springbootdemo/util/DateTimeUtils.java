@@ -12,9 +12,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * @since 2024-07-05
  */
 public abstract class DateTimeUtils {
-    private DateTimeUtils() {
-    }
-
     // 自定义格式
     public static final String yyyy = "yyyy";
     public static final String MM = "MM";
@@ -26,14 +23,15 @@ public abstract class DateTimeUtils {
     public static final String DIY_TIME_FORMAT = "HHmmss";
     public static final String DIY_DATE_FORMAT = "yyyyMMdd";
     public static final String DIY_DATE_TIME_FORMAT = "yyyyMMddHHmmss";
-
     // 默认格式
     public static final String DEFAULT_TIME_FORMAT = "HH:mm:ss";
     public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd";
     public static final String DEFAULT_DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
-
     // 缓存DateTimeFormatter实例
     private static final Map<String, DateTimeFormatter> formatterCache = new ConcurrentHashMap<>();
+
+    private DateTimeUtils() {
+    }
 
     public static DateTimeFormatter getFormatter(String format) {
         return formatterCache.computeIfAbsent(format, DateTimeFormatter::ofPattern);
@@ -189,8 +187,9 @@ public abstract class DateTimeUtils {
 
     /**
      * String to Date with specified format
+     *
      * @param dateStr 日期时间字符串
-     * @param format 转换格式
+     * @param format  转换格式
      * @return date
      */
     public static Date stringToDate(String dateStr, String format) {

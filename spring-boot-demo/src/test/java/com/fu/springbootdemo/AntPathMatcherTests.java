@@ -13,7 +13,7 @@ import java.util.List;
 @Slf4j
 public class AntPathMatcherTests {
     @Test
-    public void matcher(){
+    public void matcher() {
 
         List<String> uris = new ArrayList<>();
         uris.add("/api/test");
@@ -22,9 +22,9 @@ public class AntPathMatcherTests {
         uris.add("/api/demo/*");
 
         AntPathMatcher antPathMatcher = new AntPathMatcher();
-        boolean passUri = uris.stream().anyMatch(uri -> antPathMatcher.match(uri,"/api/test"));
+        boolean passUri = uris.stream().anyMatch(uri -> antPathMatcher.match(uri, "/api/test"));
 
-        log.info("/api/test是否是滤地址：{}",passUri);
+        log.info("/api/test是否是滤地址：{}", passUri);
 //        log.info("/a是否匹配/a/*：{}",antPathMatcher.match("/a/*","/a"));//false
 //        log.info("/a/b是否匹配/a/*：{}",antPathMatcher.match("/a/*","/a/b"));//true
 //        log.info("/a是否匹配/a/bc/def：{}",antPathMatcher.match("/a/bc/def","/a"));//false
@@ -33,9 +33,9 @@ public class AntPathMatcherTests {
     }
 
     @Test
-    public void test(){
+    public void test() {
         AntPathMatcher antPathMatcher = new AntPathMatcher();
-        boolean match = antPathMatcher.match("*:login","GET:login");
-        log.info("{}",match);
+        boolean match = antPathMatcher.match("*:login", "GET:login");
+        log.info("{}", match);
     }
 }

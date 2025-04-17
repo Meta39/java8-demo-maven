@@ -29,7 +29,7 @@ public class PersonServiceImpl implements PersonService {
 
     @Override
     public Page<Person> findAllByNameLike(String name, int page, int size) {
-        this.personRepository.findAll(PageRequest.of(0,10,Sort.by(Sort.Direction.DESC,"id")));
+        this.personRepository.findAll(PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "id")));
         //拼接%并不会SQL注入
         return this.personRepository.findAllByNameLike("%" + name + "%", PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id")));
     }

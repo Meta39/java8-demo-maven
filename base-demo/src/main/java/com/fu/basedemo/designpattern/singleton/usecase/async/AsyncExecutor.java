@@ -4,15 +4,9 @@ import java.util.concurrent.*;
 
 public class AsyncExecutor {
 
-    private AsyncExecutor() {
-    }
-
     private static final int cpuCores = Runtime.getRuntime().availableProcessors();//CPU核心数
     private static final int corePoolSize = 2 * cpuCores;//IO密集型 corePoolSize = CPU核心数 * 2
     private static final int maximumPoolSize = corePoolSize * 5;//IO密集型 maximumPoolSize = CPU核心数 * 2 * n（n是一个较大的值，比如5-10）
-
-    private static final BlockingQueue<Runnable> queue = new ArrayBlockingQueue<>(1000);//队列大小 = (预计峰值任务数 / 平均任务处理时间) * 平均IO等待时间
-
     /**
      * IO密集型异步线程池
      */
@@ -32,6 +26,10 @@ public class AsyncExecutor {
              */
             new ThreadPoolExecutor.CallerRunsPolicy()
     );
+    private static final BlockingQueue<Runnable> queue = new ArrayBlockingQueue<>(1000);//队列大小 = (预计峰值任务数 / 平均任务处理时间) * 平均IO等待时间
+
+    private AsyncExecutor() {
+    }
 
     //使用的时候获取
     public static ExecutorService getInstance() {

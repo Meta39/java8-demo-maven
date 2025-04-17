@@ -10,9 +10,9 @@ public enum ReflexEnum {
     ReflexB,
     ;
 
-    public static String value(ReflexEnum reflexEnum){
-        for (ReflexEnum reflex : ReflexEnum.values()){
-            if (reflex == reflexEnum){
+    public static String value(ReflexEnum reflexEnum) {
+        for (ReflexEnum reflex : ReflexEnum.values()) {
+            if (reflex == reflexEnum) {
                 return reflexEnum.toString();
             }
         }

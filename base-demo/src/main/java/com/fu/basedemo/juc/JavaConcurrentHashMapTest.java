@@ -16,7 +16,7 @@ public class JavaConcurrentHashMapTest {
     /**
      * 高并发情况下，线程不安全
      */
-    private static final Map<String,String> map = new HashMap<>();
+    private static final Map<String, String> map = new HashMap<>();
     /**
      * 高并发情况下，线程安全
      */
@@ -24,9 +24,9 @@ public class JavaConcurrentHashMapTest {
 
     @Test
     public void test() {
-        map.put("key","vale");
-        System.out.println("HashMap："+map.get("key"));
-        concurrentHashMap.put("key","value");
+        map.put("key", "vale");
+        System.out.println("HashMap：" + map.get("key"));
+        concurrentHashMap.put("key", "value");
         System.out.println("ConcurrentHashMap：" + concurrentHashMap.get("key"));
     }
 

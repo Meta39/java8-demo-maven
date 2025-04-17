@@ -6,5 +6,5 @@ package com.fu.springbootdemo.strategy;
  */
 public interface Strategy<T> {
     //2. 定义策略抽象方法
-    T login(String username,String password);
+    T login(String username, String password);
 }

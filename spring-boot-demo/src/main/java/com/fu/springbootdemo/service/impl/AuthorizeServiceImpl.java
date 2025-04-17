@@ -17,6 +17,16 @@ public class AuthorizeServiceImpl implements AuthorizeService {
     private final AuthorizeMapper authorizeMapper;
 
     /**
+     * 递归权限树，展示全部权限
+     */
+    private static List<Authorize> authorizeTree(Authorize authorize, List<Authorize> authorizes) {
+        return authorizes.stream()
+                .filter(a -> a.getPId().equals(authorize.getId()))
+                .peek(a -> a.setChildAuthorize(authorizeTree(a, authorizes)))
+                .collect(Collectors.toList());
+    }
+
+    /**
      * 根据ID查询权限
      */
     @Override
@@ -37,7 +47,7 @@ public class AuthorizeServiceImpl implements AuthorizeService {
      */
     @Override
     public int updateAuthorize(Authorize authorize) {
-        if (authorize.getId() == 1){
+        if (authorize.getId() == 1) {
             throw new RuntimeException("不允许修改id为1的内容");
         }
         return this.authorizeMapper.updateById(authorize);
@@ -48,7 +58,7 @@ public class AuthorizeServiceImpl implements AuthorizeService {
      */
     @Override
     public int deleteAuthorizeById(Integer id) {
-        if (id == 1){
+        if (id == 1) {
             throw new RuntimeException("不允许删除id为1的内容");
         }
         return this.authorizeMapper.deleteById(id);
@@ -78,29 +88,19 @@ public class AuthorizeServiceImpl implements AuthorizeService {
      */
     @Override
     public int deleteAuthorizeByIds(List<Integer> ids) {
-        if (ids.stream().anyMatch(id -> id == 1)){
+        if (ids.stream().anyMatch(id -> id == 1)) {
             throw new RuntimeException("不允许删除id为1的内容");
         }
         return this.authorizeMapper.deleteBatchIds(ids);
     }
 
+
+    //============================内部方法=======================================
+
     @Override
     public List<Authorize> selectAuthorizeTree() {
         List<Authorize> authorizes = this.authorizeMapper.selectList(null);
         return authorizes.stream().filter(authorize -> authorize.getPId() == 0).peek(authorize -> authorize.setChildAuthorize(authorizeTree(authorize, authorizes))).collect(Collectors.toList());
-    }
-
-
-    //============================内部方法=======================================
-
-    /**
-     * 递归权限树，展示全部权限
-     */
-    private static List<Authorize> authorizeTree(Authorize authorize, List<Authorize> authorizes) {
-        return authorizes.stream()
-                .filter(a -> a.getPId().equals(authorize.getId()))
-                .peek(a -> a.setChildAuthorize(authorizeTree(a, authorizes)))
-                .collect(Collectors.toList());
     }
 
 }

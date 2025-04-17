@@ -54,7 +54,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      */
     @Override
     public int updateUser(User user) {
-        if (StringUtils.hasText(user.getPassword())){
+        if (StringUtils.hasText(user.getPassword())) {
             user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
         }
         return this.userMapper.updateById(user);
@@ -82,7 +82,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             //获取用户列表对应的角色列表集合
             List<Integer> roleIds = this.userRoleMapper.selectList(new LambdaQueryWrapper<UserRole>().eq(UserRole::getUserId, user.getId())).stream()
                     .map(UserRole::getRoleId).collect(Collectors.toList());
-            if (!roleIds.isEmpty()){
+            if (!roleIds.isEmpty()) {
                 user.setRoles(new HashSet<>(this.roleMapper.selectBatchIds(roleIds)));
             }
         });

@@ -16,11 +16,11 @@ import java.io.Serializable;
  */
 public class EagerInitialization implements Serializable {
     private static final long serialVersionUID = 1L;
+    private static final EagerInitialization INSTANCE = new EagerInitialization();
 
     //私有化构造函数，防止外部实例化。
-    private EagerInitialization() {}
-
-    private static final EagerInitialization INSTANCE = new EagerInitialization();
+    private EagerInitialization() {
+    }
 
     //获取实例
     public static EagerInitialization getInstance() {

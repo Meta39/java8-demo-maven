@@ -8,11 +8,11 @@ public class ForbiddenException extends CommonException {
     private static final String message = "Forbidden 抱歉，您当前没有访问权限，请联系管理员授权。";
 
     public ForbiddenException() {
-        super(code,message);
+        super(code, message);
     }
 
     public ForbiddenException(String message) {
-        super(code,message);
+        super(code, message);
     }
 
 }

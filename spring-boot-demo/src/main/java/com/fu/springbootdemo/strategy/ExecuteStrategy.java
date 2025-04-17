@@ -10,6 +10,6 @@ import org.springframework.stereotype.Component;
 public class ExecuteStrategy {
 
     public Object executeStrategy(String strategy, String username, String password) {
-        return  ((Strategy<?>) ApplicationContextUtils.getBean(strategy)).login(username, password);
+        return ((Strategy<?>) ApplicationContextUtils.getBean(strategy)).login(username, password);
     }
 }

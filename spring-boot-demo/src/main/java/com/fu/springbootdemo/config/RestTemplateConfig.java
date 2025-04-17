@@ -14,6 +14,7 @@ import java.nio.charset.StandardCharsets;
 
 /**
  * RestTemplate配置
+ *
  * @since 2024-07-31
  */
 @Configuration

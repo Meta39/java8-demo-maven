@@ -40,6 +40,18 @@ public class LoginServiceImpl implements LoginService {
     private final RedisTemplate<String, Object> redisTemplate;
 
     /**
+     * 递归菜单树
+     */
+    private static List<Authorize> menuTree(Authorize authorize, List<Authorize> authorizes) {
+        return authorizes.stream()
+                .filter(a ->
+                        // NodeType：1是文件夹、2是页面、3是按钮，这里准确的说是返回菜单给前端展示。按钮权限放到另外的集合。
+                        (a.getPId().equals(authorize.getId())) && a.getNodeType() != NODE_TYPE)
+                .peek(a -> a.setChildAuthorize(menuTree(a, authorizes)))
+                .collect(Collectors.toList());
+    }
+
+    /**
      * 登录
      */
     @Override
@@ -54,7 +66,7 @@ public class LoginServiceImpl implements LoginService {
             throw new RuntimeException("登录用户被禁用");
         }
         //前端RSA加密字符串解密后和数据库的密码解密进行匹配
-        if (!Objects.equals(RSAUtil.decrypt(GlobalVariable.RSA_TOKEN_PRIVATE_KEY,password),RSAUtil.decrypt(GlobalVariable.RSA_TOKEN_PRIVATE_KEY,user.getPwd()))) {
+        if (!Objects.equals(RSAUtil.decrypt(GlobalVariable.RSA_TOKEN_PRIVATE_KEY, password), RSAUtil.decrypt(GlobalVariable.RSA_TOKEN_PRIVATE_KEY, user.getPwd()))) {
             throw new RuntimeException("密码错误");
         }
         // TODO 验证码
@@ -62,7 +74,7 @@ public class LoginServiceImpl implements LoginService {
         Set<Role> roles = this.loginMapper.selectUserRoleInfo(user.getId());
         Set<Integer> roleIds = roles.stream().map(Role::getId).collect(Collectors.toSet());
         //Redis存储当前登录用户的角色Id集合
-        if (!roleIds.isEmpty()){//判断当前登录用户是否有角色
+        if (!roleIds.isEmpty()) {//判断当前登录用户是否有角色
             tokenInfo.setRoleIds(roleIds);
             //判断是否包含超级管理员角色
             if (roleIds.stream().anyMatch(roleId -> roleId == ADMIN_ROLE_ID)) {
@@ -76,7 +88,7 @@ public class LoginServiceImpl implements LoginService {
             }
         }
         //用UUID + 用户ID作为token
-        String token = UUID.randomUUID().toString().replaceAll("-","") + user.getId();
+        String token = UUID.randomUUID().toString().replaceAll("-", "") + user.getId();
         //把登录用户信息存入Redis。无需存储menus，因为用不上还会增加Redis的压力。
         this.redisTemplate.opsForValue().set(GlobalVariable.getTokenRedisKey(token), tokenInfo, Duration.ofSeconds(globalAuthenticationFilter.getTokenTimeout()));
         //存储进Redis以后再往TokenInfo对象设置菜单返回给前端。返回的菜单不包含按钮，如果包含按钮，前端展示菜单树会错误。
@@ -126,16 +138,18 @@ public class LoginServiceImpl implements LoginService {
     public Boolean updatePwd(UpdatePwdDTO updatePwdDTO) {
         int userId = CurrentLoginUserUtil.getUserId();
         User userInfo = this.userMapper.selectById(userId);
-        if (!Objects.equals(RSAUtil.decrypt(GlobalVariable.RSA_TOKEN_PRIVATE_KEY,userInfo.getPwd()),RSAUtil.decrypt(GlobalVariable.RSA_TOKEN_PRIVATE_KEY,updatePwdDTO.getPwd()))){
+        if (!Objects.equals(RSAUtil.decrypt(GlobalVariable.RSA_TOKEN_PRIVATE_KEY, userInfo.getPwd()), RSAUtil.decrypt(GlobalVariable.RSA_TOKEN_PRIVATE_KEY, updatePwdDTO.getPwd()))) {
             throw new RuntimeException("旧密码错误！");
         }
         //加密密码
         LambdaUpdateWrapper<User> setUserPwd = new LambdaUpdateWrapper<User>()
-                .eq(User::getId,userId)
-                .set(User::getPwd,updatePwdDTO.getNewPwd());
-        this.userMapper.update(null,setUserPwd);
+                .eq(User::getId, userId)
+                .set(User::getPwd, updatePwdDTO.getNewPwd());
+        this.userMapper.update(null, setUserPwd);
         return true;
     }
+
+    //-----------------------------------------内部方法------------------------------------------------------
 
     /**
      * 续期token
@@ -147,20 +161,6 @@ public class LoginServiceImpl implements LoginService {
             return this.redisTemplate.expire(tokenRedisKey, Duration.ofSeconds(globalAuthenticationFilter.getTokenTimeout()));
         }
         throw new UnauthorizedException();
-    }
-
-    //-----------------------------------------内部方法------------------------------------------------------
-
-    /**
-     * 递归菜单树
-     */
-    private static List<Authorize> menuTree(Authorize authorize, List<Authorize> authorizes) {
-        return authorizes.stream()
-                .filter(a ->
-                        // NodeType：1是文件夹、2是页面、3是按钮，这里准确的说是返回菜单给前端展示。按钮权限放到另外的集合。
-                        (a.getPId().equals(authorize.getId())) && a.getNodeType() != NODE_TYPE)
-                .peek(a -> a.setChildAuthorize(menuTree(a, authorizes)))
-                .collect(Collectors.toList());
     }
 
 }

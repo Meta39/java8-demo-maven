@@ -1,10 +1,9 @@
 package com.fu.springbootwebservicedemo.ws;
 
+import lombok.RequiredArgsConstructor;
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBus;
 import org.apache.cxf.jaxws.EndpointImpl;
-import org.apache.cxf.transport.servlet.CXFServlet;
-import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -16,13 +15,10 @@ import javax.xml.ws.Endpoint;
  * 创建日期：2024-07-01
  */
 @Configuration
+@RequiredArgsConstructor
 public class WebServiceConfig {
-
-    @Bean(name = "cxfServlet")
-    public ServletRegistrationBean<?> cxfServlet() {
-        //urlMappings默认是：services
-        return new ServletRegistrationBean<>(new CXFServlet(), "/services/*");
-    }
+    private final WebServiceEntry webServiceEntry;
+    private final WebServiceEntry12 webServiceEntry12;
 
     @Bean(name = Bus.DEFAULT_BUS_ID)
     public SpringBus springBus() {
@@ -34,7 +30,7 @@ public class WebServiceConfig {
      */
     @Bean
     public Endpoint endpoint11() {
-        EndpointImpl endpoint = new EndpointImpl(springBus(), new WebServiceEntry());
+        EndpointImpl endpoint = new EndpointImpl(springBus(), webServiceEntry);
         endpoint.publish("/WebServiceEntry");
         return endpoint;
     }
@@ -44,7 +40,7 @@ public class WebServiceConfig {
      */
     @Bean
     public Endpoint endpoint12() {
-        EndpointImpl endpoint = new EndpointImpl(springBus(), new WebServiceEntry12());
+        EndpointImpl endpoint = new EndpointImpl(springBus(), webServiceEntry12);
         endpoint.publish("/WebServiceEntry12");
         return endpoint;
     }

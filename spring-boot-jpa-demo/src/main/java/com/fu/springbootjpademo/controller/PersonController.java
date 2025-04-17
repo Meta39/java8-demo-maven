@@ -24,6 +24,7 @@ public class PersonController {
 
     /**
      * 根据ID查询
+     *
      * @param id ID
      */
     @PostMapping("findById/{id}")
@@ -33,6 +34,7 @@ public class PersonController {
 
     /**
      * 分页查询
+     *
      * @param name 名称
      * @param page 起始页
      * @param size 每页数量
@@ -46,6 +48,7 @@ public class PersonController {
 
     /**
      * 根据id删除记录
+     *
      * @param id ID
      */
     @PostMapping("deleteById/{id}")
@@ -55,6 +58,7 @@ public class PersonController {
 
     /**
      * 根据id list批量删除
+     *
      * @param ids ids
      */
     @PostMapping("deleteAllById")

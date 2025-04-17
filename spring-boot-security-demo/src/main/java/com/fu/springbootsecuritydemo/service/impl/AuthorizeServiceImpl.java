@@ -37,7 +37,7 @@ public class AuthorizeServiceImpl extends ServiceImpl<AuthorizeMapper, Authorize
      */
     @Override
     public int updateAuthorize(Authorize authorize) {
-        if (authorize.getId() == 1){
+        if (authorize.getId() == 1) {
             throw new RuntimeException("不允许修改id为1的内容");
         }
         return this.authorizeMapper.updateById(authorize);
@@ -48,7 +48,7 @@ public class AuthorizeServiceImpl extends ServiceImpl<AuthorizeMapper, Authorize
      */
     @Override
     public int deleteAuthorizeById(Integer id) {
-        if (id == 1){
+        if (id == 1) {
             throw new RuntimeException("不允许删除id为1的内容");
         }
         return this.authorizeMapper.deleteById(id);
@@ -78,7 +78,7 @@ public class AuthorizeServiceImpl extends ServiceImpl<AuthorizeMapper, Authorize
      */
     @Override
     public int deleteAuthorizeByIds(List<Integer> ids) {
-        if (ids.stream().anyMatch(id -> id == 1)){
+        if (ids.stream().anyMatch(id -> id == 1)) {
             throw new RuntimeException("不允许删除id为1的内容");
         }
         return this.authorizeMapper.deleteBatchIds(ids);

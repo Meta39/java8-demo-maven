@@ -3,7 +3,7 @@ package com.fu.basedemo.juc;
 /**
  * 多线程减库存，模拟并发
  */
-public class JavaLockRunnable implements Runnable{
+public class JavaLockRunnable implements Runnable {
 
     @Override
     public void run() {

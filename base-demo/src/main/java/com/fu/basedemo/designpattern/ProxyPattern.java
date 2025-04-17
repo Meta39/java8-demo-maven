@@ -12,7 +12,7 @@ public interface ProxyPattern {
 }
 
 //2.本体实现接口
-class NeedToBuyPerson implements ProxyPattern{
+class NeedToBuyPerson implements ProxyPattern {
 
     @Override
     public void buy() {
@@ -22,7 +22,7 @@ class NeedToBuyPerson implements ProxyPattern{
 }
 
 //3.代理实现接口
-class ProxyPerson implements ProxyPattern{
+class ProxyPerson implements ProxyPattern {
 
     @Override
     public void buy() {
@@ -37,10 +37,10 @@ class ProxyPerson implements ProxyPattern{
 }
 
 //4.测试
-class ProxyPatternTest{
+class ProxyPatternTest {
 
     @Test
-    public void test(){
+    public void test() {
         //调用代理，让代理去执行本体的方法
         ProxyPattern proxyPerson = new ProxyPerson();
         proxyPerson.buy();

@@ -14,7 +14,7 @@ public class ForkJoinTests {
     @Test
     public void test() throws ExecutionException, InterruptedException {
         //创建MyTask对象
-        MyTask myTask = new MyTask(0,100);
+        MyTask myTask = new MyTask(0, 100);
         //创建分支合并池对象
         ForkJoinPool forkJoinPool = new ForkJoinPool();
         ForkJoinTask<Integer> forkJoinTask = forkJoinPool.submit(myTask);
@@ -44,18 +44,18 @@ class MyTask extends RecursiveTask<Integer> {
     @Override
     protected Integer compute() {
         //判断相加的2个数值是否大于VALUE
-        if ((end - begin) <= VALUE){
+        if ((end - begin) <= VALUE) {
             //相加操作
-            for (int i = begin; i <=end; i++) {
+            for (int i = begin; i <= end; i++) {
                 result = result + i;
             }
-        }else {//进一步拆分
+        } else {//进一步拆分
             //获取中间值
-            int middle = (begin + end)/2;
+            int middle = (begin + end) / 2;
             //拆分左边
-            MyTask taskLeft = new MyTask(begin,middle);
+            MyTask taskLeft = new MyTask(begin, middle);
             //拆分右边
-            MyTask taskRight = new MyTask(middle + 1,end);
+            MyTask taskRight = new MyTask(middle + 1, end);
             //调用拆分方法
             taskLeft.fork();
             taskRight.fork();

@@ -9,6 +9,7 @@ public class TransactionalThreadLocal {
     public static void set(boolean value) {
         IS_TRANSACTION.set(value);
     }
+
     public static boolean get() {
         //因为这里返回的是 boolean，因此不能返回null，如果返回null，会报空指针异常
         if (IS_TRANSACTION.get() == null) {

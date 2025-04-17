@@ -7,12 +7,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 public class SpringBootDemoApplicationTests {
 
     @Test
-    public void test(){
+    public void test() {
         String headSalt = "headSalt";//头部盐
         String tailSalt = "tailSalt";//尾部盐
-        String saltPassword = headSalt + "password" +tailSalt;
+        String saltPassword = headSalt + "password" + tailSalt;
         saltPassword = saltPassword.substring(headSalt.length());
-        String password =saltPassword.substring(0,saltPassword.length() - tailSalt.length());
+        String password = saltPassword.substring(0, saltPassword.length() - tailSalt.length());
         System.out.println(password);
     }
 

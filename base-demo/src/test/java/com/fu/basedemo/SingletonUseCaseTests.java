@@ -19,24 +19,6 @@ import org.junit.jupiter.api.Test;
 public class SingletonUseCaseTests {
 
     /**
-     * 测试数据库连接池
-     */
-    @Test
-    void testSingletonUseCase() {
-        DatabaseAccess databaseAccess = new DatabaseAccess();
-        System.out.println(databaseAccess.getUsers(User.class));;
-    }
-
-    /**
-     * 测试配置管理
-     */
-    @Test
-    void testConfigurationManager() {
-        String app = ConfigurationManager.getProperty("params.app");
-        System.out.println(app);
-    }
-
-    /**
      * 测试线程池管理
      */
     public static void main(String[] args) {
@@ -54,6 +36,25 @@ public class SingletonUseCaseTests {
 
         // 关闭线程池
         AsyncExecutor.shutdown();
+    }
+
+    /**
+     * 测试数据库连接池
+     */
+    @Test
+    void testSingletonUseCase() {
+        DatabaseAccess databaseAccess = new DatabaseAccess();
+        System.out.println(databaseAccess.getUsers(User.class));
+        ;
+    }
+
+    /**
+     * 测试配置管理
+     */
+    @Test
+    void testConfigurationManager() {
+        String app = ConfigurationManager.getProperty("params.app");
+        System.out.println(app);
     }
 
     /**

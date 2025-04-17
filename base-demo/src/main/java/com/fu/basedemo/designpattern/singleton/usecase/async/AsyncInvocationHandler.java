@@ -16,6 +16,15 @@ public class AsyncInvocationHandler implements InvocationHandler {
         this.executorService = AsyncExecutor.getInstance();
     }
 
+    @SuppressWarnings("unchecked")
+    public static <T> T createAsyncProxy(T target, Class<T> interfaceType) {
+        return (T) Proxy.newProxyInstance(
+                interfaceType.getClassLoader(),
+                new Class<?>[]{interfaceType},
+                new AsyncInvocationHandler(target)
+        );
+    }
+
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         if (method.isAnnotationPresent(Async.class)) {
@@ -29,15 +38,6 @@ public class AsyncInvocationHandler implements InvocationHandler {
             return null;
         }
         return method.invoke(target, args);
-    }
-
-    @SuppressWarnings("unchecked")
-    public static <T> T createAsyncProxy(T target, Class<T> interfaceType) {
-        return (T) Proxy.newProxyInstance(
-                interfaceType.getClassLoader(),
-                new Class<?>[]{interfaceType},
-                new AsyncInvocationHandler(target)
-        );
     }
 }
 

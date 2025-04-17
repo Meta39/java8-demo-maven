@@ -3,7 +3,9 @@
 <mapper namespace="com.fu.ssm.mapper.TestMapper">
 
     <select id="selectByTestId" parameterType="java.lang.Integer" resultType="com.fu.ssm.entity.Test">
-        select id,name,age from test where id = #{id}
+        select id, name, age
+        from test
+        where id = #{id}
     </select>
 
     <select id="selectTestPage" resultType="com.fu.ssm.entity.Test">

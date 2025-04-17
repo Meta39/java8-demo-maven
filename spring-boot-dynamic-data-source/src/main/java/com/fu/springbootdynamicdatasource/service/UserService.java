@@ -18,17 +18,17 @@ public class UserService {
     private final MySQL1UserMapper mySQL1UserMapper;
     private final MySQL2UserMapper mySQL2UserMapper;
 
-    public void select(){
+    public void select() {
         User user = mySQL1UserMapper.selectById(1);
         User user2 = mySQL2UserMapper.selectById(1);
-        log.info("user:{}",user);
-        log.info("user2:{}",user2);
+        log.info("user:{}", user);
+        log.info("user2:{}", user2);
     }
 
     @Transactional
     public void insertUser() {
-        mySQL2UserMapper.insert(new User(2,"哈哈"));
-        mySQL1UserMapper.insert(new User(2,"哈哈"));
+        mySQL2UserMapper.insert(new User(2, "哈哈"));
+        mySQL1UserMapper.insert(new User(2, "哈哈"));
         int i = 1 / 0;
     }
 

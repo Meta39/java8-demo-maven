@@ -13,7 +13,7 @@ public class JavaReadForUrlTest {
 
     @Test
     @SneakyThrows
-    public void readForUrl(){
+    public void readForUrl() {
         URL url = new URL("https://www.baidu.com");
 
         /* 字节流 */

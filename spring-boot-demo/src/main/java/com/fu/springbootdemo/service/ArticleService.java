@@ -35,7 +35,7 @@ public interface ArticleService {
     /**
      * 分页查询文章
      */
-    Page<Article> selectArticlePage(Long page, Long size,String title);
+    Page<Article> selectArticlePage(Long page, Long size, String title);
 
     /**
      * 查询文章

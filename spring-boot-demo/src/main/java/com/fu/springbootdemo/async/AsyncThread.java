@@ -14,7 +14,7 @@ public class AsyncThread {
 
     @SneakyThrows
     @Async //异步线程注解
-    public void asyncThread(){
+    public void asyncThread() {
         log.info("异步线程开始执行...");
         Thread.sleep(3000);
         log.info("异步线程执行结束...");

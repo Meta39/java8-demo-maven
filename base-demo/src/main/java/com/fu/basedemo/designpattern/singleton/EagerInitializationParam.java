@@ -8,8 +8,6 @@ import java.io.Serializable;
 public class EagerInitializationParam implements Serializable {
     private static final long serialVersionUID = 1L;
     private static final EagerInitializationParam INSTANCE;
-    //参数
-    private final String dbUrl;
 
     /*
         静态块
@@ -20,6 +18,9 @@ public class EagerInitializationParam implements Serializable {
         String dbUrl = "jdbc:mysql://localhost:3306/mydb"; // 可以通过配置文件或其他方式获取
         INSTANCE = new EagerInitializationParam(dbUrl);
     }
+
+    //参数
+    private final String dbUrl;
 
     //私有化构造函数，防止外部实例化。
     private EagerInitializationParam(String dbUrl) {

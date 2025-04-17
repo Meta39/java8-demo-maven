@@ -67,18 +67,19 @@ public class UserController {
     @PreAuthorize("user:update")
     @PutMapping("shareRoles/{userId}")
     public Integer shareRoles(@PathVariable Integer userId, @RequestBody List<Integer> roleIds) {
-        return this.userService.shareRoles(userId,roleIds);
+        return this.userService.shareRoles(userId, roleIds);
     }
 
     /**
      * 禁用用户
-     * @param id 用户ID
+     *
+     * @param id    用户ID
      * @param isBan 是否禁用
      */
     @PreAuthorize("user:update")
     @PutMapping("isBan/{id}")
-    public Integer isBanUser(@PathVariable Integer id,@RequestParam("isBan") Integer isBan) {
-        return this.userService.isBanUser(id,isBan);
+    public Integer isBanUser(@PathVariable Integer id, @RequestParam("isBan") Integer isBan) {
+        return this.userService.isBanUser(id, isBan);
     }
 
     /**
@@ -99,8 +100,8 @@ public class UserController {
     @GetMapping("page")
     public Page<User> selectUserPage(@RequestParam(required = false, defaultValue = "1") Long page,
                                      @RequestParam(required = false, defaultValue = "10") Long size,
-                                     @RequestParam(required = false,name = "username") String username) {
-        return this.userService.selectUserPage(page, size,username);
+                                     @RequestParam(required = false, name = "username") String username) {
+        return this.userService.selectUserPage(page, size, username);
     }
 
     /**
@@ -117,7 +118,7 @@ public class UserController {
      */
     @PreAuthorize("user:importExcel")
     @PostMapping("importExcel")
-    public Boolean importExcel(@RequestParam(name = "file") MultipartFile file){
+    public Boolean importExcel(@RequestParam(name = "file") MultipartFile file) {
         return this.userService.importExcel(file);
     }
 
@@ -126,7 +127,7 @@ public class UserController {
      */
     @PreAuthorize("user:exportExcel")
     @PostMapping("exportExcel")
-    public String exportExcel(@RequestBody List<Integer> userIds){
+    public String exportExcel(@RequestBody List<Integer> userIds) {
         return this.userService.exportExcel(userIds);
     }
 }

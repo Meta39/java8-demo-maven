@@ -37,7 +37,7 @@ public class GlobalAuthorizeAspect {
     @Before("globalAuthorizeAspect()&&@annotation(preAuthorize)")
     public void doBefore(JoinPoint point, PreAuthorize preAuthorize) {
         //如果不需要认证的请求方法和接口URI配置成'**'，不进行认证和鉴权。
-        if (globalAuthenticationFilter.getNotAuthentication().stream().noneMatch(notAuthentication -> Objects.equals(notAuthentication,"**"))){
+        if (globalAuthenticationFilter.getNotAuthentication().stream().noneMatch(notAuthentication -> Objects.equals(notAuthentication, "**"))) {
             ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
             assert attributes != null;
             HttpServletRequest request = attributes.getRequest();

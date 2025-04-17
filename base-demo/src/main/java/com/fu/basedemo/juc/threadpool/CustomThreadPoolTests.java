@@ -37,10 +37,9 @@ public class CustomThreadPoolTests {
                 //执行
                 customThreadPool.execute(() -> System.out.println(Thread.currentThread().getName() + "号窗口办理业务"));
             }
-        }catch (Exception e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
-        }
-        finally {
+        } finally {
             //关闭
             customThreadPool.shutdown();
         }

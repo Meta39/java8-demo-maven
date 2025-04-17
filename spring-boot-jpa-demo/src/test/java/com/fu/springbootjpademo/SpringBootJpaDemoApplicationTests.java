@@ -7,7 +7,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 public class SpringBootJpaDemoApplicationTests {
 
     @Test
-    public void test(){
+    public void test() {
 
     }
 

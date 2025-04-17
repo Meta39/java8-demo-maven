@@ -24,6 +24,15 @@ public class WebServiceTypeCache implements ApplicationRunner {
      */
     private static final Map<String, Class<?>> typeCache = new HashMap<>();
 
+    /**
+     * 通过缓存获取 IWebService 实现类 handle 函数的 泛型入参
+     *
+     * @param serviceName IWebService实现类的 bean name
+     */
+    public static Class<?> getParameterType(String serviceName) {
+        return typeCache.get(serviceName);
+    }
+
     @Override
     public void run(ApplicationArguments args) throws Exception {
         Map<String, IWebService> beans = ApplicationContextUtils.getBeansOfType(IWebService.class);
@@ -46,15 +55,6 @@ public class WebServiceTypeCache implements ApplicationRunner {
                 }
             }
         });
-    }
-
-    /**
-     * 通过缓存获取 IWebService 实现类 handle 函数的 泛型入参
-     *
-     * @param serviceName IWebService实现类的 bean name
-     */
-    public static Class<?> getParameterType(String serviceName) {
-        return typeCache.get(serviceName);
     }
 
 }

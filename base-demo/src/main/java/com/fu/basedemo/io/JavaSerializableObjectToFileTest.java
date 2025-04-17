@@ -22,7 +22,7 @@ public class JavaSerializableObjectToFileTest {
     @Test
     @SneakyThrows
     public void saveObjectToFile() {
-        Obj writeObj = new Obj(123456, "abc","不会被序列化和反序列化");
+        Obj writeObj = new Obj(123456, "abc", "不会被序列化和反序列化");
         String objectFile = "E:/File/object.txt";
 
         Path path = Paths.get(objectFile);

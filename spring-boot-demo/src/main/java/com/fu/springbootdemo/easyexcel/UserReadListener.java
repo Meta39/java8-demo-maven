@@ -15,13 +15,11 @@ import java.util.List;
 public class UserReadListener implements ReadListener<User> {
 
     private static final int BATCH_COUNT = 100; //批量处理条数
-
+    private final UserMapper userMapper;
     /**
      * 缓存的数据
      */
     private List<User> userCachedList = ListUtils.newArrayListWithExpectedSize(BATCH_COUNT);
-
-    private final UserMapper userMapper;
 
     //如果使用了spring,请使用这个构造方法。每次创建Listener的时候需要把spring管理的类传进来
     public UserReadListener(UserMapper userMapper) {

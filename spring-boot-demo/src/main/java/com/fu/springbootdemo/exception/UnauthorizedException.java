@@ -8,11 +8,11 @@ public class UnauthorizedException extends CommonException {
     private static final String message = "Unauthorized 抱歉，您未认证身份，请先登录认证身份。";
 
     public UnauthorizedException() {
-        super(code,message);
+        super(code, message);
     }
 
     public UnauthorizedException(String message) {
-        super(code,message);
+        super(code, message);
     }
 
 }

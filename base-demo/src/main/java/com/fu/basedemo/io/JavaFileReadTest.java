@@ -21,7 +21,7 @@ public class JavaFileReadTest {
         showAllFiles(dir);
     }
 
-    public void showAllFiles(File dir){
+    public void showAllFiles(File dir) {
         if (dir == null || !dir.exists()) {
             return;
         }

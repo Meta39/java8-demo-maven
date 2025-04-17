@@ -11,7 +11,7 @@ import java.util.Properties;
 public class ReadPropertiesTests {
 
     @Test
-    public void testProperties(){
+    public void testProperties() {
         Properties testProperties = PropertiesUtils.getTestProperties();
         String param = testProperties.getProperty("params.app");
         System.out.println(param);

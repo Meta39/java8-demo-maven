@@ -6,6 +6,6 @@ package com.fu.basedemo.jdk8.functionalInterface;
 @FunctionalInterface
 public interface MyFunctionalInterface<T> {
 
-    T add(T obj1,T obj2);
+    T add(T obj1, T obj2);
 
 }

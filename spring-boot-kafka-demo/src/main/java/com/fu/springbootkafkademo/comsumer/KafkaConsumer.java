@@ -13,11 +13,12 @@ public class KafkaConsumer {
 
     /**
      * 监听topics主题
+     *
      * @param msg 对应主题的生产者传过来的消息内容
      */
     @KafkaListener(topics = "first")
-    public void first(String msg){
-        log.info("get message: {}",msg);
+    public void first(String msg) {
+        log.info("get message: {}", msg);
     }
 
 }

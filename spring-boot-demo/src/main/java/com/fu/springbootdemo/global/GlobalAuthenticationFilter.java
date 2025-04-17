@@ -64,7 +64,7 @@ public class GlobalAuthenticationFilter implements Filter {
         AntPathMatcher antPathMatcher = new AntPathMatcher();//这个比equals好使！
         boolean matchURI = this.notAuthentication.stream().anyMatch(ymlMethodAndURI -> antPathMatcher.match(ymlMethodAndURI, methodAndURI));//判断请求Method和URI是否在不需要认证的集合里面
         boolean checkToken = StringUtils.hasLength(token) && Boolean.TRUE.equals(this.redisTemplate.hasKey(redisTokenKey));
-        if (checkToken){//续期token
+        if (checkToken) {//续期token
             this.redisTemplate.expire(redisTokenKey, Duration.ofSeconds(tokenTimeout));
         }
         if (matchURI || checkToken) {//认证白名单或这认证通过
