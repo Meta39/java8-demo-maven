@@ -14,7 +14,6 @@
         <module>base-demo</module>
         <module>spring-boot-demo</module>
         <module>spring-boot-dynamic-data-source</module>
-        <module>spring-boot-dynamic-data-source2</module>
         <module>spring-boot-feign-seata-demo</module>
         <module>spring-boot-jpa-demo</module>
         <module>spring-boot-kafka-demo</module>
