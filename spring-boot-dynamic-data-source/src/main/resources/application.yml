@@ -14,7 +14,6 @@ spring:
 
 datasources:
   mysql1:
-    unique-resource-name: mysql1
     mapper-locations: "classpath:mapper/mysql1/*.xml"
     xa-data-source-class-name: com.mysql.cj.jdbc.MysqlXADataSource
     xa-properties:
@@ -24,7 +23,6 @@ datasources:
     min-pool-size: 5
     max-pool-size: 20
   mysql2:
-    unique-resource-name: mysql2
     mapper-locations: "classpath:mapper/mysql2/*.xml"
     xa-data-source-class-name: com.mysql.cj.jdbc.MysqlXADataSource
     xa-properties:
