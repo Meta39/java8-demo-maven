@@ -1,6 +1,6 @@
 package com.fu.springbootwebservicedemo.ws;
 
-import com.fu.springbootwebservicedemo.util.ApplicationContextUtils;
+import com.fu.springbootwebservicedemo.util.BeanUtils;
 import org.springframework.aop.framework.AopProxyUtils;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -35,7 +35,7 @@ public class WebServiceTypeCache implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        Map<String, IWebService> beans = ApplicationContextUtils.getBeansOfType(IWebService.class);
+        Map<String, IWebService> beans = BeanUtils.getBeansOfType(IWebService.class);
         //循环map，forEach(key,value) 是最现代的方式，使用起来简洁明了。也可以用 for (Map.Entry<String, IWebService> entry : beans.entrySet()){}。
         beans.forEach((bean, type) -> {
             // AopProxyUtils.ultimateTargetClass 解决Spring Boot 使用 @Transactional 事务注解的问题。

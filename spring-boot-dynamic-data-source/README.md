@@ -74,6 +74,40 @@ spring:
 建议： 生产环境需重点关注连接池配置、事务超时设置和日志存储位置，分布式事务场景建议配置合理的 max-retries 和 recovery.delay。
 ```
 
+## 默认配置只适合单个数据源，多数据源需要自定义配置
+```yaml
+# 配置根路径（不一定在这，可以在其它位置，但必须和DataSourceConfiguration.DATASOURCES配置的一样）
+datasources:
+  # 数据源1名称（DataSourceConfiguration.dataSourceName 必须为实现类名全小写）
+  mysql1:
+    # 自定义 MyBatis mapper.xml 存放路径参数（非 JTA 参数，但是放在了里面，方便一起配置）
+    mapper-locations: "classpath:mapper/mysql1/*.xml"
+    # 最小连接池数量
+    min-pool-size: 5
+    # 最大连接池数量
+    max-pool-size: 20
+    # 数据库 XA 驱动
+    xa-data-source-class-name: com.mysql.cj.jdbc.MysqlXADataSource
+    # 数据库配置
+    xa-properties:
+      # 数据库 URL 地址
+      url: mysql1url
+      # 数据库用户名
+      user: root
+      # 数据库密码
+      password: 123456
+  # 数据源2名称（其余参数同上）
+  mysql2:
+    mapper-locations: "classpath:mapper/mysql2/*.xml"
+    min-pool-size: 5
+    max-pool-size: 20
+    xa-data-source-class-name: com.mysql.cj.jdbc.MysqlXADataSource
+    xa-properties:
+      url: mysql2url
+      user: root
+      password: 123456
+```
+
 ## 增加新数据源注意事项
 
 1. DataSourceConfiguration.BASE_PACKAGES 需要注意是否是项目的根路径

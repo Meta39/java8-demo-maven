@@ -1,7 +1,7 @@
 package com.fu.springbootwebservicedemo.ws;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fu.springbootwebservicedemo.util.ApplicationContextUtils;
+import com.fu.springbootwebservicedemo.util.BeanUtils;
 import com.fu.springbootwebservicedemo.util.JacksonUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -52,7 +52,7 @@ public class WebServiceEntry {
     @WebMethod
     @SuppressWarnings("unchecked")
     public <T> String invoke(@WebParam(name = "service") String service, @WebParam(name = "parameter") String parameter) throws JsonProcessingException {
-        IWebService<T> webService = (IWebService<T>) ApplicationContextUtils.getBean(service);
+        IWebService<T> webService = (IWebService<T>) BeanUtils.getBean(service);
 
         // 通过缓存获取 IWebService 实现类的 handle 函数泛型类型入参，这样就不用每次请求都通过反射去获取入参，提升了程序性能。
         Class<T> parameterType = (Class<T>) WebServiceTypeCache.getParameterType(service);

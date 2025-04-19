@@ -1,6 +1,6 @@
 package com.fu.springbootdemo.strategy;
 
-import com.fu.springbootdemo.util.ApplicationContextUtils;
+import com.fu.springbootdemo.util.BeanUtils;
 import org.springframework.stereotype.Component;
 
 /**
@@ -10,6 +10,6 @@ import org.springframework.stereotype.Component;
 public class ExecuteStrategy {
 
     public Object executeStrategy(String strategy, String username, String password) {
-        return ((Strategy<?>) ApplicationContextUtils.getBean(strategy)).login(username, password);
+        return ((Strategy<?>) BeanUtils.getBean(strategy)).login(username, password);
     }
 }
