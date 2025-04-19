@@ -76,7 +76,7 @@ public class UserService {
             int maxLifetime = dataSource2.getMaxLifetime();
             String testQuery = dataSource2.getTestQuery();
             log.info(
-                    "MySQL1:xaProperties{},xaDataSourceClassName:{},xaDataSource:{},minPoolSize:{},maxPoolSize:{},borrowConnectionTimeout:{},reapTimeout:{},maintenanceInterval:{},maxIdleTime:{},maxLifetime:{},testQuery:{}",
+                    "MySQL2:xaProperties{},xaDataSourceClassName:{},xaDataSource:{},minPoolSize:{},maxPoolSize:{},borrowConnectionTimeout:{},reapTimeout:{},maintenanceInterval:{},maxIdleTime:{},maxLifetime:{},testQuery:{}",
                     xaProperties,
                     xaDataSourceClassName,
                     xaDataSource,
