@@ -11,15 +11,25 @@ spring:
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
     time-zone: GMT+8
-  datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    mysql1:
-      mapper-locations: "classpath:mapper/mysql1/*.xml"
-      url: jdbc:mysql://localhost:3306/dynamic?useUnicode=true&characterEncoding=utf-8&useSSL=true&serverTimezone=Asia/Shanghai&pinGlobalTxToPhysicalConnection=true
+
+datasources:
+  mysql1:
+    unique-resource-name: mysql1
+    mapper-locations: "classpath:mapper/mysql1/*.xml"
+    xa-data-source-class-name: com.mysql.cj.jdbc.MysqlXADataSource
+    xa-properties:
+      url: jdbc:mysql://localhost:3306/dynamic1?useUnicode=true&characterEncoding=utf-8&useSSL=true&serverTimezone=Asia/Shanghai&pinGlobalTxToPhysicalConnection=true
       user: root
       password: 123456
-    mysql2:
-      mapper-locations: "classpath:mapper/mysql2/*.xml"
+    min-pool-size: 5
+    max-pool-size: 20
+  mysql2:
+    unique-resource-name: mysql2
+    mapper-locations: "classpath:mapper/mysql2/*.xml"
+    xa-data-source-class-name: com.mysql.cj.jdbc.MysqlXADataSource
+    xa-properties:
       url: jdbc:mysql://localhost:3306/dynamic2?useUnicode=true&characterEncoding=utf-8&useSSL=true&serverTimezone=Asia/Shanghai&pinGlobalTxToPhysicalConnection=true
       user: root
       password: 123456
+    min-pool-size: 5
+    max-pool-size: 20

@@ -7,8 +7,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
 public class SpringBootDynamicDataSourceApplicationTests {
+    private final UserService userService;
+
     @Autowired
-    private UserService userService;
+    public SpringBootDynamicDataSourceApplicationTests(UserService userService) {
+        this.userService = userService;
+    }
 
     @Test
     public void contextLoads() {

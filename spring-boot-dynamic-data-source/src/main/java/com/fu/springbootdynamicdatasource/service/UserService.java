@@ -25,7 +25,7 @@ public class UserService {
         log.info("user2:{}", user2);
     }
 
-    @Transactional
+    @Transactional//使用的是JTA事务
     public void insertUser() {
         mySQL2UserMapper.insert(new User(2, "哈哈"));
         mySQL1UserMapper.insert(new User(2, "哈哈"));
