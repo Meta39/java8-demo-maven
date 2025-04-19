@@ -39,7 +39,9 @@ spring:
         concurrent-connection-validation: true  # 是否启用并发连接验证，默认 true
         xa-data-source-class-name: # XA 数据源的全限定类名（必填，如 com.mysql.cj.jdbc.MysqlXADataSource）
         xa-properties: # XA 数据源自定义属性（必填，如 url、user、password等）
-          自定义1: value
+          url: #数据库连接地址
+          user: #数据库用户名
+          password: #数据库密码
         # 下面的配置是和 connectionfactory 相同的配置
         max-pool-size: 1          # 最大连接池大小，默认 1（生产环境建议调整）
         min-pool-size: 1          # 最小连接池大小，默认 1（生产环境建议调整）
