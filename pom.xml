@@ -27,6 +27,7 @@
         <module>spring-boot-xxl-job-demo</module>
         <module>spring-springmvc-mybatis-demo</module>
         <module>velocity-generate-code-demo</module>
+        <module>spring-boot-jta-mybatis-plus-demo</module>
     </modules>
 
     <properties>
