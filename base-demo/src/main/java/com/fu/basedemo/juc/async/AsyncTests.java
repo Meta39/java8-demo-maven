@@ -9,6 +9,7 @@ import java.util.concurrent.*;
  * 异步调用：分为有返回值和无返回值
  */
 public class AsyncTests {
+    private static final BlockingQueue<Runnable> queue = new ArrayBlockingQueue<>(1000);//队列大小 = (预计峰值任务数 / 平均任务处理时间) * 平均IO等待时间
     private static final int cpuCores = Runtime.getRuntime().availableProcessors();//CPU核心数
     private static final int corePoolSize = 2 * cpuCores;//IO密集型 corePoolSize = CPU核心数 * 2
     private static final int maximumPoolSize = corePoolSize * 5;//IO密集型 maximumPoolSize = CPU核心数 * 2 * n（n是一个较大的值，比如5-10）
@@ -21,7 +22,6 @@ public class AsyncTests {
             Executors.defaultThreadFactory(), //threadFactory设置创建线程的工厂
             new ThreadPoolExecutor.CallerRunsPolicy()
     );
-    private static final BlockingQueue<Runnable> queue = new ArrayBlockingQueue<>(1000);//队列大小 = (预计峰值任务数 / 平均任务处理时间) * 平均IO等待时间
 
     //自定义静态方法简化 无返回值 + 使用自定义线程池
     public static void runAsyncTask(Runnable runnable) {
