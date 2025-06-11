@@ -30,7 +30,9 @@
         <module>spring-boot-jta-mybatis-plus-demo</module>
     </modules>
 
+    <!-- properties 定义的变量名可以在执行 mvn 时使用 -D变量名=变量值 进行修改，如：mvn -Dmy.property=newValue -->
     <properties>
+        <my.property>defaultValue</my.property>
         <java.version>1.8</java.version>
         <!-- maven.compiler.source 和 maven.compiler.target 这2个参数需要引入 apache maven-compiler-plugin 插件 -->
         <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
