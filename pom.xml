@@ -232,7 +232,7 @@
     </dependencyManagement>
 
     <build>
-        <finalName>${project.artifactId}-${spring.profiles.active}</finalName>
+        <finalName>${project.artifactId}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
@@ -282,27 +282,15 @@
             </plugin>
         </plugins>
         <resources>
-            <!-- 排除打包文件 -->
-            <resource>
-                <directory>src/main/resources</directory>
-                <excludes>
-                    <exclude>application*.yml</exclude>
-                    <exclude>application*.properties</exclude>
-                </excludes>
-            </resource>
-            <!-- 打包需要的文件 -->
+            <!--
+                打包需要的静态资源文件
+                打包全部静态资源文件，启动jar包通过命令行参数控制
+                如：java -Xms256m -Xmx512m -Dlogging.config=./logback-spring.xml -jar app.jar - -spring.profiles.active=dev
+             -->
             <resource>
                 <directory>src/main/resources</directory>
                 <!-- 解决yml配置@spring.profiles.active@时编译后没有生成对应环境的问题 -->
                 <filtering>true</filtering>
-                <!-- 只打包具体的环境，不打包其它环境的配置文件 -->
-                <includes>
-                    <include>**/*.xml</include>
-                    <include>application.yml</include>
-                    <include>application-${spring.profiles.active}*.yml</include>
-                    <include>application.properties</include>
-                    <include>application-${spring.profiles.active}*.properties</include>
-                </includes>
             </resource>
         </resources>
     </build>
