@@ -52,12 +52,11 @@ public final class MyBatisSqlParsingPlugin implements Interceptor {
         try {
             String sql = formatSql(parameterHandler, boundSql);
             if (!boundSql.getSql().equals(sql)) {
-                log.info("Execute SQL: {}", sql);
+                log.info("{}", sql);
             }
         } catch (Exception e) {
             String sql = boundSql.getSql();
-            log.error("SQL: {}", sql);
-            log.error("formatSql Exception: ", e);
+            log.error("SQL: {}\nformatSql Exception: ",sql, e);
         }
         return invocation.proceed();
     }
