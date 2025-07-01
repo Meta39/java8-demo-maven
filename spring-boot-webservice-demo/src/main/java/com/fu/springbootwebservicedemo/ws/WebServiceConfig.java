@@ -20,6 +20,12 @@ public class WebServiceConfig {
     private final WebServiceEntry webServiceEntry;
     private final WebServiceEntry12 webServiceEntry12;
 
+    /*@Bean(name = "cxfServlet")
+    public ServletRegistrationBean<?> cxfServlet() {
+        //urlMappings默认是：services
+        return new ServletRegistrationBean<>(new CXFServlet(), "/hai/*");
+    }*/
+
     @Bean(name = Bus.DEFAULT_BUS_ID)
     public SpringBus springBus() {
         return new SpringBus();
