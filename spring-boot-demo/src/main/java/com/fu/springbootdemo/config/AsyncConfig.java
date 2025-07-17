@@ -32,7 +32,8 @@ public class AsyncConfig implements AsyncConfigurer {
     private int maxSize = 50;
     private int keepAlive = 60;
     private int queueCapacity = 100;//队列容量不要设置太大，否则会影响效率。
-    private String threadNamePrefix = "schedulerTask";
+    private String threadNamePrefixAsyncTask = "asyncTask";
+    private String threadNamePrefixSchedulerTask = "schedulerTask";
 
     /**
      * 修改默认的 Async 异步线程池配置
@@ -46,6 +47,7 @@ public class AsyncConfig implements AsyncConfigurer {
         executor.setMaxPoolSize(maxSize);//最大线程池大小
         executor.setKeepAliveSeconds(keepAlive);//线程池存活时间单位秒s
         executor.setQueueCapacity(queueCapacity);//队列大小
+        executor.setThreadNamePrefix(threadNamePrefixAsyncTask);
         /*
           拒绝处理策略
           AbortPolicy()：默认策略，直接丢弃并抛出异常。
@@ -66,7 +68,8 @@ public class AsyncConfig implements AsyncConfigurer {
     public ThreadPoolTaskScheduler threadPoolTaskScheduler() {
         ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
         scheduler.setPoolSize(maxSize);
-        scheduler.setThreadNamePrefix(threadNamePrefix);
+        scheduler.setThreadNamePrefix(threadNamePrefixSchedulerTask);
+        scheduler.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
         scheduler.initialize();
         log.info("定时任务线程池大小={}", maxSize);
         return scheduler;
