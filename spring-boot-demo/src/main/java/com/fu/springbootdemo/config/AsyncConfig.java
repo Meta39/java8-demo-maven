@@ -28,10 +28,10 @@ import java.util.concurrent.ThreadPoolExecutor;
 @Configuration
 @ConfigurationProperties(prefix = "spring.task.execution.pool") // 该注解的locations已经被启用，现在只要是在环境中，都会优先加载
 public class AsyncConfig implements AsyncConfigurer {
-    private int coreSize = 8;//设置默认值，如果yml配置文件有值，则赋值，否则使用默认值。
-    private int maxSize = 16;
+    private int coreSize = 10;//设置默认值，如果yml配置文件有值，则赋值，否则使用默认值。
+    private int maxSize = 50;
     private int keepAlive = 60;
-    private int queueCapacity = 1000;
+    private int queueCapacity = 100;//队列容量不要设置太大，否则会影响效率。
     private String threadNamePrefix = "schedulerTask";
 
     /**
