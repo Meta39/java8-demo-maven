@@ -1,5 +1,6 @@
 package com.fu.mybatissqllog.plugin;
 
+import com.fu.mybatissqllog.util.DateTimeUtils;
 import org.apache.ibatis.executor.parameter.ParameterHandler;
 import org.apache.ibatis.executor.statement.StatementHandler;
 import org.apache.ibatis.mapping.BoundSql;
@@ -22,12 +23,8 @@ import java.lang.reflect.Field;
 import java.sql.Statement;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -37,26 +34,47 @@ import java.util.regex.Pattern;
 })
 public final class MyBatisSqlParsingPlugin implements Interceptor {
     private static final Logger log = LoggerFactory.getLogger(MyBatisSqlParsingPlugin.class);
-    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-
-    private static String formatString(String str) {
-        return "'" + str + "'";
-    }
+    private static final String MAPPEDSTATEMENT_NAME = "mappedStatement";
+    private static final String PERCENT_SIGN = "%";
+    private static final String PERCENT_SIGN2 = PERCENT_SIGN + PERCENT_SIGN;//%%
+    private static final String PERCENT_SIGN_STRING = PERCENT_SIGN + "s";//%s
+    private static final String NULL_STRING = "null";//null字符串
+    private static final String SPACE = " ";//空格
+    private static final String APOSTROPHE = "'";//单引号'
+    private static final char LEFT_CURLY_BRACES = '{';//左花括号
+    private static final String TRANSLATION_QUESTION_MARK = "\\?";//转译问号
+    private static final String REGEX_STRING = "\\s+";
+    private static final Map<ParameterHandler, MappedStatement> MAPPED_STATEMENT_CACHE = new ConcurrentHashMap<>();
 
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
-        StatementHandler statementHandler = (StatementHandler) invocation.getTarget();
-        ParameterHandler parameterHandler = statementHandler.getParameterHandler();
-        BoundSql boundSql = statementHandler.getBoundSql();
-        try {
-            String sql = formatSql(parameterHandler, boundSql);
-            if (!boundSql.getSql().equals(sql)) {
-                log.info("{}", sql);
+        if (invocation.getTarget() instanceof StatementHandler) {
+            StatementHandler statementHandler = (StatementHandler) invocation.getTarget();
+            ParameterHandler parameterHandler = statementHandler.getParameterHandler();
+            BoundSql boundSql = statementHandler.getBoundSql();
+            String sqlSource = boundSql.getSql();
+
+            try {
+                MappedStatement mappedStatement = MAPPED_STATEMENT_CACHE.computeIfAbsent(parameterHandler, ph -> {
+                    try {
+                        Field mappedStatementField = ph.getClass().getDeclaredField(MAPPEDSTATEMENT_NAME);
+                        mappedStatementField.setAccessible(true);
+                        return (MappedStatement) mappedStatementField.get(ph);
+                    } catch (Exception e) {
+                        log.error("get ParameterHandler fail: ", e);
+                        return null;
+                    }
+                });
+                if (Objects.isNull(mappedStatement)) {
+                    return invocation.proceed();
+                }
+                String sql = formatSql(boundSql, parameterHandler.getParameterObject(), mappedStatement.getConfiguration());
+                if (!sqlSource.equals(sql)) {
+                    log.info("{}", sql);
+                }
+            } catch (Exception e) {
+                log.error("{}\nException:", sqlSource, e);
             }
-        } catch (Exception e) {
-            String sql = boundSql.getSql();
-            log.error("SQL: {}\nformatSql Exception: ",sql, e);
         }
         return invocation.proceed();
     }
@@ -64,35 +82,27 @@ public final class MyBatisSqlParsingPlugin implements Interceptor {
     /**
      * 格式化SQL及其参数
      */
-    private String formatSql(ParameterHandler parameterHandler, BoundSql boundSql) throws NoSuchFieldException, IllegalAccessException {
-
-        Class<? extends ParameterHandler> parameterHandlerClass = parameterHandler.getClass();
-        Field mappedStatementField = parameterHandlerClass.getDeclaredField("mappedStatement");
-        mappedStatementField.setAccessible(true);
-        MappedStatement mappedStatement = (MappedStatement) mappedStatementField.get(parameterHandler);
-
-        String sql = boundSql.getSql().replaceAll("\\s+", " ");
+    private String formatSql(BoundSql boundSql, Object parameterObject, Configuration configuration) {
+        String sql = boundSql.getSql().replaceAll(REGEX_STRING, SPACE);
 
         // sql字符串是空或存储过程，直接跳过
-        if (!StringUtils.hasText(sql) || sql.trim().charAt(0) == '{') {
-            return "";
+        if (!StringUtils.hasText(sql) || sql.trim().charAt(0) == LEFT_CURLY_BRACES) {
+            return SPACE;
         }
 
         // 不传参数的场景，直接把Sql美化一下返回出去
-        Object parameterObject = parameterHandler.getParameterObject();
         List<ParameterMapping> parameterMappingList = boundSql.getParameterMappings();
         if (Objects.isNull(parameterObject) || parameterMappingList.isEmpty()) {
             return sql;
         }
 
-        return handleCommonParameter(sql, boundSql, mappedStatement);
+        return handleCommonParameter(sql, boundSql, configuration);
     }
 
     //替换预编译SQL
-    private String handleCommonParameter(String sql, BoundSql boundSql, MappedStatement mappedStatement) {
+    private String handleCommonParameter(String sql, BoundSql boundSql, Configuration configuration) {
         Object parameterObject = boundSql.getParameterObject();
         List<ParameterMapping> parameterMappings = boundSql.getParameterMappings();
-        Configuration configuration = mappedStatement.getConfiguration();
         TypeHandlerRegistry typeHandlerRegistry = configuration.getTypeHandlerRegistry();
         List<String> params = new ArrayList<>();
 
@@ -114,9 +124,9 @@ public final class MyBatisSqlParsingPlugin implements Interceptor {
         }
 
         //转译百分号
-        if (sql.contains("%")) {
+        if (sql.contains(PERCENT_SIGN)) {
             //如果参数不一致直接返回SQL
-            Pattern pattern = Pattern.compile("\\?");
+            Pattern pattern = Pattern.compile(TRANSLATION_QUESTION_MARK);
             Matcher matcher = pattern.matcher(sql);
             int count = 0;
             while (matcher.find()) {
@@ -126,51 +136,50 @@ public final class MyBatisSqlParsingPlugin implements Interceptor {
                 return sql;
             }
             if (params.size() != count) {
-                log.error("params.size() != count SQL: {}", sql);
-                log.error("params.size() != count SQL parameters: {}", params);
+                //SQL 参数和参数值长度不一致
+                log.error("SQL parameter length and value are inconsistent, SQL:{}\nSQL parameters:{}", sql, params);
                 return sql;
             }
-            sql = sql.replaceAll("%", "%%");
+            sql = sql.replaceAll(PERCENT_SIGN, PERCENT_SIGN2);
         }
 
-        sql = sql.replaceAll("\\?", "%s");
+        sql = sql.replaceAll(TRANSLATION_QUESTION_MARK, PERCENT_SIGN_STRING);
         return String.format(sql, params.toArray());
     }
 
     private String formatParam(Object object) {
         if (object == null) {
-            return "null";
+            return NULL_STRING;
         }
-        // 尝试格式化String
         if (object instanceof String) {
             return formatString((String) object);
         }
-        // 尝试格式化Date
         if (object instanceof Date) {
             return formatDate((Date) object);
         }
-        // 尝试格式化LocalDate
         if (object instanceof LocalDate) {
             return formatLocalDate((LocalDate) object);
         }
-        // 尝试格式化LocalDateTime
         if (object instanceof LocalDateTime) {
             return formatLocalDateTime((LocalDateTime) object);
         }
-        // 默认行为：直接转换为字符串
         return object.toString();
     }
 
+    private static String formatString(String str) {
+        return APOSTROPHE + str + APOSTROPHE;
+    }
+
     private String formatDate(Date date) {
-        return "'" + DATE_TIME_FORMATTER.format(date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime()) + "'";
+        return APOSTROPHE + DateTimeUtils.dateToString(date) + APOSTROPHE;
     }
 
     private String formatLocalDate(LocalDate date) {
-        return "'" + DATE_FORMATTER.format(date) + "'";
+        return APOSTROPHE + DateTimeUtils.localDateToString(date) + APOSTROPHE;
     }
 
     private String formatLocalDateTime(LocalDateTime dateTime) {
-        return "'" + DATE_TIME_FORMATTER.format(dateTime) + "'";
+        return APOSTROPHE + DateTimeUtils.localDateTimeToString(dateTime) + APOSTROPHE;
     }
 
 }
