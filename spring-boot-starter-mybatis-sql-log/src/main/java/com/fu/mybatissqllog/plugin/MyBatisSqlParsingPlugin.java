@@ -23,8 +23,10 @@ import java.lang.reflect.Field;
 import java.sql.Statement;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
 
 @Intercepts({
         @Signature(type = StatementHandler.class, method = "update", args = {Statement.class,}),
@@ -42,7 +44,6 @@ public final class MyBatisSqlParsingPlugin implements Interceptor {
     private static final char LEFT_CURLY_BRACES = '{';//左花括号
     private static final String TRANSLATION_QUESTION_MARK = "\\?";//转译问号
     private static final String REGEX_STRING = "\\s+";
-    private static final Map<ParameterHandler, MappedStatement> MAPPED_STATEMENT_CACHE = new ConcurrentHashMap<>();
 
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
@@ -53,16 +54,9 @@ public final class MyBatisSqlParsingPlugin implements Interceptor {
             String sqlSource = boundSql.getSql();
 
             try {
-                MappedStatement mappedStatement = MAPPED_STATEMENT_CACHE.computeIfAbsent(parameterHandler, ph -> {
-                    try {
-                        Field mappedStatementField = ph.getClass().getDeclaredField(MAPPEDSTATEMENT_NAME);
-                        mappedStatementField.setAccessible(true);
-                        return (MappedStatement) mappedStatementField.get(ph);
-                    } catch (Exception e) {
-                        log.error("get ParameterHandler fail: ", e);
-                        return null;
-                    }
-                });
+                Field mappedStatementField = parameterHandler.getClass().getDeclaredField(MAPPEDSTATEMENT_NAME);
+                mappedStatementField.setAccessible(true);
+                MappedStatement mappedStatement = (MappedStatement) mappedStatementField.get(mappedStatementField);
                 if (Objects.isNull(mappedStatement)) {
                     return invocation.proceed();
                 }
