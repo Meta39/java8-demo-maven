@@ -25,8 +25,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @Intercepts({
         @Signature(type = StatementHandler.class, method = "update", args = {Statement.class,}),
@@ -124,11 +122,11 @@ public final class MyBatisSqlParsingPlugin implements Interceptor {
         }
 
         //如果参数和值不一致直接返回SQL
-        Pattern pattern = Pattern.compile(TRANSLATION_QUESTION_MARK);
-        Matcher matcher = pattern.matcher(sql);
         int count = 0;
-        while (matcher.find()) {
-            count++;
+        for (int i = 0; i < sql.length(); i++) {
+            if (sql.charAt(i) == '?') {
+                count++;
+            }
         }
         if (count == 0 || params.isEmpty()) {
             return sql;
