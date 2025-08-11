@@ -3,6 +3,7 @@ package com.fu.mybatissqllog;
 import com.fu.mybatissqllog.plugin.MyBatisSqlParsingPlugin;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -14,8 +15,8 @@ public class AutoConfig {
     @Bean
     //不包含这个类，这个类才会注入到Spring容器中
     @ConditionalOnMissingBean(MyBatisSqlParsingPlugin.class)
-    public MyBatisSqlParsingPlugin myBatisSqlParsingPlugin() {
-        return new MyBatisSqlParsingPlugin();
+    public MyBatisSqlParsingPlugin myBatisSqlParsingPlugin(ApplicationContext applicationContext) {
+        return new MyBatisSqlParsingPlugin(applicationContext);
     }
 
 }

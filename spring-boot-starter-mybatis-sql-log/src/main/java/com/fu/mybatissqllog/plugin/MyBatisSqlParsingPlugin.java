@@ -4,7 +4,6 @@ import com.fu.mybatissqllog.util.DateTimeUtils;
 import org.apache.ibatis.executor.parameter.ParameterHandler;
 import org.apache.ibatis.executor.statement.StatementHandler;
 import org.apache.ibatis.mapping.BoundSql;
-import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.ParameterMapping;
 import org.apache.ibatis.mapping.ParameterMode;
 import org.apache.ibatis.plugin.Interceptor;
@@ -14,12 +13,13 @@ import org.apache.ibatis.plugin.Signature;
 import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.ResultHandler;
+import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.type.TypeHandlerRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationContext;
 import org.springframework.util.StringUtils;
 
-import java.lang.reflect.Field;
 import java.sql.Statement;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -34,7 +34,6 @@ import java.util.Objects;
 })
 public final class MyBatisSqlParsingPlugin implements Interceptor {
     private static final Logger log = LoggerFactory.getLogger(MyBatisSqlParsingPlugin.class);
-    private static final String MAPPEDSTATEMENT_NAME = "mappedStatement";
     private static final String PERCENT_SIGN = "%";
     private static final String PERCENT_SIGN2 = PERCENT_SIGN + PERCENT_SIGN;//%%
     private static final String PERCENT_SIGN_STRING = PERCENT_SIGN + "s";//%s
@@ -42,8 +41,15 @@ public final class MyBatisSqlParsingPlugin implements Interceptor {
     private static final String SPACE = " ";//空格
     private static final String APOSTROPHE = "'";//单引号'
     private static final char LEFT_CURLY_BRACES = '{';//左花括号
+    private static final char QUESTION_MARK = '?';//问号字符
     private static final String TRANSLATION_QUESTION_MARK = "\\?";//转译问号
     private static final String REGEX_STRING = "\\s+";
+    //注入 ApplicationContext 然后通过 SqlSessionFactory 获取 Configuration
+    private final ApplicationContext applicationContext;
+
+    public MyBatisSqlParsingPlugin(ApplicationContext applicationContext) {
+        this.applicationContext = applicationContext;
+    }
 
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
@@ -54,14 +60,9 @@ public final class MyBatisSqlParsingPlugin implements Interceptor {
             String sqlSource = boundSql.getSql();
 
             try {
-                //这里暂时没有更好的办法，因为 MyBatis 没有提个获取 MappedStatement 的方法，只能通过反射去获取。
-                Field mappedStatementField = parameterHandler.getClass().getDeclaredField(MAPPEDSTATEMENT_NAME);
-                mappedStatementField.setAccessible(true);
-                MappedStatement mappedStatement = (MappedStatement) mappedStatementField.get(parameterHandler);
-                if (Objects.isNull(mappedStatement)) {
-                    return invocation.proceed();
-                }
-                String sql = formatSql(boundSql, parameterHandler.getParameterObject(), mappedStatement.getConfiguration());
+                SqlSessionFactory sqlSessionFactory = applicationContext.getBean(SqlSessionFactory.class);
+                Configuration configuration = sqlSessionFactory.getConfiguration();
+                String sql = formatSql(boundSql, parameterHandler.getParameterObject(), configuration);
                 if (!sqlSource.equals(sql)) {
                     log.info("{}", sql);
                 }
@@ -119,7 +120,7 @@ public final class MyBatisSqlParsingPlugin implements Interceptor {
         //如果参数和值不一致直接返回SQL
         int count = 0;
         for (int i = 0; i < sql.length(); i++) {
-            if (sql.charAt(i) == '?') {
+            if (sql.charAt(i) == QUESTION_MARK) {
                 count++;
             }
         }
