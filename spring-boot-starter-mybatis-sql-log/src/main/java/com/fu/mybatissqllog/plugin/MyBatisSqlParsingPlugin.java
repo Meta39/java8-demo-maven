@@ -34,15 +34,12 @@ import java.util.Objects;
 })
 public final class MyBatisSqlParsingPlugin implements Interceptor {
     private static final Logger log = LoggerFactory.getLogger(MyBatisSqlParsingPlugin.class);
-    private static final String PERCENT_SIGN = "%";
-    private static final String PERCENT_SIGN2 = PERCENT_SIGN + PERCENT_SIGN;//%%
-    private static final String PERCENT_SIGN_STRING = PERCENT_SIGN + "s";//%s
     private static final String NULL_STRING = "null";//null字符串
     private static final String SPACE = " ";//空格
     private static final String APOSTROPHE = "'";//单引号'
     private static final char LEFT_CURLY_BRACES = '{';//左花括号
     private static final char QUESTION_MARK = '?';//问号字符
-    private static final String TRANSLATION_QUESTION_MARK = "\\?";//转译问号
+    private static final String QUESTION_MARK_STRING = "?";//问号字符
     private static final String REGEX_STRING = "\\s+";
     //注入 ApplicationContext 然后通过 SqlSessionFactory 获取 Configuration
     private final ApplicationContext applicationContext;
@@ -63,9 +60,7 @@ public final class MyBatisSqlParsingPlugin implements Interceptor {
                 SqlSessionFactory sqlSessionFactory = applicationContext.getBean(SqlSessionFactory.class);
                 Configuration configuration = sqlSessionFactory.getConfiguration();
                 String sql = formatSql(boundSql, parameterHandler.getParameterObject(), configuration);
-                if (!sqlSource.equals(sql)) {
-                    log.info("{}", sql);
-                }
+                log.info("{}", sql);
             } catch (Exception e) {
                 log.error("{}\nSqlParsingException:", sqlSource, e);
             }
@@ -84,19 +79,18 @@ public final class MyBatisSqlParsingPlugin implements Interceptor {
             return SPACE;
         }
 
-        // 不传参数的场景，直接把Sql美化一下返回出去
-        List<ParameterMapping> parameterMappingList = boundSql.getParameterMappings();
-        if (Objects.isNull(parameterObject) || parameterMappingList.isEmpty()) {
+        // 不传参数的场景，直接把Sql返回出去
+        List<ParameterMapping> parameterMappings = boundSql.getParameterMappings();
+        if (Objects.isNull(parameterObject) || parameterMappings.isEmpty()) {
             return sql;
         }
 
-        return handleCommonParameter(sql, boundSql, configuration);
+        return handleCommonParameter(sql, boundSql, configuration, parameterMappings);
     }
 
     //替换预编译SQL
-    private String handleCommonParameter(String sql, BoundSql boundSql, Configuration configuration) {
+    private String handleCommonParameter(String sql, BoundSql boundSql, Configuration configuration,List<ParameterMapping> parameterMappings) {
         Object parameterObject = boundSql.getParameterObject();
-        List<ParameterMapping> parameterMappings = boundSql.getParameterMappings();
         TypeHandlerRegistry typeHandlerRegistry = configuration.getTypeHandlerRegistry();
         List<String> params = new ArrayList<>();
 
@@ -117,6 +111,10 @@ public final class MyBatisSqlParsingPlugin implements Interceptor {
             params.add(this.formatParam(propertyValue));
         }
 
+        if (params.isEmpty()) {
+            return sql;
+        }
+
         //如果参数和值不一致直接返回SQL
         int count = 0;
         for (int i = 0; i < sql.length(); i++) {
@@ -124,7 +122,7 @@ public final class MyBatisSqlParsingPlugin implements Interceptor {
                 count++;
             }
         }
-        if (count == 0 || params.isEmpty()) {
+        if (count == 0) {
             return sql;
         }
         if (params.size() != count) {
@@ -133,13 +131,28 @@ public final class MyBatisSqlParsingPlugin implements Interceptor {
             return sql;
         }
 
-        //转译百分号
-        if (sql.contains(PERCENT_SIGN)) {
-            sql = sql.replaceAll(PERCENT_SIGN, PERCENT_SIGN2);
-        }
+        return finalSql(sql, params);
+    }
 
-        sql = sql.replaceAll(TRANSLATION_QUESTION_MARK, PERCENT_SIGN_STRING);
-        return String.format(sql, params.toArray());
+    /**
+     * 完整SQL
+     * @param sql 预编译SQL
+     * @param params 参数
+     */
+    private String finalSql(String sql, List<String> params) {
+        StringBuilder sb = new StringBuilder(sql);
+        int offset = 0; // 偏移量，因为替换后字符串长度会变化
+        for (String param : params) {
+            int index = sb.indexOf(QUESTION_MARK_STRING, offset);
+            if (index == -1) {
+                break; // 没有更多 ? 了
+            }
+
+            // 替换这个 ?
+            sb.replace(index, index + 1, param);
+            offset = index + param.length(); // 更新偏移量
+        }
+        return sb.toString();
     }
 
     private String formatParam(Object object) {
