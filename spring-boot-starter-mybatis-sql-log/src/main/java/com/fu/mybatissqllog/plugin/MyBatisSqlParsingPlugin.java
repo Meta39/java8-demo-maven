@@ -73,7 +73,7 @@ public final class MyBatisSqlParsingPlugin implements Interceptor {
                     log.info("{}", sql);
                 }
             } catch (Exception e) {
-                log.error("{}\nException:", sqlSource, e);
+                log.error("{}\nSqlParsingException:", sqlSource, e);
             }
         }
         return invocation.proceed();
