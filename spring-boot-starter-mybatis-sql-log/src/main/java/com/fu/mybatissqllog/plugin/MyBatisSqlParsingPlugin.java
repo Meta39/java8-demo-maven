@@ -123,23 +123,24 @@ public final class MyBatisSqlParsingPlugin implements Interceptor {
             params.add(this.formatParam(propertyValue));
         }
 
+        //如果参数和值不一致直接返回SQL
+        Pattern pattern = Pattern.compile(TRANSLATION_QUESTION_MARK);
+        Matcher matcher = pattern.matcher(sql);
+        int count = 0;
+        while (matcher.find()) {
+            count++;
+        }
+        if (count == 0 || params.isEmpty()) {
+            return sql;
+        }
+        if (params.size() != count) {
+            //SQL 参数和参数值长度不一致
+            log.error("SQL parameter length and value are inconsistent, SQL:{}\nSQL parameters:{}", sql, params);
+            return sql;
+        }
+
         //转译百分号
         if (sql.contains(PERCENT_SIGN)) {
-            //如果参数不一致直接返回SQL
-            Pattern pattern = Pattern.compile(TRANSLATION_QUESTION_MARK);
-            Matcher matcher = pattern.matcher(sql);
-            int count = 0;
-            while (matcher.find()) {
-                count++;
-            }
-            if (count == 0 || params.isEmpty()) {
-                return sql;
-            }
-            if (params.size() != count) {
-                //SQL 参数和参数值长度不一致
-                log.error("SQL parameter length and value are inconsistent, SQL:{}\nSQL parameters:{}", sql, params);
-                return sql;
-            }
             sql = sql.replaceAll(PERCENT_SIGN, PERCENT_SIGN2);
         }
 
