@@ -72,7 +72,7 @@ public final class MyBatisSqlParsingPlugin implements Interceptor {
 
         // sql字符串是空或存储过程，直接跳过
         if (!StringUtils.hasText(sql) || sql.trim().charAt(0) == LEFT_CURLY_BRACES) {
-            return SPACE;
+            return null;
         }
 
         // 不传参数的场景，直接把Sql返回出去
