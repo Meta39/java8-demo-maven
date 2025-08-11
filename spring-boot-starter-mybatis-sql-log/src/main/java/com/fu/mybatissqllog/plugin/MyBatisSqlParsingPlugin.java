@@ -57,7 +57,7 @@ public final class MyBatisSqlParsingPlugin implements Interceptor {
                 //这里暂时没有更好的办法，因为 MyBatis 没有提个获取 MappedStatement 的方法，只能通过反射去获取。
                 Field mappedStatementField = parameterHandler.getClass().getDeclaredField(MAPPEDSTATEMENT_NAME);
                 mappedStatementField.setAccessible(true);
-                MappedStatement mappedStatement = (MappedStatement) mappedStatementField.get(mappedStatementField);
+                MappedStatement mappedStatement = (MappedStatement) mappedStatementField.get(parameterHandler);
                 if (Objects.isNull(mappedStatement)) {
                     return invocation.proceed();
                 }
