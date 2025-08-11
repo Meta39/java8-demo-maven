@@ -85,12 +85,13 @@ public final class MyBatisSqlParsingPlugin implements Interceptor {
             return sql;
         }
 
-        return handleCommonParameter(sql, boundSql, configuration, parameterMappings);
+        return handleCommonParameter(sql, boundSql, configuration);
     }
 
     //替换预编译SQL
-    private String handleCommonParameter(String sql, BoundSql boundSql, Configuration configuration,List<ParameterMapping> parameterMappings) {
+    private String handleCommonParameter(String sql, BoundSql boundSql, Configuration configuration) {
         Object parameterObject = boundSql.getParameterObject();
+        List<ParameterMapping> parameterMappings = boundSql.getParameterMappings();
         TypeHandlerRegistry typeHandlerRegistry = configuration.getTypeHandlerRegistry();
         List<String> params = new ArrayList<>();
 
@@ -136,7 +137,8 @@ public final class MyBatisSqlParsingPlugin implements Interceptor {
 
     /**
      * 完整SQL
-     * @param sql 预编译SQL
+     *
+     * @param sql    预编译SQL
      * @param params 参数
      */
     private String finalSql(String sql, List<String> params) {
