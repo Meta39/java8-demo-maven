@@ -55,9 +55,7 @@ public final class MyBatisSqlParsingPlugin implements Interceptor {
             String sqlSource = boundSql.getSql();
 
             try {
-                SqlSessionFactory sqlSessionFactory = applicationContext.getBean(SqlSessionFactory.class);
-                Configuration configuration = sqlSessionFactory.getConfiguration();
-                String sql = formatSql(boundSql, configuration);
+                String sql = formatSql(boundSql);
                 log.info("{}", sql);
             } catch (Exception e) {
                 log.error("{}\nSqlParsingException:", sqlSource, e);
@@ -69,7 +67,7 @@ public final class MyBatisSqlParsingPlugin implements Interceptor {
     /**
      * 格式化SQL及其参数
      */
-    private String formatSql(BoundSql boundSql, Configuration configuration) {
+    private String formatSql(BoundSql boundSql) {
         String sql = boundSql.getSql().replaceAll(REGEX_STRING, SPACE);
 
         // sql字符串是空或存储过程，直接跳过
@@ -85,13 +83,15 @@ public final class MyBatisSqlParsingPlugin implements Interceptor {
             return sql;
         }
 
-        return handleCommonParameter(sql, boundSql, configuration);
+        return handleCommonParameter(sql, boundSql);
     }
 
     //替换预编译SQL
-    private String handleCommonParameter(String sql, BoundSql boundSql, Configuration configuration) {
+    private String handleCommonParameter(String sql, BoundSql boundSql) {
         Object parameterObject = boundSql.getParameterObject();
         List<ParameterMapping> parameterMappings = boundSql.getParameterMappings();
+        SqlSessionFactory sqlSessionFactory = applicationContext.getBean(SqlSessionFactory.class);
+        Configuration configuration = sqlSessionFactory.getConfiguration();
         TypeHandlerRegistry typeHandlerRegistry = configuration.getTypeHandlerRegistry();
         List<String> params = new ArrayList<>();
 
