@@ -1,7 +1,6 @@
 package com.fu.mybatissqllog.plugin;
 
 import com.fu.mybatissqllog.util.DateTimeUtils;
-import org.apache.ibatis.executor.parameter.ParameterHandler;
 import org.apache.ibatis.executor.statement.StatementHandler;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.ParameterMapping;
@@ -52,14 +51,13 @@ public final class MyBatisSqlParsingPlugin implements Interceptor {
     public Object intercept(Invocation invocation) throws Throwable {
         if (invocation.getTarget() instanceof StatementHandler) {
             StatementHandler statementHandler = (StatementHandler) invocation.getTarget();
-            ParameterHandler parameterHandler = statementHandler.getParameterHandler();
             BoundSql boundSql = statementHandler.getBoundSql();
             String sqlSource = boundSql.getSql();
 
             try {
                 SqlSessionFactory sqlSessionFactory = applicationContext.getBean(SqlSessionFactory.class);
                 Configuration configuration = sqlSessionFactory.getConfiguration();
-                String sql = formatSql(boundSql, parameterHandler.getParameterObject(), configuration);
+                String sql = formatSql(boundSql, configuration);
                 log.info("{}", sql);
             } catch (Exception e) {
                 log.error("{}\nSqlParsingException:", sqlSource, e);
@@ -71,7 +69,7 @@ public final class MyBatisSqlParsingPlugin implements Interceptor {
     /**
      * 格式化SQL及其参数
      */
-    private String formatSql(BoundSql boundSql, Object parameterObject, Configuration configuration) {
+    private String formatSql(BoundSql boundSql, Configuration configuration) {
         String sql = boundSql.getSql().replaceAll(REGEX_STRING, SPACE);
 
         // sql字符串是空或存储过程，直接跳过
@@ -81,7 +79,9 @@ public final class MyBatisSqlParsingPlugin implements Interceptor {
 
         // 不传参数的场景，直接把Sql返回出去
         List<ParameterMapping> parameterMappings = boundSql.getParameterMappings();
-        if (Objects.isNull(parameterObject) || parameterMappings.isEmpty()) {
+        if (Objects.isNull(boundSql.getParameterObject())
+                ||
+                (Objects.isNull(parameterMappings) || parameterMappings.isEmpty())) {
             return sql;
         }
 
