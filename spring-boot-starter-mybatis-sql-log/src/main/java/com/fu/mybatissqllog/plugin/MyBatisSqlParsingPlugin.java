@@ -38,7 +38,7 @@ public final class MyBatisSqlParsingPlugin implements Interceptor {
     private static final String APOSTROPHE = "'";//单引号'
     private static final char LEFT_CURLY_BRACES = '{';//左花括号
     private static final char QUESTION_MARK = '?';//问号字符
-    private static final String QUESTION_MARK_STRING = "?";//问号字符
+    private static final String QUESTION_MARK_STRING = "?";//问号字符串
     private static final String REGEX_STRING = "\\s+";
     //注入 ApplicationContext 然后通过 SqlSessionFactory 获取 Configuration
     private final ApplicationContext applicationContext;
@@ -112,27 +112,30 @@ public final class MyBatisSqlParsingPlugin implements Interceptor {
             params.add(this.formatParam(propertyValue));
         }
 
-        if (params.isEmpty()) {
+        //如果参数和值不一致直接返回SQL
+        int countParams = countParams(sql);
+
+        if (countParams == 0) {
             return sql;
         }
 
-        //如果参数和值不一致直接返回SQL
-        int count = 0;
-        for (int i = 0; i < sql.length(); i++) {
-            if (sql.charAt(i) == QUESTION_MARK) {
-                count++;
-            }
-        }
-        if (count == 0) {
-            return sql;
-        }
-        if (params.size() != count) {
+        if (params.size() != countParams) {
             //SQL 参数和参数值长度不一致
             log.error("SQL parameter length and value are inconsistent, SQL:{}\nSQL parameters:{}", sql, params);
             return sql;
         }
 
         return finalSql(sql, params);
+    }
+
+    private int countParams(String sql) {
+        int count = 0;
+        for (int i = 0; i < sql.length(); i++) {
+            if (sql.charAt(i) == QUESTION_MARK) {
+                count++;
+            }
+        }
+        return count;
     }
 
     /**
