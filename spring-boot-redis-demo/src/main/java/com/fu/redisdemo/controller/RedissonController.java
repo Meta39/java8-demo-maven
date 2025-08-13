@@ -1,6 +1,6 @@
 package com.fu.redisdemo.controller;
 
-import com.fu.redisdemo.util.RedissonUtils;
+import com.fu.redisdemo.redisson.RedissonUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RAtomicLong;
@@ -42,7 +42,7 @@ public class RedissonController {
      */
     @PostMapping("/subProductLock")
     public void subProductLock() {
-        boolean lock = RedissonUtils.lock(redisson, "subProductLock", () -> {
+        boolean lock = RedissonUtils.runnableLockNoWaitingShortTask("subProductLock", () -> {
             RAtomicLong stocks = redisson.getAtomicLong(STOCKS);
             long cunrrent = stocks.get();//获取当前值
             if (cunrrent == 0L) {
