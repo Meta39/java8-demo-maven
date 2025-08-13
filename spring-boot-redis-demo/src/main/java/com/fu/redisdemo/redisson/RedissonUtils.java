@@ -173,7 +173,7 @@ public final class RedissonUtils implements ApplicationContextAware {
             throw new RuntimeException(e);
         } finally {
             //锁不为空，并且是当前前程和已经上锁才解锁，防止解其它线程的锁。
-            if (Objects.nonNull(lock) && lock.isHeldByCurrentThread() && lock.isLocked()) {
+            if (Objects.nonNull(lock) && lock.isHeldByCurrentThread()) {
                 lock.unlock();
             }
         }
