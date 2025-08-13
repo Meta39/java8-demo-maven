@@ -120,8 +120,8 @@ public final class MyBatisSqlParsingPlugin implements Interceptor {
         }
 
         if (params.size() != countParams) {
-            //SQL 参数和参数值长度不一致
-            log.error("SQL parameter length and value are inconsistent, SQL:{}\nSQL parameters:{}", sql, params);
+            //SQL 参数和参数值长度不一致（就是SQL里面包含问号字符串导致SQL解析失败，这种情况比较特殊，建议抛弃抛弃解析！！！）
+            //log.error("SQL parameter length and value are inconsistent, SQL:{}\nSQL parameters:{}", sql, params);
             return sql;
         }
 
