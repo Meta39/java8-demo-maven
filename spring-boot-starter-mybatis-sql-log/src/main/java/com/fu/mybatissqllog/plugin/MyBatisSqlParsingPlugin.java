@@ -13,10 +13,10 @@ import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.SqlSessionFactory;
-import org.apache.ibatis.type.TypeHandlerRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.sql.Statement;
@@ -68,18 +68,19 @@ public final class MyBatisSqlParsingPlugin implements Interceptor {
      * 格式化SQL及其参数
      */
     private String formatSql(BoundSql boundSql) {
-        String sql = boundSql.getSql().replaceAll(REGEX_STRING, SPACE);
+        String sql = boundSql.getSql();
 
-        // sql字符串是空或存储过程，直接跳过
+        // sql字符串是空或存储过程，直接返回
         if (!StringUtils.hasText(sql) || sql.trim().charAt(0) == LEFT_CURLY_BRACES) {
-            return null;
+            return sql;
         }
 
-        // 不传参数的场景，直接把Sql返回出去
+        //美化不为空的SQL
+        sql = sql.replaceAll(REGEX_STRING, SPACE);
+
+        // 不传参数的场景，直接把美化后的SQL返回出去
         List<ParameterMapping> parameterMappings = boundSql.getParameterMappings();
-        if (Objects.isNull(boundSql.getParameterObject())
-                ||
-                (Objects.isNull(parameterMappings) || parameterMappings.isEmpty())) {
+        if (CollectionUtils.isEmpty(parameterMappings)) {
             return sql;
         }
 
@@ -92,7 +93,6 @@ public final class MyBatisSqlParsingPlugin implements Interceptor {
         List<ParameterMapping> parameterMappings = boundSql.getParameterMappings();
         SqlSessionFactory sqlSessionFactory = applicationContext.getBean(SqlSessionFactory.class);
         Configuration configuration = sqlSessionFactory.getConfiguration();
-        TypeHandlerRegistry typeHandlerRegistry = configuration.getTypeHandlerRegistry();
         List<String> params = new ArrayList<>();
 
         for (ParameterMapping parameterMapping : parameterMappings) {
@@ -103,8 +103,8 @@ public final class MyBatisSqlParsingPlugin implements Interceptor {
             String propertyName = parameterMapping.getProperty();
             if (boundSql.hasAdditionalParameter(propertyName)) {
                 propertyValue = boundSql.getAdditionalParameter(propertyName);
-            } else if (typeHandlerRegistry.hasTypeHandler(parameterObject.getClass())) {
-                propertyValue = parameterObject;
+            } else if (Objects.isNull(parameterObject)) {
+                propertyValue = null;
             } else {
                 MetaObject metaObject = configuration.newMetaObject(parameterObject);
                 propertyValue = metaObject.getValue(propertyName);
