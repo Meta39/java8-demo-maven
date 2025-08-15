@@ -13,6 +13,7 @@ import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.SqlSessionFactory;
+import org.apache.ibatis.type.TypeHandlerRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
@@ -95,6 +96,7 @@ public final class MyBatisSqlParsingPlugin implements Interceptor {
         List<ParameterMapping> parameterMappings = boundSql.getParameterMappings();
         SqlSessionFactory sqlSessionFactory = applicationContext.getBean(SqlSessionFactory.class);
         Configuration configuration = sqlSessionFactory.getConfiguration();
+        TypeHandlerRegistry typeHandlerRegistry = configuration.getTypeHandlerRegistry();
         List<String> params = new ArrayList<>();
 
         for (ParameterMapping parameterMapping : parameterMappings) {
@@ -107,6 +109,9 @@ public final class MyBatisSqlParsingPlugin implements Interceptor {
                 propertyValue = boundSql.getAdditionalParameter(propertyName);
             } else if (Objects.isNull(parameterObject)) {
                 propertyValue = null;
+            } else if (typeHandlerRegistry.hasTypeHandler(parameterObject.getClass())) {
+                //typeHandlerRegistry.hasTypeHandler 这个判断并不是多余的！
+                propertyValue = parameterObject;
             } else {
                 MetaObject metaObject = configuration.newMetaObject(parameterObject);
                 propertyValue = metaObject.getValue(propertyName);
