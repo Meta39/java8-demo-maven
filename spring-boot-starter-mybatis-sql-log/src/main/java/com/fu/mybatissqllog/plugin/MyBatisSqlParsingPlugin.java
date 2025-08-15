@@ -40,6 +40,8 @@ public final class MyBatisSqlParsingPlugin implements Interceptor {
     private static final char QUESTION_MARK = '?';//问号字符
     private static final String QUESTION_MARK_STRING = "?";//问号字符串
     private static final String REGEX_STRING = "\\s+";
+    private static final String COMMA_STRING = ",";//逗号,
+    private static final String PARAMS = ",params:";
     //注入 ApplicationContext 然后通过 SqlSessionFactory 获取 Configuration
     private final ApplicationContext applicationContext;
 
@@ -122,7 +124,7 @@ public final class MyBatisSqlParsingPlugin implements Interceptor {
         if (params.size() != countParams) {
             //SQL 参数和参数值长度不一致（就是SQL里面包含问号字符串导致SQL解析失败，这种情况比较特殊，建议抛弃抛弃解析！！！）
             //log.error("SQL parameter length and value are inconsistent, SQL:{}\nSQL parameters:{}", sql, params);
-            return sql;
+            return sql + PARAMS + String.join(COMMA_STRING, params);
         }
 
         return finalSql(sql, params);
