@@ -101,9 +101,10 @@ public final class MyBatisPlusUtils {
 
     /**
      * 通用分页查询方法
+     * 避免内存溢出、减少网络/数据库压力，平衡单次查询效率与总耗时。
      *
      * @param functionInterface              获取分页数据的方法
-     * @param pageSize                       每次获取的数据量
+     * @param pageSize                       每次获取的数据量（业务场景的最佳分批大小（通常5000-10000条较合理））
      * @param businessLogicFunctionInterface 对获取的分页数据进行处理
      */
     public static <T> void findAllByPage(PageFunctionInterface<T> functionInterface, long pageSize, BusinessLogicFunctionInterface<T> businessLogicFunctionInterface) {
