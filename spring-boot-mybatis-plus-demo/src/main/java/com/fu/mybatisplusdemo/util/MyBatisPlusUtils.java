@@ -78,6 +78,13 @@ public final class MyBatisPlusUtils {
     }
 
     /**
+     * 自定义继承了 BaseMapper 分页方法（默认每次取1000条，直到取完为止）
+     */
+    public static <T> void findByPage(MyBatisPlusPageFunctionInterface<T> functionInterface, MyBatisPlusFunctionInterface<T> myBatisPlusFunctionInterface) {
+        findByPage(functionInterface, DEFAULT_PAGE_SIZE, myBatisPlusFunctionInterface);
+    }
+
+    /**
      * 通用分页查询方法
      *
      * @param functionInterface            获取分页数据的方法

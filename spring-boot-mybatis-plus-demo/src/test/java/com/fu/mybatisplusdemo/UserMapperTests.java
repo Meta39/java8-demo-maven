@@ -1,6 +1,7 @@
 package com.fu.mybatisplusdemo;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fu.mybatisplusdemo.entity.User;
 import com.fu.mybatisplusdemo.enums.SexEnum;
 import com.fu.mybatisplusdemo.mapper.UserMapper;
@@ -33,13 +34,36 @@ public class UserMapperTests {
         System.out.println(this.userMapper.insert(user));
     }
 
+    /**
+     * 使用BaseMapper自带的selectPage方法查询所有数据
+     */
     @Test
     public void myBatisPlusUtilsFindByPageTest() {
         List<User> allUsers = new ArrayList<>();
         MyBatisPlusUtils.findByPage(userMapper,
                 new LambdaQueryWrapper<User>().like(User::getName, "M"),
                 users -> {
-                    users.forEach(user -> {log.info(user.getName());});
+                    users.forEach(user -> {
+                        log.info(user.getName());
+                    });
+                    allUsers.addAll(users);
+                }
+        );
+        log.info("allUsers: {},distinct Users:{}", allUsers.size(), allUsers.stream().map(User::getName).distinct().count());
+    }
+
+    /**
+     * 使用自定义分页方法查询所有符合条件的数据
+     */
+    @Test
+    public void myBatisPlusUtilsFindByPageTest2() {
+        List<User> allUsers = new ArrayList<>();
+        MyBatisPlusUtils.findByPage(
+                (Page<User> page) -> userMapper.findPage(page),
+                users -> {
+                    users.forEach(user -> {
+                        log.info(user.getName());
+                    });
                     allUsers.addAll(users);
                 }
         );
