@@ -138,6 +138,7 @@ public final class MyBatisPlusUtils {
         if (CollectionUtils.isEmpty(idList)) {
             return Collections.emptyList();
         }
+        Assert.notNull(inSqlFunctionInterface, "数据处理逻辑不能为 null");
         int totalIds = idList.size();
         //预分配结果列表容量（减少扩容开销）
         List<T> tList = new ArrayList<>(totalIds);
