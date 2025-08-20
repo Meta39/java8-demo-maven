@@ -40,7 +40,7 @@ public class UserMapperTests {
     @Test
     public void myBatisPlusUtilsFindByPageTest() {
         List<User> allUsers = new ArrayList<>();
-        MyBatisPlusUtils.findByPage(userMapper,
+        MyBatisPlusUtils.findAllByPage(userMapper,
                 new LambdaQueryWrapper<User>().like(User::getName, "M"),
                 users -> {
                     users.forEach(user -> {
@@ -58,7 +58,7 @@ public class UserMapperTests {
     @Test
     public void myBatisPlusUtilsFindByPageTest2() {
         List<User> allUsers = new ArrayList<>();
-        MyBatisPlusUtils.findByPage(
+        MyBatisPlusUtils.findAllByPage(
                 (Page<User> page) -> userMapper.findPage(page),
                 users -> {
                     users.forEach(user -> {

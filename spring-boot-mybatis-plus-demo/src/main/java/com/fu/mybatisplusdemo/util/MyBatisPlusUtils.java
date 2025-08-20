@@ -25,7 +25,7 @@ public final class MyBatisPlusUtils {
      */
     @FunctionalInterface
     public interface MyBatisPlusPageFunctionInterface<T> {
-        Page<T> selectPage(Page<T> page);
+        Page<T> findPageLogic(Page<T> page);
     }
 
     /**
@@ -34,7 +34,7 @@ public final class MyBatisPlusUtils {
      */
     @FunctionalInterface
     public interface MyBatisPlusFunctionInterface<T> {
-        void execute(List<T> tList);
+        void businessLogic(List<T> tList);
     }
 
     /**
@@ -43,8 +43,8 @@ public final class MyBatisPlusUtils {
      * @param extendsBaseMapperClass       继承了BaseMapper的Mapper接口
      * @param myBatisPlusFunctionInterface 业务逻辑
      */
-    public static <T> void findByPage(BaseMapper<T> extendsBaseMapperClass, long pageSize, MyBatisPlusFunctionInterface<T> myBatisPlusFunctionInterface) {
-        findByPage(extendsBaseMapperClass, null, pageSize, myBatisPlusFunctionInterface);
+    public static <T> void findAllByPage(BaseMapper<T> extendsBaseMapperClass, long pageSize, MyBatisPlusFunctionInterface<T> myBatisPlusFunctionInterface) {
+        findAllByPage(extendsBaseMapperClass, null, pageSize, myBatisPlusFunctionInterface);
     }
 
     /**
@@ -53,8 +53,8 @@ public final class MyBatisPlusUtils {
      * @param extendsBaseMapperClass       继承了BaseMapper的Mapper接口
      * @param myBatisPlusFunctionInterface 业务逻辑
      */
-    public static <T> void findByPage(BaseMapper<T> extendsBaseMapperClass, MyBatisPlusFunctionInterface<T> myBatisPlusFunctionInterface) {
-        findByPage(extendsBaseMapperClass, null, DEFAULT_PAGE_SIZE, myBatisPlusFunctionInterface);
+    public static <T> void findAllByPage(BaseMapper<T> extendsBaseMapperClass, MyBatisPlusFunctionInterface<T> myBatisPlusFunctionInterface) {
+        findAllByPage(extendsBaseMapperClass, null, DEFAULT_PAGE_SIZE, myBatisPlusFunctionInterface);
     }
 
     /**
@@ -63,8 +63,8 @@ public final class MyBatisPlusUtils {
      * @param extendsBaseMapperClass       继承了BaseMapper的Mapper接口
      * @param myBatisPlusFunctionInterface 业务逻辑
      */
-    public static <T> void findByPage(BaseMapper<T> extendsBaseMapperClass, LambdaQueryWrapper<T> lambdaQueryWrapper, MyBatisPlusFunctionInterface<T> myBatisPlusFunctionInterface) {
-        findByPage(extendsBaseMapperClass, lambdaQueryWrapper, DEFAULT_PAGE_SIZE, myBatisPlusFunctionInterface);
+    public static <T> void findAllByPage(BaseMapper<T> extendsBaseMapperClass, LambdaQueryWrapper<T> lambdaQueryWrapper, MyBatisPlusFunctionInterface<T> myBatisPlusFunctionInterface) {
+        findAllByPage(extendsBaseMapperClass, lambdaQueryWrapper, DEFAULT_PAGE_SIZE, myBatisPlusFunctionInterface);
     }
 
     /**
@@ -73,15 +73,15 @@ public final class MyBatisPlusUtils {
      * @param extendsBaseMapperClass       继承了BaseMapper的Mapper接口
      * @param myBatisPlusFunctionInterface 业务逻辑
      */
-    public static <T> void findByPage(BaseMapper<T> extendsBaseMapperClass, LambdaQueryWrapper<T> lambdaQueryWrapper, long pageSize, MyBatisPlusFunctionInterface<T> myBatisPlusFunctionInterface) {
-        findByPage((Page<T> page) -> extendsBaseMapperClass.selectPage(page, lambdaQueryWrapper), pageSize, myBatisPlusFunctionInterface);
+    public static <T> void findAllByPage(BaseMapper<T> extendsBaseMapperClass, LambdaQueryWrapper<T> lambdaQueryWrapper, long pageSize, MyBatisPlusFunctionInterface<T> myBatisPlusFunctionInterface) {
+        findAllByPage((Page<T> page) -> extendsBaseMapperClass.selectPage(page, lambdaQueryWrapper), pageSize, myBatisPlusFunctionInterface);
     }
 
     /**
      * 自定义继承了 BaseMapper 分页方法（默认每次取1000条，直到取完为止）
      */
-    public static <T> void findByPage(MyBatisPlusPageFunctionInterface<T> functionInterface, MyBatisPlusFunctionInterface<T> myBatisPlusFunctionInterface) {
-        findByPage(functionInterface, DEFAULT_PAGE_SIZE, myBatisPlusFunctionInterface);
+    public static <T> void findAllByPage(MyBatisPlusPageFunctionInterface<T> functionInterface, MyBatisPlusFunctionInterface<T> myBatisPlusFunctionInterface) {
+        findAllByPage(functionInterface, DEFAULT_PAGE_SIZE, myBatisPlusFunctionInterface);
     }
 
     /**
@@ -91,13 +91,13 @@ public final class MyBatisPlusUtils {
      * @param pageSize                     每次获取的数据量
      * @param myBatisPlusFunctionInterface 对获取的分页数据进行处理
      */
-    public static <T> void findByPage(MyBatisPlusPageFunctionInterface<T> functionInterface, long pageSize, MyBatisPlusFunctionInterface<T> myBatisPlusFunctionInterface) {
+    public static <T> void findAllByPage(MyBatisPlusPageFunctionInterface<T> functionInterface, long pageSize, MyBatisPlusFunctionInterface<T> myBatisPlusFunctionInterface) {
         // 参数校验
         Assert.isTrue(pageSize > 0, "每页大小必须大于 0");
         Assert.notNull(myBatisPlusFunctionInterface, "数据处理逻辑不能为 null");
         int currentPage = 1;
         while (true) {
-            Page<T> tPage = functionInterface.selectPage(Page.of(currentPage, pageSize));
+            Page<T> tPage = functionInterface.findPageLogic(Page.of(currentPage, pageSize));
             long pages = tPage.getPages();
             List<T> records = tPage.getRecords();
             //数据为空
@@ -106,7 +106,7 @@ public final class MyBatisPlusUtils {
             }
 
             // 业务逻辑
-            myBatisPlusFunctionInterface.execute(records);
+            myBatisPlusFunctionInterface.businessLogic(records);
             //最后一页
             if (pages <= currentPage) {
                 return;
