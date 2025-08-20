@@ -70,4 +70,14 @@ public class UserMapperTests {
         log.info("allUsers: {},distinct Users:{}", allUsers.size(), allUsers.stream().map(User::getName).distinct().count());
     }
 
+    @Test
+    public void myBatisPlusUtilsFindByPageTest3() {
+        List<Integer> allId = new ArrayList<>(4000);
+        for (int i = 1; i <= 4000; i++) {
+            allId.add(i);
+        }
+        List<User> users = MyBatisPlusUtils.findAllByIds(allId, (batchIds) -> userMapper.selectList(new LambdaQueryWrapper<User>().in(User::getId, batchIds)));
+        log.info("users: {}", users.size());
+    }
+
 }
