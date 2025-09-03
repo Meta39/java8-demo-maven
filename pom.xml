@@ -19,6 +19,7 @@
         <module>spring-boot-kafka-demo</module>
         <module>spring-boot-minio-demo</module>
         <module>spring-boot-mybatis-plus-demo</module>
+        <module>spring-boot-mybatis-plus-generator-demo</module>
         <module>spring-boot-redis-demo</module>
         <module>spring-boot-rocketmq-demo</module>
         <module>spring-boot-security-demo</module>

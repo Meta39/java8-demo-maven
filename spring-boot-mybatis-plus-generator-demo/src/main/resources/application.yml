@@ -1,0 +1,36 @@
+mybatis-plus-generator:
+  # 需要生成entity、mapper的表，全部表则填all或者去掉tables。
+  tables:
+    - "user"
+  database:
+    # MySQL示例 注释读取增加remarks=true&useInformationSchema=true
+    url: jdbc:mysql://localhost:3306/mybatisplusdemo?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&useSSL=false&serverTimezone=Asia/Shanghai&remarks=true&useInformationSchema=true
+    # Oracle示例 注释读取增加 remarks=true 或者 remarksReporting=true（某些驱动版本）
+    # url: jdbc:oracle:thin:@//localhost:1521/TEST?remarksReporting=true
+    # 数据库账号
+    username: root
+    #数据库密码
+    password: 123456
+  # 作者
+  author: zhongyf
+  # 创建文件日期格式
+  comment-date: yyyy-MM-dd
+  # 文件输出目录
+  output-dir: "C:/src/main/java"
+  # 文件父目录
+  parent-package: "com.fu.demo"
+  # 实体包名
+  entity-package-name: entity
+  # mapper java 文件包名
+  mapper-package-name: mapper
+
+# 日志配置
+logging:
+  # 日志级别
+  level:
+    # 输出表结构日志
+    com.fu.mybatisplusgenerator: debug
+  # 日志文件
+  file:
+    # 输出目录
+    path: ./logs
