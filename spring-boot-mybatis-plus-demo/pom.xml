@@ -28,6 +28,12 @@
             <scope>provided</scope>
             <optional>true</optional>
         </dependency>
+        <!-- 对象之间相互转换（无反射，但是会增加额外的类和编译时长） -->
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct</artifactId>
+            <optional>true</optional>
+        </dependency>
         <!-- jdbc -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -77,5 +83,95 @@
             <artifactId>httpclient</artifactId>
         </dependency>
     </dependencies>
+
+    <build>
+        <finalName>${project.artifactId}</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                    <annotationProcessorPaths>
+                        <!-- path 标签里面的依赖必须填写版本号 version ，否则会编译失败！！！ -->
+                        <path>
+                            <groupId>org.mapstruct</groupId>
+                            <artifactId>mapstruct-processor</artifactId>
+                            <version>${org.mapstruct.version}</version>
+                        </path>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>${lombok.version}</version>
+                        </path>
+                        <!-- lombok 1.18.16+ 版本需要引入 lombok-mapstruct-binding 否则会导致编译顺序问题，进而影响 mapstruct -->
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok-mapstruct-binding</artifactId>
+                            <version>${lombok-mapstruct-binding.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <!-- 打包导入设置了 systemPath 的jar包 -->
+                    <includeSystemScope>true</includeSystemScope>
+                    <!-- 删除target/classes重复的资源 -->
+                    <addResources>true</addResources>
+                    <!-- 打包时排除依赖【如果子项目也引用了maven-compiler-plugin，则以子项目的配置为准】 -->
+                    <excludes>
+                        <!--不打包lombok，因为lombok只在编译时使用，编译后就没用了-->
+                        <exclude>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                        </exclude>
+                        <!--spring官方排除的依赖项-->
+                        <exclude>
+                            <groupId>org.springframework.boot</groupId>
+                            <artifactId>spring-boot-configuration-processor</artifactId>
+                        </exclude>
+                        <!-- 排除 test -->
+                        <exclude>
+                            <groupId>org.springframework.boot</groupId>
+                            <artifactId>spring-boot-starter-test</artifactId>
+                        </exclude>
+                        <!-- 排除 log4j -->
+                        <exclude>
+                            <groupId>org.apache.logging.log4j</groupId>
+                            <artifactId>log4j-api</artifactId>
+                        </exclude>
+                        <exclude>
+                            <groupId>org.apache.logging.log4j</groupId>
+                            <artifactId>log4j-to-slf4j</artifactId>
+                        </exclude>
+                    </excludes>
+                </configuration>
+                <!-- 解决打包没有把依赖Jar包打入springboot的jar包的问题 -->
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+        <resources>
+            <!--
+                打包需要的静态资源文件
+                打包全部静态资源文件，启动jar包通过命令行参数控制
+                如：java -Xms256m -Xmx512m -Dlogging.config=./logback-spring.xml -jar app.jar - -spring.profiles.active=dev
+             -->
+            <resource>
+                <directory>src/main/resources</directory>
+                <!-- 解决yml配置@spring.profiles.active@时编译后没有生成对应环境的问题 -->
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+    </build>
 
 </project>

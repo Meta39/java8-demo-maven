@@ -4,11 +4,12 @@ import com.baomidou.mybatisplus.annotation.*;
 import com.fu.mybatisplusdemo.enums.SexEnum;
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.Date;
 
 @Data
 @TableName("user")
-public class User {
+public class User implements Serializable {
 
     private static final long serialVersionUID = 766730990998679444L;
 

@@ -2,9 +2,11 @@ package com.fu.mybatisplusdemo;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.fu.mybatisplusdemo.dto.UserDTO;
 import com.fu.mybatisplusdemo.entity.User;
 import com.fu.mybatisplusdemo.enums.SexEnum;
 import com.fu.mybatisplusdemo.mapper.UserMapper;
+import com.fu.mybatisplusdemo.mapstruct.UserConvertMapper;
 import com.fu.mybatisplusdemo.util.MyBatisPlusUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
@@ -14,6 +16,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @SpringBootTest
@@ -42,14 +45,11 @@ public class UserMapperTests {
         List<User> allUsers = new ArrayList<>();
         MyBatisPlusUtils.findAllByPage(userMapper,
                 new LambdaQueryWrapper<User>().like(User::getName, "M"),
-                users -> {
-                    users.forEach(user -> {
-                        log.info(user.getName());
-                    });
-                    allUsers.addAll(users);
-                }
+                allUsers::addAll
         );
+        List<UserDTO> userDTOS = UserConvertMapper.INSTANCE.userListToUserDTOList(allUsers);
         log.info("allUsers: {},distinct Users:{}", allUsers.size(), allUsers.stream().map(User::getName).distinct().count());
+        log.info("allUserDTOs: {},distinct UserDTOs:{}", userDTOS.size(), userDTOS.stream().map(UserDTO::getName).distinct().collect(Collectors.toList()));
     }
 
     /**
