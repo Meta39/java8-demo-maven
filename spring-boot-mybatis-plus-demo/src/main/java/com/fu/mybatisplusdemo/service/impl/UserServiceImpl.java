@@ -71,7 +71,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      * 根据ID集合批量删除用户
      */
     @Override
-    public int deleteUserByIds(List<Integer> ids) {
-        return this.userMapper.deleteBatchIds(ids);
+    public int deleteByIds(List<Integer> ids) {
+        return this.userMapper.deleteByIds(ids);
     }
 }

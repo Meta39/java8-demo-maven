@@ -81,6 +81,6 @@ public class UserController {
      */
     @DeleteMapping
     public int deleteUsers(@RequestBody List<Integer> ids) {
-        return this.userService.deleteUserByIds(ids);
+        return this.userService.deleteByIds(ids);
     }
 }

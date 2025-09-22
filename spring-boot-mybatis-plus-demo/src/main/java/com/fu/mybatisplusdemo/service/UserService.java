@@ -41,5 +41,5 @@ public interface UserService extends IService<User> {
     /**
      * 根据ID集合批量删除用户
      */
-    int deleteUserByIds(List<Integer> ids);
+    int deleteByIds(List<Integer> ids);
 }
