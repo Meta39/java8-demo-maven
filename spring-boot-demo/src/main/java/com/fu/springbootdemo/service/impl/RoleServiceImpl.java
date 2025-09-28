@@ -153,7 +153,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
         if (ids != null && !ids.isEmpty() && ids.stream().anyMatch(id -> id == 1)) {
             throw new RuntimeException("禁止删除超级管理员角色！");
         }
-        return this.roleMapper.deleteBatchIds(ids);
+        return this.roleMapper.deleteByIds(ids);
     }
 
 }

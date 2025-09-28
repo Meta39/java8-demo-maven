@@ -85,6 +85,6 @@ public class ArticleServiceImpl implements ArticleService {
      */
     @Override
     public int deleteArticleByIds(List<Long> ids) {
-        return this.articleMapper.deleteBatchIds(ids);
+        return this.articleMapper.deleteByIds(ids);
     }
 }

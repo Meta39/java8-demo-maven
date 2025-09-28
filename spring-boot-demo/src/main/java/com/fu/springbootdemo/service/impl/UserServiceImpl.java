@@ -133,9 +133,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     public int deleteUserByIds(List<Integer> ids) {
         if (ids != null && !ids.isEmpty() && ids.stream().anyMatch(id -> id == 1)) {
-            new RuntimeException("不允许删除超级用户");
+            throw new RuntimeException("不允许删除超级用户");
         }
-        return this.userMapper.deleteBatchIds(ids);
+        return this.userMapper.deleteByIds(ids);
     }
 
     @Override

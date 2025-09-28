@@ -93,7 +93,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
      */
     @Override
     public int deleteRoleByIds(List<Integer> ids) {
-        return this.roleMapper.deleteBatchIds(ids);
+        return this.roleMapper.deleteByIds(ids);
     }
 
 }

@@ -76,7 +76,7 @@ public class ${className}ServiceImpl extends ServiceImpl<${className}Mapper, ${c
      */
     @Override
     public int delete${className}ByIds(List<Integer> ids) {
-        return this.${classname}Mapper.deleteBatchIds(ids);
+        return this.${classname}Mapper.deleteByIds(ids);
     }
 
 }

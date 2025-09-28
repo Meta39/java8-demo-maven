@@ -91,7 +91,7 @@ public class AuthorizeServiceImpl implements AuthorizeService {
         if (ids.stream().anyMatch(id -> id == 1)) {
             throw new RuntimeException("不允许删除id为1的内容");
         }
-        return this.authorizeMapper.deleteBatchIds(ids);
+        return this.authorizeMapper.deleteByIds(ids);
     }
 
 
