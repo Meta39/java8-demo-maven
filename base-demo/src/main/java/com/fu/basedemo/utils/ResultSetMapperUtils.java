@@ -46,10 +46,9 @@ public class ResultSetMapperUtils {
     public static <T> String buildSelectQuery(Class<T> clazz) {
         StringBuilder query = new StringBuilder("SELECT ");
 
-        Field[] fields = clazz.getDeclaredFields();
         boolean first = true;
 
-        for (Field field : fields) {
+        for (Field field : clazz.getDeclaredFields()) {
             if (field.isAnnotationPresent(IgnoreColumn.class)) {
                 continue; // 跳过被 @Ignore 注解标记的字段
             }

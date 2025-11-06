@@ -99,8 +99,7 @@ public class LoginServiceImpl implements LoginService {
                 menus = this.authorizeMapper.selectList(new LambdaQueryWrapper<Authorize>().orderByAsc(Authorize::getSort));
             } else {
                 for (Integer roleId : roleIds) {//根据角色ID获取角色权限ID集合
-                    List<RoleAuthorize> roleAuthorizes = this.roleAuthorizeMapper.selectList(new LambdaQueryWrapper<RoleAuthorize>().eq(RoleAuthorize::getRoleId, roleId));
-                    for (RoleAuthorize roleAuthorize : roleAuthorizes) {//获取其中一个角色的所有权限列表
+                    for (RoleAuthorize roleAuthorize : this.roleAuthorizeMapper.selectList(new LambdaQueryWrapper<RoleAuthorize>().eq(RoleAuthorize::getRoleId, roleId))) {//获取其中一个角色的所有权限列表
                         List<Authorize> oneRoleAuthorizes = this.authorizeMapper.selectList(new LambdaQueryWrapper<Authorize>().eq(Authorize::getId, roleAuthorize.getAuthorizeId()).orderByAsc(Authorize::getSort));
                         menus.addAll(oneRoleAuthorizes);
                     }

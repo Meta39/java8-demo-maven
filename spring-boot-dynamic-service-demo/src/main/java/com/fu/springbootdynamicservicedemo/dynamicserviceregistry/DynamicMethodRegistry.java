@@ -82,8 +82,7 @@ public class DynamicMethodRegistry {
             String serviceName = StringUtils.hasText(dsValue) ? dsValue : beanName;
 
             Map<String, MethodMeta> methods = new HashMap<>();
-            Method[] declaredMethods = targetClass.getDeclaredMethods();
-            for (Method method : declaredMethods) {
+            for (Method method : targetClass.getDeclaredMethods()) {
                 DynamicMethod dm = method.getAnnotation(DynamicMethod.class);
                 if (dm == null) continue;
 

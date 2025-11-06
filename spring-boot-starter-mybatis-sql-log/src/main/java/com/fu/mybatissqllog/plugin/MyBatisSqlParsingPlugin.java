@@ -93,13 +93,12 @@ public final class MyBatisSqlParsingPlugin implements Interceptor {
     //替换预编译SQL
     private String handleCommonParameter(String sql, BoundSql boundSql) {
         Object parameterObject = boundSql.getParameterObject();
-        List<ParameterMapping> parameterMappings = boundSql.getParameterMappings();
         SqlSessionFactory sqlSessionFactory = applicationContext.getBean(SqlSessionFactory.class);
         Configuration configuration = sqlSessionFactory.getConfiguration();
         TypeHandlerRegistry typeHandlerRegistry = configuration.getTypeHandlerRegistry();
         List<String> params = new ArrayList<>();
 
-        for (ParameterMapping parameterMapping : parameterMappings) {
+        for (ParameterMapping parameterMapping : boundSql.getParameterMappings()) {
             if (parameterMapping.getMode() == ParameterMode.OUT) {
                 continue;
             }
