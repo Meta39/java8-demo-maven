@@ -43,9 +43,6 @@ public class DynamicMethodRegistry {
     // serviceName -> (methodName -> MethodMeta)
     private final Map<String, Map<String, MethodMeta>> registry = new ConcurrentHashMap<>();
 
-    // 幂等初始化保护
-    private volatile boolean initialized = false;
-
     public boolean hasService(String serviceName) {
         return registry.containsKey(serviceName);
     }
@@ -68,15 +65,9 @@ public class DynamicMethodRegistry {
      * 自动初始化（Spring 容器启动后自动扫描）
      */
     @PostConstruct
-    public synchronized void init() {
-        if (initialized) {
-            log.warn("DynamicMethodRegistry has been initialized, skipping duplicate initialization");
-            return;
-        }
-
+    public void init() {
         Map<String, Object> beans = context.getBeansWithAnnotation(DynamicService.class);
         if (CollectionUtils.isEmpty(beans)) {
-            initialized = true;
             log.warn("No @DynamicService Bean was found");
             return;
         }
@@ -155,8 +146,6 @@ public class DynamicMethodRegistry {
                 log.warn("@DynamicService (bean:{}) does not have the @DynamicMethod annotation", serviceName);
             }
         }
-
-        initialized = true;
     }
 
     @Getter
