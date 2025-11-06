@@ -9,15 +9,13 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 import java.lang.invoke.MethodHandle;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /*
 | 场景编号 | 测试内容                  | 核心断言点              |
@@ -41,50 +39,61 @@ import java.util.Set;
 public class DynamicInvoker {
     private static final String SQUARE_BRACKETS_LEFT = "[";
     private static final String SQUARE_BRACKETS_RIGHT = "]";
-    private static final String SPACE = " ";
+    // 缓存常用类型判断结果
+    private static final List<Class<?>> PRIMITIVE_OR_WRAPPERS = Arrays.asList(
+            Boolean.class, Byte.class, Character.class, Short.class,
+            Integer.class, Long.class, Float.class, Double.class
+    );
 
     private final DynamicMethodRegistry registry;
     private final ObjectMapper objectMapper;
     private final Validator validator;
 
     public Object invoke(String serviceName, String methodName, String body) throws Throwable {
+        //获取 meta
         DynamicMethodRegistry.MethodMeta meta = registry.getMethodMeta(serviceName, methodName);
-        if (meta == null) {
-            throw new IllegalArgumentException("Dynamic method not found: " + serviceName + "." + methodName);
-        }
 
-        Object[] args;
+        //参数转换
+        Object[] args = resolveArgsFromJson(serviceName, methodName, meta, body);
+
+        // 参数校验
+        validateArgs(args);
+
+        // 执行方法
+        MethodHandle metaHandle = meta.getHandle();
+        Object ret = metaHandle.invokeWithArguments(args);
+        return meta.isVoidReturn() ? null : ret;
+    }
+
+    private void validateArgs(Object[] args) {
+        if (args == null) return;
+
+        for (Object arg : args) {
+            if (arg == null || isPrimitiveOrWrapper(arg.getClass())) continue;
+
+            Set<ConstraintViolation<Object>> violations = validator.validate(arg);
+            if (!CollectionUtils.isEmpty(violations)) {
+                ConstraintViolation<Object> violation = violations.iterator().next();
+                //有一个参数校验失败就立即抛出异常，而不是全部校验完才抛出，这样可以提高性能并提供更及时的反馈。
+                throw new IllegalArgumentException(violation.getPropertyPath() + " " + violation.getMessage());
+            }
+        }
+    }
+
+    private Object[] resolveArgsFromJson(String serviceName, String methodName, DynamicMethodRegistry.MethodMeta meta, String body) {
         try {
-            args = resolveArgs(meta, body);
+            return resolveArgs(meta, body);
         } catch (JsonProcessingException e) {
             throw new IllegalArgumentException(String.format("Failed to parse JSON parameter (%s.%s): %s", serviceName, methodName, e.getOriginalMessage()), e);
         }
-
-        // 参数校验
-        for (Object arg : args) {
-            if (arg == null || isPrimitiveOrWrapper(arg.getClass())) continue;
-            Set<ConstraintViolation<Object>> violations = validator.validate(arg);
-            if (!violations.isEmpty()) {
-                for (ConstraintViolation<Object> v : violations) {
-                    //有一个参数校验失败就立即抛出异常，而不是全部校验完才抛出，这样可以提高性能并提供更及时的反馈。
-                    throw new IllegalArgumentException(v.getPropertyPath() + SPACE + v.getMessage());
-                }
-            }
-        }
-
-        MethodHandle metaHandle = meta.getHandle();
-        Object ret = metaHandle.invokeWithArguments(args);
-        if (meta.isVoidReturn()) return null;
-        return ret;
     }
+
 
     private Object[] resolveArgs(DynamicMethodRegistry.MethodMeta meta, String body) throws JsonProcessingException {
         Class<?>[] paramTypes = meta.getParamTypes();
         int paramLen = paramTypes.length;
         if (paramLen == 0) return new Object[0];
-        if (!StringUtils.hasText(body)) {
-            return new Object[paramLen];
-        }
+        if (!StringUtils.hasText(body)) return new Object[paramLen];
 
         String trimmed = body.trim();
 
@@ -161,17 +170,12 @@ public class DynamicInvoker {
     }
 
     private boolean isJacksonCollectionLike(JavaType jt) {
-        if (jt == null) return false;
-        return jt.isCollectionLikeType() || jt.isArrayType();
+        return jt != null && (jt.isCollectionLikeType() || jt.isArrayType());
     }
 
     //不能是 String，因为可能是 JSON 字符串
     private boolean isPrimitiveOrWrapper(Class<?> cls) {
-        if (cls.isPrimitive()) return true;
-        // 常见包装类型判断
-        return cls == Boolean.class || cls == Byte.class || cls == Character.class ||
-                cls == Short.class || cls == Integer.class || cls == Long.class ||
-                cls == Float.class || cls == Double.class;
+        return cls.isPrimitive() || PRIMITIVE_OR_WRAPPERS.contains(cls);
     }
 
 }

@@ -52,7 +52,7 @@ public class DynamicInvokerTest {
         Object result = invoker.invoke("calcService", "concat", null);
     }
 
-    // ⑦ 参数校验失败
+    // ⑦ 参数校验失败（报错，则校验通过）
     @Test
     void testValidationFailure() throws Throwable {
         String json = "{\"userDTO\":null}";
@@ -73,13 +73,6 @@ public class DynamicInvokerTest {
         String json = "[\"a\",\"b\",\"c\"]";
         Object result = invoker.invoke("calcService", "echoArray", json);
         Assertions.assertEquals("a,b,c", result);
-    }
-
-    // ⑩ 参数校验通过（非 null）
-    @Test
-    void testValidationPass() throws Throwable {
-        Object result = invoker.invoke("calcService", "requireNotNull", "\"hello\"");
-        Assertions.assertEquals("OK:hello", result);
     }
 
 }

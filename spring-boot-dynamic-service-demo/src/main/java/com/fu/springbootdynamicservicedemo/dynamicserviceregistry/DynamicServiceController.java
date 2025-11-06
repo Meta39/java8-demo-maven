@@ -14,24 +14,17 @@ import org.springframework.web.bind.annotation.RestController;
 public class DynamicServiceController {
 
     private final DynamicInvoker invoker;
-    private final DynamicMethodRegistry registry;
 
     @PostMapping("/{serviceName}/{methodName}")
     public ResponseEntity<?> invokeDynamicMethod(@PathVariable String serviceName,
                                                  @PathVariable String methodName,
                                                  @RequestBody(required = false) String body) {
-        if (!registry.hasService(serviceName)) {
-            return ResponseEntity.badRequest().body("Service not found: " + serviceName);
-        }
-        if (!registry.hasMethod(serviceName, methodName)) {
-            return ResponseEntity.badRequest().body("Method not found: " + methodName);
-        }
         try {
             Object result = invoker.invoke(serviceName, methodName, body);
             return ResponseEntity.ok(result);
         } catch (Throwable e) {
             log.error("{}.{} invoke error:", serviceName, methodName, e);
-            String msg = e.getMessage() != null ? e.getMessage() : e.getClass().getSimpleName();
+            String msg = e.getMessage() != null ? e.getMessage() : "Internal server error";
             return ResponseEntity.internalServerError().body("Error: " + msg);
         }
     }

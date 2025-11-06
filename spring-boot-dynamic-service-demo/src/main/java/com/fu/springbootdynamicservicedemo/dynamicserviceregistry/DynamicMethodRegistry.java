@@ -21,7 +21,6 @@ import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
-import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -42,18 +41,18 @@ public class DynamicMethodRegistry {
     // serviceName -> (methodName -> MethodMeta)
     private final Map<String, Map<String, MethodMeta>> registry = new ConcurrentHashMap<>();
 
-    public boolean hasService(String serviceName) {
-        return registry.containsKey(serviceName);
-    }
-
-    public boolean hasMethod(String serviceName, String methodName) {
-        Map<String, MethodMeta> serviceMethods = registry.get(serviceName);
-        return serviceMethods != null && serviceMethods.containsKey(methodName);
-    }
-
+    //校验并获取
     public MethodMeta getMethodMeta(String serviceName, String methodName) {
         Map<String, MethodMeta> methods = registry.get(serviceName);
-        return methods == null ? null : methods.get(methodName);
+        if (methods == null) {
+            throw new IllegalArgumentException("Service not found: " + serviceName);
+        }
+
+        MethodMeta meta = methods.get(methodName);
+        if (meta == null) {
+            throw new IllegalArgumentException("Method not found: " + serviceName + "." + methodName);
+        }
+        return meta;
     }
 
     /**
@@ -78,8 +77,7 @@ public class DynamicMethodRegistry {
             Class<?> targetClass = AopUtils.getTargetClass(bean);
             DynamicService ds = targetClass.getAnnotation(DynamicService.class);
             assert ds != null;
-            String dsValue = ds.value();
-            String serviceName = StringUtils.hasText(dsValue) ? dsValue : beanName;
+            String serviceName = StringUtils.hasText(ds.value()) ? ds.value() : beanName;
 
             Map<String, MethodMeta> methods = new HashMap<>();
             for (Method method : targetClass.getDeclaredMethods()) {
@@ -103,21 +101,8 @@ public class DynamicMethodRegistry {
                 }
 
                 MethodHandle handle = lookup.unreflect(method).bindTo(bean);
-
-                Parameter[] parameters = method.getParameters();
-                int parametersLength = parameters.length;
-                Class<?>[] paramTypes = new Class[parametersLength];
-                String[] paramNames = new String[parametersLength];
-                JavaType[] jacksonTypes = new JavaType[parametersLength];
-
-                for (int i = 0; i < parametersLength; i++) {
-                    paramTypes[i] = parameters[i].getType();
-                    paramNames[i] = parameters[i].getName();
-                    Type parameterizedType = parameters[i].getParameterizedType();
-                    jacksonTypes[i] = typeFactory.constructType(parameterizedType);
-                }
-
-                MethodMeta meta = new MethodMeta(bean, method, handle, paramTypes, paramNames, jacksonTypes);
+                //创建 MethodMeta
+                MethodMeta meta = createMethodMeta(bean, method, handle, typeFactory);
                 methods.put(methodName, meta);
             }
 
@@ -128,6 +113,24 @@ public class DynamicMethodRegistry {
                 log.warn("@DynamicService (bean:{}) does not have the @DynamicMethod annotation", serviceName);
             }
         }
+    }
+
+    private MethodMeta createMethodMeta(Object bean, Method method, MethodHandle handle, TypeFactory typeFactory) {
+        Parameter[] parameters = method.getParameters();
+        int paramCount = parameters.length;
+
+        Class<?>[] paramTypes = new Class[paramCount];
+        String[] paramNames = new String[paramCount];
+        JavaType[] jacksonTypes = new JavaType[paramCount];
+
+        for (int i = 0; i < paramCount; i++) {
+            Parameter param = parameters[i];
+            paramTypes[i] = param.getType();
+            paramNames[i] = param.getName();
+            jacksonTypes[i] = typeFactory.constructType(param.getParameterizedType());
+        }
+
+        return new MethodMeta(bean, method, handle, paramTypes, paramNames, jacksonTypes);
     }
 
     @Getter
