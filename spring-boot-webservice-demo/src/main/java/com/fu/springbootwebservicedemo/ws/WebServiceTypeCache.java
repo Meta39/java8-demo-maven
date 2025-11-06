@@ -41,8 +41,7 @@ public class WebServiceTypeCache implements ApplicationRunner {
             // AopProxyUtils.ultimateTargetClass 解决Spring Boot 使用 @Transactional 事务注解的问题。
             Class<?> beanClass = AopProxyUtils.ultimateTargetClass(type);
             // 获取 IWebService 实现类的泛型类型
-            Type[] genericInterfaces = beanClass.getGenericInterfaces();
-            for (Type genericInterface : genericInterfaces) {
+            for (Type genericInterface : beanClass.getGenericInterfaces()) {
                 if (genericInterface instanceof ParameterizedType) {
                     ParameterizedType parameterizedType = (ParameterizedType) genericInterface;
                     Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();
