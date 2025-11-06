@@ -53,12 +53,8 @@ public class DynamicMethodRegistry {
     }
 
     public MethodMeta getMethodMeta(String serviceName, String methodName) {
-        Map<String, MethodMeta> methods = getDynamicService(serviceName);
+        Map<String, MethodMeta> methods = registry.get(serviceName);
         return methods == null ? null : methods.get(methodName);
-    }
-
-    public Map<String, MethodMeta> getDynamicService(String serviceName) {
-        return registry.get(serviceName);
     }
 
     /**
