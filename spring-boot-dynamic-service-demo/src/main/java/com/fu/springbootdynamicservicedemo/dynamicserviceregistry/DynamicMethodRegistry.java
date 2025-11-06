@@ -24,7 +24,6 @@ import java.lang.reflect.Parameter;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -61,7 +60,7 @@ public class DynamicMethodRegistry {
      * 自动初始化（Spring 容器启动后自动扫描）
      */
     @PostConstruct
-    public void init() {
+    public void init() throws IllegalAccessException {
         Map<String, Object> beans = context.getBeansWithAnnotation(DynamicService.class);
         if (CollectionUtils.isEmpty(beans)) {
             log.warn("No @DynamicService Bean was found");
@@ -78,10 +77,7 @@ public class DynamicMethodRegistry {
 
             Class<?> targetClass = AopUtils.getTargetClass(bean);
             DynamicService ds = targetClass.getAnnotation(DynamicService.class);
-            if (Objects.isNull(ds)) {
-                // 这通常不会发生，因为我们是通过 getBeansWithAnnotation 拿到的
-                continue;
-            }
+            assert ds != null;
             String dsValue = ds.value();
             String serviceName = StringUtils.hasText(dsValue) ? dsValue : beanName;
 
@@ -107,16 +103,7 @@ public class DynamicMethodRegistry {
                     ));
                 }
 
-                MethodHandle handle;
-                try {
-                    handle = lookup.unreflect(method).bindTo(bean);
-                } catch (IllegalAccessException e) {
-                    // 这里理论上不会因为我们只允许 public 方法，但仍捕获并包装以便定位
-                    throw new IllegalStateException(String.format(
-                            "Cannot create MethodHandle: %s.%s (bean=%s): %s",
-                            targetClass.getName(), method.getName(), beanName, e.getMessage()
-                    ), e);
-                }
+                MethodHandle handle = lookup.unreflect(method).bindTo(bean);
 
                 Parameter[] parameters = method.getParameters();
                 int parametersLength = parameters.length;
