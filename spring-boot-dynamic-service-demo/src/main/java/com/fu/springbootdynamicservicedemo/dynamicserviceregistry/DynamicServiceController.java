@@ -1,4 +1,4 @@
-package com.fu.springbootdynamicservicedemo.dynamicservice;
+package com.fu.springbootdynamicservicedemo.dynamicserviceregistry;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +17,9 @@ public class DynamicServiceController {
     private final DynamicMethodRegistry registry;
 
     @PostMapping("/{serviceName}/{methodName}")
-    public ResponseEntity<?> invokeDynamicMethod(@PathVariable String serviceName, @PathVariable String methodName, @RequestBody(required = false) String body) {
+    public ResponseEntity<?> invokeDynamicMethod(@PathVariable String serviceName,
+                                                 @PathVariable String methodName,
+                                                 @RequestBody(required = false) String body) {
         if (!registry.hasService(serviceName)) {
             return ResponseEntity.badRequest().body("Service not found: " + serviceName);
         }
@@ -29,7 +31,9 @@ public class DynamicServiceController {
             return ResponseEntity.ok(result);
         } catch (Throwable e) {
             log.error("{}.{} invoke error:", serviceName, methodName, e);
-            return ResponseEntity.internalServerError().body("Error: " + e.getMessage());
+            String msg = e.getMessage() != null ? e.getMessage() : e.getClass().getSimpleName();
+            return ResponseEntity.internalServerError().body("Error: " + msg);
         }
     }
+
 }

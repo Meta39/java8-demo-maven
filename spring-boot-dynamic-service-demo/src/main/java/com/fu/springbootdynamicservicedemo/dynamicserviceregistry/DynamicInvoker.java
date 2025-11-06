@@ -1,4 +1,4 @@
-package com.fu.springbootdynamicservicedemo.dynamicservice;
+package com.fu.springbootdynamicservicedemo.dynamicserviceregistry;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -22,10 +23,15 @@ import java.util.Set;
  * 修正了集合/数组目标类型接收标量值时报错的问题：
  * - 单参数场景：如果目标是集合/数组且 body 不是数组，包一层 [] 再反序列化
  * - 多参数按字段场景：如果字段是标量但目标是集合/数组，创建 ArrayNode 包装后再 convertValue
+ * 同时包裹并增强了 JSON 错误上下文信息。
  */
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class DynamicInvoker {
+    private static final String SQUARE_BRACKETS_LEFT = "[";
+    private static final String SQUARE_BRACKETS_RIGHT = "]";
+    private static final String SPACE = " ";
 
     private final DynamicMethodRegistry registry;
     private final ObjectMapper objectMapper;
@@ -33,22 +39,29 @@ public class DynamicInvoker {
 
     public Object invoke(String serviceName, String methodName, String body) throws Throwable {
         DynamicMethodRegistry.MethodMeta meta = registry.getMethodMeta(serviceName, methodName);
+        if (meta == null) {
+            throw new IllegalArgumentException("Dynamic method not found: " + serviceName + "." + methodName);
+        }
 
-        Object[] args = resolveArgs(meta, body);
+        Object[] args;
+        try {
+            args = resolveArgs(meta, body);
+        } catch (JsonProcessingException e) {
+            throw new IllegalArgumentException(String.format("Failed to parse JSON parameter (%s.%s): %s", serviceName, methodName, e.getOriginalMessage()), e);
+        }
 
         // 参数校验
         for (Object arg : args) {
-            if (arg == null) continue;
-            if (isPrimitiveOrWrapper(arg.getClass())) continue;
+            if (arg == null || isPrimitiveOrWrapper(arg.getClass())) continue;
             Set<ConstraintViolation<Object>> violations = validator.validate(arg);
             if (!violations.isEmpty()) {
-                StringBuilder sb = new StringBuilder("参数校验失败: ");
                 for (ConstraintViolation<Object> v : violations) {
-                    sb.append("[").append(v.getPropertyPath()).append(" ").append(v.getMessage()).append("]");
+                    //有一个参数校验失败就立即抛出异常，而不是全部校验完才抛出，这样可以提高性能并提供更及时的反馈。
+                    throw new IllegalArgumentException(v.getPropertyPath() + SPACE + v.getMessage());
                 }
-                throw new IllegalArgumentException(sb.toString());
             }
         }
+
         MethodHandle metaHandle = meta.getHandle();
         Object ret = metaHandle.invokeWithArguments(args);
         if (meta.isVoidReturn()) return null;
@@ -66,7 +79,7 @@ public class DynamicInvoker {
         String trimmed = body.trim();
 
         // ---------- 如果是数组 JSON（例如 [..]） ----------
-        if (trimmed.startsWith("[")) {
+        if (trimmed.startsWith(SQUARE_BRACKETS_LEFT)) {
             //  单参数且参数类型是集合/数组时，直接映射整个数组
             JavaType oneJacksonParamType = meta.getJacksonParamTypes()[0];
             if (paramLen == 1 && isJacksonCollectionLike(oneJacksonParamType)) {
@@ -83,7 +96,7 @@ public class DynamicInvoker {
                 if ((value instanceof Number || value instanceof String)
                         && isJacksonCollectionLike(tempJacksonParamType)) {
                     // 把标量包成数组
-                    String json = "[" + objectMapper.writeValueAsString(value) + "]";
+                    String json = SQUARE_BRACKETS_LEFT + objectMapper.writeValueAsString(value) + SQUARE_BRACKETS_RIGHT;
                     args[i] = objectMapper.readValue(json, tempJacksonParamType);
                 } else {
                     args[i] = objectMapper.convertValue(value, tempJacksonParamType);
@@ -96,7 +109,7 @@ public class DynamicInvoker {
         if (paramLen == 1) {
             JavaType oneJacksonParamType = meta.getJacksonParamTypes()[0];
             if (isJacksonCollectionLike(oneJacksonParamType)) {
-                String wrapped = "[" + body + "]";
+                String wrapped = SQUARE_BRACKETS_LEFT + body + SQUARE_BRACKETS_RIGHT;
                 Object arg = objectMapper.readValue(wrapped, oneJacksonParamType);
                 return new Object[]{arg};
             } else {
@@ -110,19 +123,16 @@ public class DynamicInvoker {
         Object[] args = new Object[paramLen];
         String[] paramNames = meta.getParamNames();
         Map<String, JsonNode> fieldMap = new HashMap<>();
-        Iterator<String> it = root.fieldNames();
-        while (it.hasNext()) {
-            String fn = it.next();
-            fieldMap.put(fn, root.get(fn));
+        // 直接使用 fields() 迭代更简洁
+        Iterator<Map.Entry<String, JsonNode>> fit = root.fields();
+        while (fit.hasNext()) {
+            Map.Entry<String, JsonNode> e = fit.next();
+            fieldMap.put(e.getKey(), e.getValue());
         }
 
         for (int i = 0; i < paramLen; i++) {
             String paramName = paramNames[i];
             JsonNode n = fieldMap.get(paramName);
-            if (n == null) {
-                String snakeCase = toSnakeCase(paramName);
-                n = fieldMap.get(snakeCase);
-            }
 
             if (n == null) {
                 args[i] = null;
@@ -140,12 +150,12 @@ public class DynamicInvoker {
         return args;
     }
 
-
     private boolean isJacksonCollectionLike(JavaType jt) {
         if (jt == null) return false;
         return jt.isCollectionLikeType() || jt.isArrayType();
     }
 
+    //不能是 String，因为可能是 JSON 字符串
     private boolean isPrimitiveOrWrapper(Class<?> cls) {
         if (cls.isPrimitive()) return true;
         // 常见包装类型判断
@@ -154,16 +164,4 @@ public class DynamicInvoker {
                 cls == Float.class || cls == Double.class;
     }
 
-    private String toSnakeCase(String s) {
-        StringBuilder sb = new StringBuilder();
-        for (char c : s.toCharArray()) {
-            if (Character.isUpperCase(c)) {
-                sb.append('_').append(Character.toLowerCase(c));
-            } else {
-                sb.append(c);
-            }
-        }
-        return sb.toString();
-    }
 }
-
