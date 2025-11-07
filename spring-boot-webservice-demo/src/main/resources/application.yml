@@ -3,3 +3,12 @@ server:
 
 cxf:
   path: /services
+
+spring:
+  application:
+    name: webservicedemo
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/mybatisplusdemo?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&useSSL=false&serverTimezone=Asia/Shanghai
+    username: root
+    password: 123456

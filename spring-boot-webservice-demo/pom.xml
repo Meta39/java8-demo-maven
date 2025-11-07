@@ -44,6 +44,17 @@
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-spring-boot-starter-jaxws</artifactId>
         </dependency>
+        <!-- mysql -->
+        <dependency>
+            <groupId>com.mysql</groupId>
+            <artifactId>mysql-connector-j</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <!-- 事务 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-jdbc</artifactId>
+        </dependency>
     </dependencies>
 
 </project>

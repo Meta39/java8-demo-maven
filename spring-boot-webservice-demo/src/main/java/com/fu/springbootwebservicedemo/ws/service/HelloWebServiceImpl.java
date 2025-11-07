@@ -6,6 +6,7 @@ import com.fu.springbootwebservicedemo.dto.Work;
 import com.fu.springbootwebservicedemo.ws.IWebService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
@@ -55,6 +56,7 @@ public class HelloWebServiceImpl implements IWebService<HelloReq> {
         <R><Code>200</Code><Message>success</Message><Data><Name>哈哈</Name><Age>18</Age></Data></R>
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public HelloRes handle(HelloReq req) {
         String name = req.getName();
         List<Work> works = req.getWorks();

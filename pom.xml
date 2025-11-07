@@ -66,7 +66,7 @@
         <!-- java8 最后支持 2.* -->
         <caffeine.version>2.9.3</caffeine.version>
         <!-- java8 最后支持 3.5.* -->
-        <cxf-spring-boot-starter-jaxws.version>3.6.6</cxf-spring-boot-starter-jaxws.version>
+        <cxf-spring-boot-starter-jaxws.version>3.5.11</cxf-spring-boot-starter-jaxws.version>
         <org.mapstruct.version>1.6.3</org.mapstruct.version>
         <!-- Lombok 尽量跟 Spring Boot 的版本一致 -->
         <lombok.version>1.18.42</lombok.version>

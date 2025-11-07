@@ -1,7 +1,7 @@
 package com.fu.springbootwebservicedemo.ws;
 
 import com.fu.springbootwebservicedemo.util.BeanUtils;
-import org.springframework.aop.framework.AopProxyUtils;
+import org.springframework.aop.support.AopUtils;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
@@ -34,24 +34,25 @@ public class WebServiceTypeCache implements ApplicationRunner {
     }
 
     @Override
-    public void run(ApplicationArguments args) throws Exception {
-        Map<String, IWebService> beans = BeanUtils.getBeansOfType(IWebService.class);
+    public void run(ApplicationArguments args) {
         //循环map，forEach(key,value) 是最现代的方式，使用起来简洁明了。也可以用 for (Map.Entry<String, IWebService> entry : beans.entrySet()){}。
-        beans.forEach((bean, type) -> {
-            // AopProxyUtils.ultimateTargetClass 解决Spring Boot 使用 @Transactional 事务注解的问题。
-            Class<?> beanClass = AopProxyUtils.ultimateTargetClass(type);
+        BeanUtils
+                .getBeansOfType(IWebService.class)
+                .forEach((bean, type) -> {
+            // AopUtils.getTargetClass 解决Spring Boot 使用 @Transactional 事务注解的问题。
             // 获取 IWebService 实现类的泛型类型
-            for (Type genericInterface : beanClass.getGenericInterfaces()) {
-                if (genericInterface instanceof ParameterizedType) {
-                    ParameterizedType parameterizedType = (ParameterizedType) genericInterface;
-                    Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();
-
-                    if (actualTypeArguments.length > 0) {
-                        Class<?> parameterType = (Class<?>) actualTypeArguments[0];
-                        //把泛型入参放入缓存。防止每次请求都通过反射获取入参，影响程序性能。
-                        typeCache.put(bean, parameterType);
-                    }
-                }
+            for (Type genericInterface : AopUtils.getTargetClass(type).getGenericInterfaces()) {
+                //ParameterizedType 是 Java 反射机制中的重要接口，表示参数化类型（泛型类型）。我们定义的IWebService接口是泛型接口，因此不是 ParameterizedType，则跳过。
+                if (!(genericInterface instanceof ParameterizedType)) continue;
+                ParameterizedType parameterizedType = (ParameterizedType) genericInterface;
+                //getActualTypeArguments 获取实际类型参数，即实现IWebService接口的泛型类型的具体类型。
+                Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();
+                //正常情况下这里不会是0，但是为了健壮性，还是保留。
+                if (actualTypeArguments.length == 0) continue;
+                //因为IWebService有且仅有一个参数（并且是泛型参数），所以我们获取第一个即可。
+                Class<?> parameterType = (Class<?>) actualTypeArguments[0];
+                //把泛型入参放入缓存。防止每次请求都通过反射获取入参，影响程序性能。
+                typeCache.put(bean, parameterType);
             }
         });
     }
