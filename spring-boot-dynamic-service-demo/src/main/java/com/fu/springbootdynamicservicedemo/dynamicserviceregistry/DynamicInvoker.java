@@ -56,6 +56,9 @@ public class DynamicInvoker {
         return meta.isVoidReturn() ? null : meta.getHandle().invokeWithArguments(args);
     }
 
+    /**
+     * 无法调用重名方法，因为无法提前知道参数的格式和个数。所以调用的类出现重名方法会报错。
+     */
     public Object invokeNoCache(String beanName, String methodName, String body) throws Throwable {
         Object bean = context.getBean(beanName);
         Method method = findUniqueMethod(beanName, methodName, AopUtils.getTargetClass(bean).getDeclaredMethods());
