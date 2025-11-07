@@ -12,6 +12,15 @@ public class DynamicInvokerTest {
     @Autowired
     private DynamicInvoker invoker;
 
+    @Test
+    void test() throws Throwable {
+        String beanName = "calcService";
+        String methodName = "sumList";
+        String body = "[1,2,3,4,5,6]";
+        Object ret = invoker.invokeNoCache(beanName, methodName, body);
+        System.out.println(ret);
+    }
+
     //不存在的 DynamicService（报错，则校验通过）
     @Test
     void testNonexistentBean() throws Throwable {

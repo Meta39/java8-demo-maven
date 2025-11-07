@@ -6,15 +6,20 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.type.TypeFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.aop.support.AopUtils;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
-import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.util.*;
 
 /*
@@ -56,6 +61,7 @@ public class DynamicInvoker {
         PRIMITIVE_OR_WRAPPERS = Collections.unmodifiableSet(tempSet);
     }
 
+    private final ApplicationContext context;
     private final DynamicMethodRegistry registry;
     private final ObjectMapper objectMapper;
     private final Validator validator;
@@ -63,19 +69,54 @@ public class DynamicInvoker {
     public Object invoke(String serviceName, String methodName, String body) throws Throwable {
         //获取 meta
         DynamicMethodRegistry.MethodMeta meta = registry.getMethodMeta(serviceName, methodName);
-
         //参数转换
-        Object[] args = resolveArgsFromJson(serviceName, methodName, meta, body);
-
+        Object[] args = resolveArgsByMethodMeta(serviceName, methodName, meta, body);
         // 参数校验
         validateArgs(args);
-
         // 执行方法
-        MethodHandle metaHandle = meta.getHandle();
-        Object ret = metaHandle.invokeWithArguments(args);
-        return meta.isVoidReturn() ? null : ret;
+        return meta.isVoidReturn() ? null : meta.getHandle().invokeWithArguments(args);
     }
 
+    //不能存在同名方法。
+    public Object invokeNoCache(String beanName, String methodName, String body) throws Throwable {
+        Object bean = context.getBean(beanName);
+        Method method = checkAndGetMethod(beanName, methodName, AopUtils.getTargetClass(bean).getDeclaredMethods());
+        DynamicMethodRegistry.checkPublicMethod(beanName, methodName, method.getModifiers());
+        return checkAndReturn(method.getReturnType(), MethodHandles
+                .lookup()
+                .unreflect(method)
+                .bindTo(bean)
+                .invokeWithArguments(resolveArgsNoCache(beanName, methodName, method.getParameters(), body)));
+    }
+
+    private Method checkAndGetMethod(String beanName, String methodName, Method[] methods) {
+        int count = 0;
+        Method m = null;
+        for (Method method : methods) {
+            //如果同一个类出现同名方法，则抛出异常。
+            if (count > 1) {
+                DynamicMethodRegistry.cheackSameMethodInTheSameClass(beanName, methodName);
+            }
+            if (method.getName().equals(methodName)) {
+                m = method;
+                count++;
+            }
+        }
+        if (m == null) {
+            throw new IllegalArgumentException("not find " + beanName + "." + methodName);
+        }
+        return m;
+    }
+
+    private static Object checkAndReturn(Class<?> returnType, Object ret) {
+        return isVoidReturn(returnType) ? null : ret;
+    }
+
+    public static boolean isVoidReturn(Class<?> returnType) {
+        return returnType == void.class || returnType == Void.class;
+    }
+
+    //参数校验
     private void validateArgs(Object[] args) {
         if (args == null) return;
 
@@ -91,18 +132,33 @@ public class DynamicInvoker {
         }
     }
 
-    private Object[] resolveArgsFromJson(String serviceName, String methodName, DynamicMethodRegistry.MethodMeta meta, String body) {
+    private Object[] resolveArgsNoCache(String serviceName, String methodName, Parameter[] parameters, String body) {
+        int paramCount = parameters.length;
+        String[] paramNames = new String[paramCount];
+        JavaType[] jacksonTypes = new JavaType[paramCount];
+        // TypeFactory 缓存，避免在循环中多次获取
+        final TypeFactory typeFactory = objectMapper.getTypeFactory();
+        for (int i = 0; i < paramCount; i++) {
+            Parameter param = parameters[i];
+            paramNames[i] = param.getName();
+            jacksonTypes[i] = typeFactory.constructType(param.getParameterizedType());
+        }
+        return resolveArgsFromJson(serviceName, methodName, paramCount, jacksonTypes, paramNames, body);
+    }
+
+    private Object[] resolveArgsByMethodMeta(String serviceName, String methodName, DynamicMethodRegistry.MethodMeta meta, String body) {
+        return resolveArgsFromJson(serviceName, methodName, meta.getParamTypesLength(), meta.getJacksonParamTypes(), meta.getParamNames(), body);
+    }
+
+    private Object[] resolveArgsFromJson(String serviceName, String methodName, int paramLen, JavaType[] jacksonParamTypes, String[] paramNames, String body) {
         try {
-            return resolveArgs(meta, body);
+            return resolveArgs(paramLen, jacksonParamTypes, paramNames, body);
         } catch (JsonProcessingException e) {
             throw new IllegalArgumentException(String.format("Failed to parse JSON parameter (%s.%s): %s", serviceName, methodName, e.getOriginalMessage()), e);
         }
     }
 
-
-    private Object[] resolveArgs(DynamicMethodRegistry.MethodMeta meta, String body) throws JsonProcessingException {
-        Class<?>[] paramTypes = meta.getParamTypes();
-        int paramLen = paramTypes.length;
+    private Object[] resolveArgs(int paramLen, JavaType[] jacksonParamTypes, String[] paramNames, String body) throws JsonProcessingException {
         if (paramLen == 0) return new Object[0];
         if (!StringUtils.hasText(body)) return new Object[paramLen];
 
@@ -111,7 +167,7 @@ public class DynamicInvoker {
         // ---------- 如果是数组 JSON（例如 [..]） ----------
         if (trimmed.startsWith(SQUARE_BRACKETS_LEFT)) {
             //  单参数且参数类型是集合/数组时，直接映射整个数组
-            JavaType oneJacksonParamType = meta.getJacksonParamTypes()[0];
+            JavaType oneJacksonParamType = jacksonParamTypes[0];
             if (paramLen == 1 && isJacksonCollectionLike(oneJacksonParamType)) {
                 Object arg = objectMapper.readValue(body, oneJacksonParamType);
                 return new Object[]{arg};
@@ -122,7 +178,7 @@ public class DynamicInvoker {
             Object[] args = new Object[paramLen];
             for (int i = 0; i < paramLen && i < raw.length; i++) {
                 Object value = raw[i];
-                JavaType tempJacksonParamType = meta.getJacksonParamTypes()[i];
+                JavaType tempJacksonParamType = jacksonParamTypes[i];
                 if ((value instanceof Number || value instanceof String)
                         && isJacksonCollectionLike(tempJacksonParamType)) {
                     // 把标量包成数组
@@ -137,7 +193,7 @@ public class DynamicInvoker {
 
         // ---------- 单参数场景 ----------
         if (paramLen == 1) {
-            JavaType oneJacksonParamType = meta.getJacksonParamTypes()[0];
+            JavaType oneJacksonParamType = jacksonParamTypes[0];
             if (isJacksonCollectionLike(oneJacksonParamType)) {
                 String wrapped = SQUARE_BRACKETS_LEFT + body + SQUARE_BRACKETS_RIGHT;
                 Object arg = objectMapper.readValue(wrapped, oneJacksonParamType);
@@ -151,7 +207,6 @@ public class DynamicInvoker {
         // ---------- 多参数：按字段取值 ----------
         JsonNode root = objectMapper.readTree(body);
         Object[] args = new Object[paramLen];
-        String[] paramNames = meta.getParamNames();
         Map<String, JsonNode> fieldMap = new HashMap<>();
         // 直接使用 fields() 迭代更简洁
         Iterator<Map.Entry<String, JsonNode>> fit = root.fields();
@@ -167,7 +222,7 @@ public class DynamicInvoker {
             if (n == null) {
                 args[i] = null;
             } else {
-                JavaType tempJacksonParamType = meta.getJacksonParamTypes()[i];
+                JavaType tempJacksonParamType = jacksonParamTypes[i];
                 if ((n.isValueNode() || n.isNumber() || n.isTextual()) && isJacksonCollectionLike(tempJacksonParamType)) {
                     ArrayNode arr = JsonNodeFactory.instance.arrayNode();
                     arr.add(n);

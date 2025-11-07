@@ -84,25 +84,17 @@ public class DynamicMethodRegistry {
                 DynamicMethod dm = method.getAnnotation(DynamicMethod.class);
                 if (dm == null) continue;
 
-                if (!Modifier.isPublic(method.getModifiers())) {
-                    throw new IllegalStateException(String.format(
-                            "@DynamicMethod must be public: %s.%s (bean=%s)",
-                            targetClass.getName(), method.getName(), beanName
-                    ));
-                }
+                checkPublicMethod(beanName, method.getName(), method.getModifiers());
 
                 String dmValue = dm.value();
                 String methodName = StringUtils.hasText(dmValue) ? dmValue : method.getName();
                 if (methods.containsKey(methodName)) {
-                    throw new IllegalStateException(String.format(
-                            "The same method name occurs in the same @DynamicService class: %s.%s (Bean=%s)",
-                            serviceName, methodName, beanName
-                    ));
+                    cheackSameMethodInTheSameClass(serviceName, methodName);
                 }
 
                 MethodHandle handle = lookup.unreflect(method).bindTo(bean);
                 //创建 MethodMeta
-                MethodMeta meta = createMethodMeta(bean, method, handle, typeFactory);
+                MethodMeta meta = createMethodMeta(method, handle, typeFactory);
                 methods.put(methodName, meta);
             }
 
@@ -115,37 +107,40 @@ public class DynamicMethodRegistry {
         }
     }
 
-    private MethodMeta createMethodMeta(Object bean, Method method, MethodHandle handle, TypeFactory typeFactory) {
+    public static void cheackSameMethodInTheSameClass(String beanName, String methodName) {
+        throw new IllegalStateException("The same method name occurs in the same @DynamicService class: " + beanName + "." + methodName);
+    }
+
+    public static void checkPublicMethod(String beanName, String methodName, int modifiers) {
+        if (!Modifier.isPublic(modifiers)) {
+            throw new IllegalStateException("@DynamicMethod must be public: " + beanName + "." + methodName);
+        }
+    }
+
+    private MethodMeta createMethodMeta(Method method, MethodHandle handle, TypeFactory typeFactory) {
         Parameter[] parameters = method.getParameters();
         int paramCount = parameters.length;
 
-        Class<?>[] paramTypes = new Class[paramCount];
         String[] paramNames = new String[paramCount];
         JavaType[] jacksonTypes = new JavaType[paramCount];
 
         for (int i = 0; i < paramCount; i++) {
             Parameter param = parameters[i];
-            paramTypes[i] = param.getType();
             paramNames[i] = param.getName();
             jacksonTypes[i] = typeFactory.constructType(param.getParameterizedType());
         }
 
-        return new MethodMeta(bean, method, handle, paramTypes, paramNames, jacksonTypes);
+        return new MethodMeta(handle, method.getReturnType() == void.class, paramCount, paramNames, jacksonTypes);
     }
 
     @Getter
     @AllArgsConstructor
     public static class MethodMeta {
-        private final Object bean;
-        private final Method method;
         private final MethodHandle handle;
-        private final Class<?>[] paramTypes;
+        private final boolean voidReturn;
+        private final int paramTypesLength;
         private final String[] paramNames;
         private final JavaType[] jacksonParamTypes;
-
-        public boolean isVoidReturn() {
-            return method.getReturnType() == void.class;
-        }
     }
 }
 

@@ -9,6 +9,11 @@ import java.util.List;
 @DynamicService
 public class CalcService {
 
+    //同名方法，使 invokeNoCache 调用报错。因为出现了同名方法。
+    public int sumList() {
+        return 1;
+    }
+
     @DynamicMethod("sumList")
     public int sumList(List<Integer> nums) {
         return nums.stream().mapToInt(Integer::intValue).sum();
