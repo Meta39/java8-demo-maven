@@ -18,17 +18,12 @@ import org.springframework.util.StringUtils;
 import javax.annotation.PostConstruct;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.Parameter;
-import java.util.HashMap;
-import java.util.Map;
+import java.lang.reflect.*;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 自动扫描并注册所有 @DynamicService Bean 与其 @DynamicMethod。
- * 支持使用 beanName 作为默认 serviceName。
- * 兼容 Java 8。
  */
 @Slf4j
 @Component
@@ -38,77 +33,62 @@ public class DynamicMethodRegistry {
     private final ApplicationContext context;
     private final ObjectMapper objectMapper;
 
-    // serviceName -> (methodName -> MethodMeta)
     private final Map<String, Map<String, MethodMeta>> registry = new ConcurrentHashMap<>();
 
-    //校验并获取
-    public MethodMeta getMethodMeta(String serviceName, String methodName) {
-        Map<String, MethodMeta> methods = registry.get(serviceName);
-        if (methods == null) {
-            throw new IllegalArgumentException("Service not found: " + serviceName);
-        }
-
-        MethodMeta meta = methods.get(methodName);
-        if (meta == null) {
-            throw new IllegalArgumentException("Method not found: " + serviceName + "." + methodName);
-        }
-        return meta;
-    }
-
-    /**
-     * 自动初始化（Spring 容器启动后自动扫描）
-     */
     @PostConstruct
     public void init() throws IllegalAccessException {
         Map<String, Object> beans = context.getBeansWithAnnotation(DynamicService.class);
         if (CollectionUtils.isEmpty(beans)) {
-            log.warn("No @DynamicService Bean was found");
+            log.warn("No @DynamicService Bean found");
             return;
         }
 
         MethodHandles.Lookup lookup = MethodHandles.lookup();
-        // TypeFactory 缓存，避免在循环中多次获取
-        final TypeFactory typeFactory = objectMapper.getTypeFactory();
+        TypeFactory tf = objectMapper.getTypeFactory();
 
         for (Map.Entry<String, Object> entry : beans.entrySet()) {
-            String beanName = entry.getKey();
-            Object bean = entry.getValue();
-
-            Class<?> targetClass = AopUtils.getTargetClass(bean);
-            DynamicService ds = targetClass.getAnnotation(DynamicService.class);
-            assert ds != null;
-            String serviceName = StringUtils.hasText(ds.value()) ? ds.value() : beanName;
-
-            Map<String, MethodMeta> methods = new HashMap<>();
-            for (Method method : targetClass.getDeclaredMethods()) {
-                DynamicMethod dm = method.getAnnotation(DynamicMethod.class);
-                if (dm == null) continue;
-
-                checkPublicMethod(beanName, method.getName(), method.getModifiers());
-
-                String dmValue = dm.value();
-                String methodName = StringUtils.hasText(dmValue) ? dmValue : method.getName();
-                if (methods.containsKey(methodName)) {
-                    cheackSameMethodInTheSameClass(serviceName, methodName);
-                }
-
-                MethodHandle handle = lookup.unreflect(method).bindTo(bean);
-                //创建 MethodMeta
-                MethodMeta meta = createMethodMeta(method, handle, typeFactory);
-                methods.put(methodName, meta);
-            }
-
-            if (!methods.isEmpty()) {
-                registry.put(serviceName, methods);
-                log.info("Register @DynamicService bean:[{}] methods:{}", serviceName, methods.keySet());
-            } else {
-                log.warn("@DynamicService (bean:{}) does not have the @DynamicMethod annotation", serviceName);
-            }
+            registerService(entry.getKey(), entry.getValue(), lookup, tf);
         }
     }
 
+    private void registerService(String beanName, Object bean, MethodHandles.Lookup lookup, TypeFactory tf) throws IllegalAccessException {
+        Class<?> targetClass = AopUtils.getTargetClass(bean);
+        DynamicService ds = targetClass.getAnnotation(DynamicService.class);
+        String serviceName = StringUtils.hasText(ds.value()) ? ds.value() : beanName;
+
+        Map<String, MethodMeta> methods = new HashMap<>();
+        for (Method m : targetClass.getDeclaredMethods()) {
+            DynamicMethod dm = m.getAnnotation(DynamicMethod.class);
+            if (dm == null) continue;
+
+            checkPublicMethod(serviceName, m.getName(), m.getModifiers());
+            String methodName = StringUtils.hasText(dm.value()) ? dm.value() : m.getName();
+
+            if (methods.containsKey(methodName)) {
+                cheackSameMethodInTheSameClass(serviceName, methodName);
+            }
+
+            methods.put(methodName, createMeta(m, lookup.unreflect(m).bindTo(bean), tf));
+        }
+
+        if (!methods.isEmpty()) {
+            registry.put(serviceName, methods);
+            log.info("Registered DynamicService [{}] with methods: {}", serviceName, methods.keySet());
+        } else {
+            log.warn("@DynamicService [{}] has no @DynamicMethod", serviceName);
+        }
+    }
+
+    public MethodMeta getMethodMeta(String service, String method) {
+        Map<String, MethodMeta> m = registry.get(service);
+        if (m == null) throw new IllegalArgumentException("Service not found: " + service);
+        MethodMeta meta = m.get(method);
+        if (meta == null) throw new IllegalArgumentException("Method not found: " + service + "." + method);
+        return meta;
+    }
+
     public static void cheackSameMethodInTheSameClass(String beanName, String methodName) {
-        throw new IllegalStateException("The same method name occurs in the same @DynamicService class: " + beanName + "." + methodName);
+        throw new IllegalStateException("Duplicate method in same class: " + beanName + "." + methodName);
     }
 
     public static void checkPublicMethod(String beanName, String methodName, int modifiers) {
@@ -117,20 +97,20 @@ public class DynamicMethodRegistry {
         }
     }
 
-    private MethodMeta createMethodMeta(Method method, MethodHandle handle, TypeFactory typeFactory) {
-        Parameter[] parameters = method.getParameters();
-        int paramCount = parameters.length;
-
-        String[] paramNames = new String[paramCount];
-        JavaType[] jacksonTypes = new JavaType[paramCount];
-
-        for (int i = 0; i < paramCount; i++) {
-            Parameter param = parameters[i];
-            paramNames[i] = param.getName();
-            jacksonTypes[i] = typeFactory.constructType(param.getParameterizedType());
+    private MethodMeta createMeta(Method m, MethodHandle handle, TypeFactory tf) {
+        Parameter[] params = m.getParameters();
+        int len = params.length;
+        String[] names = new String[len];
+        JavaType[] types = new JavaType[len];
+        for (int i = 0; i < len; i++) {
+            names[i] = params[i].getName();
+            types[i] = tf.constructType(params[i].getParameterizedType());
         }
+        return new MethodMeta(handle, isVoid(m.getReturnType()), len, names, types);
+    }
 
-        return new MethodMeta(handle, method.getReturnType() == void.class, paramCount, paramNames, jacksonTypes);
+    public static boolean isVoid(Class<?> returnType) {
+        return returnType == void.class || returnType == Void.class;
     }
 
     @Getter
@@ -143,4 +123,3 @@ public class DynamicMethodRegistry {
         private final JavaType[] jacksonParamTypes;
     }
 }
-

@@ -12,6 +12,7 @@ public class DynamicInvokerTest {
     @Autowired
     private DynamicInvoker invoker;
 
+    //不能出现重名方法，如果出现重名方法，则调用报错。（报错，则校验通过）
     @Test
     void test() throws Throwable {
         String beanName = "calcService";
