@@ -5,6 +5,7 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
 import java.util.List;
 
 @Data
@@ -12,6 +13,7 @@ import java.util.List;
 public class HelloReq {
 
     @JacksonXmlProperty(localName = "Name")
+    @NotBlank
     private String name;
 
     @JacksonXmlElementWrapper(localName = "Works")
