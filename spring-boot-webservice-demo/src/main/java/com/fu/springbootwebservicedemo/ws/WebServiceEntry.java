@@ -8,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
@@ -17,6 +16,9 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 import javax.xml.ws.BindingType;
 import javax.xml.ws.soap.SOAPBinding;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -30,6 +32,18 @@ import java.util.Set;
 @BindingType(value = SOAPBinding.SOAP11HTTP_BINDING)
 @RequiredArgsConstructor
 public class WebServiceEntry {
+    //java数据类型，不用校验。因为一定是个对象，所以String类型也要包含进去。
+    private static final Set<Class<?>> PRIMITIVE_OR_WRAPPERS;
+
+    static {
+        Set<Class<?>> temp = new HashSet<>(Arrays.asList(
+                Boolean.class, Byte.class, Character.class, Short.class,
+                Integer.class, Long.class, Float.class, Double.class,
+                String.class
+        ));
+        PRIMITIVE_OR_WRAPPERS = Collections.unmodifiableSet(temp);
+    }
+
     private final App app;
     private final Validator validator;
 
@@ -89,18 +103,22 @@ public class WebServiceEntry {
     }
 
     //参数校验
-    private <T> void validateParameter(T reqObject) {
-        if (reqObject == null) return;
-        if (reqObject instanceof String && !StringUtils.hasText((String) reqObject)) return;
+    private <T> void validateParameter(T arg) {
+        //不进行校验的参数类型，则跳过校验。因为无法校验。
+        if (arg == null || isPrimitiveOrWrapper(arg.getClass())) return;
         //判断是否开启参数校验，默认开启。
         if (app.isValidate()) {
-            Set<ConstraintViolation<T>> violations = validator.validate(reqObject);
+            Set<ConstraintViolation<T>> violations = validator.validate(arg);
             if (!CollectionUtils.isEmpty(violations)) {
                 ConstraintViolation<T> violation = violations.iterator().next();
                 //有一个参数校验失败就立即抛出异常，而不是全部校验完才抛出，这样可以提高性能并提供更及时的反馈。
                 throw new IllegalArgumentException(violation.getPropertyPath() + " " + violation.getMessage());
             }
         }
+    }
+
+    private boolean isPrimitiveOrWrapper(Class<?> cls) {
+        return cls.isPrimitive() || PRIMITIVE_OR_WRAPPERS.contains(cls);
     }
 
 }
