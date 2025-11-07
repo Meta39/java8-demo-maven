@@ -33,7 +33,8 @@ public class DynamicMethodRegistry {
     private final ApplicationContext context;
     private final ObjectMapper objectMapper;
 
-    private final Map<String, Map<String, MethodMeta>> registry = new ConcurrentHashMap<>();
+    //key: bean name + method name
+    private final Map<String, MethodMeta> registry = new ConcurrentHashMap<>();
 
     @PostConstruct
     public void init() throws IllegalAccessException {
@@ -43,6 +44,7 @@ public class DynamicMethodRegistry {
             return;
         }
 
+        //因为初始化是单线程的，所以下面这种方式是安全的。
         MethodHandles.Lookup lookup = MethodHandles.lookup();
         TypeFactory tf = objectMapper.getTypeFactory();
 
@@ -56,7 +58,6 @@ public class DynamicMethodRegistry {
         DynamicService ds = targetClass.getAnnotation(DynamicService.class);
         String serviceName = StringUtils.hasText(ds.value()) ? ds.value() : beanName;
 
-        Map<String, MethodMeta> methods = new HashMap<>();
         for (Method m : targetClass.getDeclaredMethods()) {
             DynamicMethod dm = m.getAnnotation(DynamicMethod.class);
             if (dm == null) continue;
@@ -64,26 +65,25 @@ public class DynamicMethodRegistry {
             checkPublicMethod(serviceName, m.getName(), m.getModifiers());
             String methodName = StringUtils.hasText(dm.value()) ? dm.value() : m.getName();
 
-            if (methods.containsKey(methodName)) {
+            String cacheKey = buildKey(serviceName, methodName);
+            if (registry.containsKey(cacheKey)) {
                 cheackSameMethodInTheSameClass(serviceName, methodName);
             }
 
-            methods.put(methodName, createMeta(m, lookup.unreflect(m).bindTo(bean), tf));
-        }
-
-        if (!methods.isEmpty()) {
-            registry.put(serviceName, methods);
-            log.info("Registered DynamicService [{}] with methods: {}", serviceName, methods.keySet());
-        } else {
-            log.warn("@DynamicService [{}] has no @DynamicMethod", serviceName);
+            registry.put(cacheKey, createMeta(m, lookup.unreflect(m).bindTo(bean), tf));
+            log.info("Registered service [{}] with methods: {}", serviceName, registry.keySet());
         }
     }
 
+    private String buildKey(String serviceName, String methodName) {
+        return serviceName + "." + methodName;
+    }
+
     public MethodMeta getMethodMeta(String service, String method) {
-        Map<String, MethodMeta> m = registry.get(service);
-        if (m == null) throw new IllegalArgumentException("Service not found: " + service);
-        MethodMeta meta = m.get(method);
-        if (meta == null) throw new IllegalArgumentException("Method not found: " + service + "." + method);
+        MethodMeta meta = registry.get(buildKey(service, method));
+        if (meta == null) {
+            throw new IllegalArgumentException("Method not found: " + service + "." + method);
+        }
         return meta;
     }
 
