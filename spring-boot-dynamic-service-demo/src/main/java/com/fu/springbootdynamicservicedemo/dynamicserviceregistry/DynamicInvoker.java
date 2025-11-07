@@ -27,6 +27,7 @@ import java.util.*;
 | ⑦    | 参数校验失败                | `@NotNull` 参数触发异常  |
 | ⑧    | 标量包集合（多参数其中一个是 List）  | 标量自动包装为集合          |
  */
+
 /**
  * 修正了集合/数组目标类型接收标量值时报错的问题：
  * - 单参数场景：如果目标是集合/数组且 body 不是数组，包一层 [] 再反序列化
@@ -40,10 +41,20 @@ public class DynamicInvoker {
     private static final String SQUARE_BRACKETS_LEFT = "[";
     private static final String SQUARE_BRACKETS_RIGHT = "]";
     // 缓存常用类型判断结果
-    private static final List<Class<?>> PRIMITIVE_OR_WRAPPERS = Arrays.asList(
-            Boolean.class, Byte.class, Character.class, Short.class,
-            Integer.class, Long.class, Float.class, Double.class
-    );
+    private static final Set<Class<?>> PRIMITIVE_OR_WRAPPERS;
+
+    static {
+        Set<Class<?>> tempSet = new HashSet<>();
+        tempSet.add(Boolean.class);
+        tempSet.add(Byte.class);
+        tempSet.add(Character.class);
+        tempSet.add(Short.class);
+        tempSet.add(Integer.class);
+        tempSet.add(Long.class);
+        tempSet.add(Float.class);
+        tempSet.add(Double.class);
+        PRIMITIVE_OR_WRAPPERS = Collections.unmodifiableSet(tempSet);
+    }
 
     private final DynamicMethodRegistry registry;
     private final ObjectMapper objectMapper;
