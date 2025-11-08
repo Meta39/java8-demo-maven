@@ -14,7 +14,6 @@ import org.springframework.util.StringUtils;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -36,11 +35,17 @@ public class DynamicInvoker {
     private static final Set<Class<?>> PRIMITIVE_OR_WRAPPERS;
 
     static {
-        Set<Class<?>> temp = new HashSet<>(Arrays.asList(
-                Boolean.class, Byte.class, Character.class, Short.class,
-                Integer.class, Long.class, Float.class, Double.class
-        ));
-        PRIMITIVE_OR_WRAPPERS = Collections.unmodifiableSet(temp);
+        PRIMITIVE_OR_WRAPPERS = Collections.unmodifiableSet(new HashSet<Class<?>>() {{
+            this.add(Boolean.class);
+            this.add(Character.class);
+            this.add(Byte.class);
+            this.add(Short.class);
+            this.add(Integer.class);
+            this.add(Long.class);
+            this.add(Float.class);
+            this.add(Double.class);
+            this.add(Void.class);
+        }});
     }
 
     private final DynamicMethodRegistry registry;
@@ -75,8 +80,7 @@ public class DynamicInvoker {
         try {
             return resolveArgs(len, types, names, body);
         } catch (JsonProcessingException e) {
-            throw new IllegalArgumentException(String.format("Failed to parse JSON (%s.%s): %s",
-                    serviceName, methodName, e.getOriginalMessage()), e);
+            throw new IllegalArgumentException(String.format("Failed to parse JSON (%s.%s): %s", serviceName, methodName, e.getOriginalMessage()), e);
         }
     }
 
@@ -118,9 +122,7 @@ public class DynamicInvoker {
     }
 
     private Object resolveSingleArg(JavaType type, String body) throws JsonProcessingException {
-        return isCollectionLike(type)
-                ? objectMapper.readValue(SQUARE_BRACKETS_LEFT + body + SQUARE_BRACKETS_RIGHT, type)
-                : objectMapper.readValue(body, type);
+        return isCollectionLike(type) ? objectMapper.readValue(SQUARE_BRACKETS_LEFT + body + SQUARE_BRACKETS_RIGHT, type) : objectMapper.readValue(body, type);
     }
 
     private Object adaptCollectionValue(Object value, JavaType targetType) throws JsonProcessingException {
