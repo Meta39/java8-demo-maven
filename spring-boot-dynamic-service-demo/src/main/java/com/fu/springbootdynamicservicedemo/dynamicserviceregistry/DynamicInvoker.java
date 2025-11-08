@@ -1,24 +1,23 @@
 package com.fu.springbootdynamicservicedemo.dynamicserviceregistry;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.type.TypeFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.aop.support.AopUtils;
-import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
-import java.lang.invoke.MethodHandles;
-import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * 动态方法调用器，支持：
@@ -44,7 +43,6 @@ public class DynamicInvoker {
         PRIMITIVE_OR_WRAPPERS = Collections.unmodifiableSet(temp);
     }
 
-    private final ApplicationContext context;
     private final DynamicMethodRegistry registry;
     private final ObjectMapper objectMapper;
     private final Validator validator;
@@ -54,41 +52,6 @@ public class DynamicInvoker {
         Object[] args = resolveArgsByMeta(serviceName, methodName, meta, body);
         validateArgs(args);
         return meta.isVoidReturn() ? null : meta.getHandle().invokeWithArguments(args);
-    }
-
-    /**
-     * 无法调用重名方法，因为无法提前知道参数的格式和个数。所以调用的类出现重名方法会报错。
-     */
-    public Object invokeNoCache(String beanName, String methodName, String body) throws Throwable {
-        Object bean = context.getBean(beanName);
-        Method method = findUniqueMethod(beanName, methodName, AopUtils.getTargetClass(bean).getDeclaredMethods());
-        DynamicMethodRegistry.checkPublicMethod(beanName, methodName, method.getModifiers());
-        return checkReturn(method.getReturnType(),
-                MethodHandles.lookup()
-                        .unreflect(method)
-                        .bindTo(bean)
-                        .invokeWithArguments(resolveArgsNoCache(beanName, methodName, method.getParameters(), body))
-        );
-    }
-
-    private Method findUniqueMethod(String beanName, String methodName, Method[] methods) {
-        Method found = null;
-        for (Method m : methods) {
-            if (m.getName().equals(methodName)) {
-                if (found != null) {
-                    DynamicMethodRegistry.cheackSameMethodInTheSameClass(beanName, methodName);
-                }
-                found = m;
-            }
-        }
-        if (found == null) {
-            throw new IllegalArgumentException("Method not found: " + beanName + "." + methodName);
-        }
-        return found;
-    }
-
-    private static Object checkReturn(Class<?> returnType, Object ret) {
-        return DynamicMethodRegistry.isVoid(returnType) ? null : ret;
     }
 
     private void validateArgs(Object[] args) {
@@ -102,18 +65,6 @@ public class DynamicInvoker {
                 throw new IllegalArgumentException(v.getPropertyPath() + " " + v.getMessage());
             }
         }
-    }
-
-    private Object[] resolveArgsNoCache(String serviceName, String methodName, Parameter[] params, String body) {
-        TypeFactory tf = objectMapper.getTypeFactory();
-        int len = params.length;
-        String[] names = new String[len];
-        JavaType[] types = new JavaType[len];
-        for (int i = 0; i < len; i++) {
-            names[i] = params[i].getName();
-            types[i] = tf.constructType(params[i].getParameterizedType());
-        }
-        return resolveArgsFromJson(serviceName, methodName, len, types, names, body);
     }
 
     private Object[] resolveArgsByMeta(String serviceName, String methodName, DynamicMethodRegistry.MethodMeta meta, String body) {

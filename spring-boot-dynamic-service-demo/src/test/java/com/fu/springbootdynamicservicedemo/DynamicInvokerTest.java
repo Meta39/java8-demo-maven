@@ -12,16 +12,6 @@ public class DynamicInvokerTest {
     @Autowired
     private DynamicInvoker invoker;
 
-    //不能出现重名方法，如果出现重名方法，则调用报错。（报错，则校验通过）
-    @Test
-    void test() throws Throwable {
-        String beanName = "calcService";
-        String methodName = "sumList";
-        String body = "[1,2,3,4,5,6]";
-        Object ret = invoker.invokeNoCache(beanName, methodName, body);
-        System.out.println(ret);
-    }
-
     //不存在的 DynamicService（报错，则校验通过）
     @Test
     void testNonexistentBean() throws Throwable {
