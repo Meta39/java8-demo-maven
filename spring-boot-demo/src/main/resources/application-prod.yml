@@ -7,12 +7,28 @@ server:
 
 spring:
   task:
+    # 异步线程池配置
     execution:
+      # 队列满了的拒绝策略（默认：CallerRunsPolicy 如果线程池满了，则交由主线程执行。防止丢失数据）
+      rejection: CallerRunsPolicy
+      thread-name-prefix: task-
       pool:
         core-size: 16
+        # 可以是CPU 线程的 2 ~ 5 倍，甚至更多。
         max-size: 32
-        queue-capacity: 2000
-        keep-alive: 120
+        # 队列尽量不要超过100
+        queue-capacity: 50
+        keep-alive: 180s
+        #是否需要回收空闲线程（默认：true）
+        allow-core-thread-timeout: true
+    # 定时任务线程池配置
+    scheduling:
+      # 队列满了的拒绝策略
+      rejection: AbortPolicy
+      thread-name-prefix: scheduling-
+      pool:
+        # 默认1（可以是CPU 线程的 2 ~ 5 倍，甚至更多）
+        size: 16
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:13306/spring_boot_demo?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&useSSL=false&serverTimezone=Asia/Shanghai
