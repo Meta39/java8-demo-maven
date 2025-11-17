@@ -1,52 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- 此文件已弃用，改用其它方式实现日志输出。 -->
 <configuration scan="true" scanPeriod="60 seconds" debug="false">
     <!-- 应用名称 -->
-    <springProperty scope="context" name="springApplicationName" source="spring.application.name"
-                    defaultValue="unknownApplicationName"/>
-    <!-- 环境 -->
-    <springProperty scope="context" name="springProfilesActive" source="spring.profiles.active" defaultValue="dev"/>
+    <springProperty scope="context" name="springApplicationName" source="spring.application.name"/>
     <!-- 重启后是否删除日志 -->
-    <springProperty scope="context" name="cleanHistoryOnStart"
-                    source="logging.logback.rollingpolicy.clean-history-on-start" defaultValue="false"/>
+    <springProperty scope="context" name="cleanHistoryOnStart" source="logging.logback.rollingpolicy.clean-history-on-start" defaultValue="false"/>
     <!-- 单个日志文件的大小 -->
-    <springProperty scope="context" name="maxFileSize" source="logging.logback.rollingpolicy.max-file-size"
-                    defaultValue="10MB"/>
+    <springProperty scope="context" name="maxFileSize" source="logging.logback.rollingpolicy.max-file-size" defaultValue="50MB"/>
     <!-- 日志总文件最大值 -->
-    <springProperty scope="context" name="totalSizeCap" source="logging.logback.rollingpolicy.total-size-cap"
-                    defaultValue="10GB"/>
+    <springProperty scope="context" name="totalSizeCap" source="logging.logback.rollingpolicy.total-size-cap" defaultValue="50GB"/>
     <!-- 日志保留时长 (天) -->
-    <springProperty scope="context" name="maxHistory" source="logging.logback.rollingpolicy.max-history"
-                    defaultValue="7"/>
+    <springProperty scope="context" name="maxHistory" source="logging.logback.rollingpolicy.max-history" defaultValue="30"/>
     <!-- 日志文件路径 -->
-    <springProperty scope="context" name="path" source="logging.file.path"
-                    defaultValue="./logs/${springApplicationName}/${springProfilesActive}"/>
+    <springProperty scope="context" name="path" source="logging.file.path" defaultValue="./logs"/>
 
     <contextName>${springApplicationName}</contextName>
 
-    <!-- 彩色日志依赖的渲染类 -->
-    <conversionRule conversionWord="clr" converterClass="org.springframework.boot.logging.logback.ColorConverter"/>
-    <conversionRule conversionWord="wEx"
-                    converterClass="org.springframework.boot.logging.logback.WhitespaceThrowableProxyConverter"/>
-    <!-- 控制台输出的彩色日志格式 -->
-    <springProperty scope="context" name="patternConsole" source="logging.pattern.console"
-                    defaultValue="%clr([%d{HH:mm:ss}){faint} %clr(%p) %clr(%.10t]){faint} %clr(%C{39}){cyan} %clr(%M:%L){magenta}: %m%n%wEx"/>
-    <!-- 输出到文件的日志格式 -->
-    <springProperty scope="context" name="patternFile" source="logging.pattern.file"
-                    value="[%d{MM-dd HH:mm:ss} %p %.10t] %C{39}\.%M\\(\\): %m%n"/>
+    <property name="PATTERN_FILE" value="%d{${LOG_DATEFORMAT_PATTERN:-yyyy-MM-dd HH:mm:ss.SSS}} ${LOG_LEVEL_PATTERN:-%5p} ${PID:- } --- [%t] %-40.40logger{39} :%L %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}"/>
 
-    <!-- 控制台输出 -->
-    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder" charset="UTF-8">
-            <!-- 输出到控制台的日志格式 -->
-            <pattern>${patternConsole}</pattern>
-        </encoder>
-    </appender>
-
-    <appender name="output_file" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <!-- 循环政策：基于时间创建日志文件 -->
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>${path}/%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <fileNamePattern>${path}/%d{yyyy-MM-dd}/%i.log</fileNamePattern>
             <totalSizeCap>${totalSizeCap}</totalSizeCap>
             <maxHistory>${maxHistory}</maxHistory>
             <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
@@ -56,35 +29,12 @@
             <cleanHistoryOnStart>${cleanHistoryOnStart}</cleanHistoryOnStart>
         </rollingPolicy>
         <encoder>
-            <!-- 输出到文件的日志格式（不建议用彩色日志格式，因为会有一些特殊符号。） -->
-            <pattern>${patternFile}</pattern>
+            <pattern>${PATTERN_FILE}</pattern>
         </encoder>
     </appender>
 
-    <!--  开发环境，日志输出到控制台  -->
-    <springProfile name="dev">
-        <!-- 控制输出到控制台的日志级别，开发环境INFO或者DEBUG -->
-        <root level="INFO">
-            <appender-ref ref="console"/>
-        </root>
-    </springProfile>
-
-    <!--  生产环境，日志输出到文件  -->
-    <springProfile name="prod">
-        <!-- 控制输出到文件的日志级别，生产环境推荐ERROR或者WARN -->
-        <root level="ERROR">
-            <appender-ref ref="output_file"/>
-        </root>
-    </springProfile>
-
-    <!--  测试环境，日志输出到控制台和文件  -->
-    <springProfile name="test">
-        <!-- 控制输出到控制台和文件的日志级别，测试环境推荐INFO -->
-        <root level="INFO">
-            <!-- 当开发者切换到test环境进行开发时，推荐开启输出到控制台注解 -->
-            <!--            <appender-ref ref="console"/>-->
-            <appender-ref ref="output_file"/>
-        </root>
-    </springProfile>
+    <root level="INFO">
+        <appender-ref ref="FILE" />
+    </root>
 
 </configuration>
