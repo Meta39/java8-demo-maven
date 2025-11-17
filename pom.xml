@@ -299,6 +299,14 @@
             </plugin>
         </plugins>
         <resources>
+            <resource>
+                <directory>src/main/resources/logback</directory>
+                <targetPath>.</targetPath>
+                <includes>
+                    <include>logback-spring.xml</include>
+                </includes>
+                <filtering>false</filtering>
+            </resource>
             <!--
                 打包需要的静态资源文件
                 打包全部静态资源文件，启动jar包通过命令行参数控制
