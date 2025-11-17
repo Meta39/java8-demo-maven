@@ -15,7 +15,9 @@
 
     <contextName>${springApplicationName}</contextName>
 
-    <property name="PATTERN_FILE" value="[%d{yyyy-MM-dd HH:mm:ss.SSS} %p ${PID:- } %t] %-40.40logger{50} :%L %m%n"/>
+    <conversionRule conversionWord="wEx" converterClass="org.springframework.boot.logging.logback.ExtendedWhitespaceThrowableProxyConverter"/>
+
+    <property name="PATTERN_FILE" value="[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%5p] [${PID:- }] [%t] %-40.40logger{45} :%L %m%n%wEx"/>
 
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
