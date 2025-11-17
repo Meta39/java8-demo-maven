@@ -15,7 +15,7 @@
 
     <contextName>${springApplicationName}</contextName>
 
-    <property name="PATTERN_FILE" value="%d{${LOG_DATEFORMAT_PATTERN:-yyyy-MM-dd HH:mm:ss.SSS}} ${LOG_LEVEL_PATTERN:-%5p} ${PID:- } --- [%t] %-40.40logger{39} :%L %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}"/>
+    <property name="PATTERN_FILE" value="[%d{yyyy-MM-dd HH:mm:ss.SSS} %p ${PID:- } %t] %-40.40logger{50} :%L %m%n"/>
 
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
