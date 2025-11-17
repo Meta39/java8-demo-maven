@@ -20,6 +20,9 @@ import java.util.concurrent.Executor;
 @Configuration
 @RequiredArgsConstructor
 public class AsyncConfig implements AsyncConfigurer {
+    /**
+     * 异步线程不能直接丢弃，防止有些请求丢失。如果可以丢弃的请求，最好另外定义一个异步线程池。
+     */
     @Value("${spring.task.execution.rejection:CallerRunsPolicy}")
     private TaskRejectedExecutionHandler rejectionPolicy;
     private final TaskExecutionProperties taskExecutionProperties;
