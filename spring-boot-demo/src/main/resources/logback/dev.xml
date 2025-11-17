@@ -5,7 +5,7 @@
                     converterClass="org.springframework.boot.logging.logback.WhitespaceThrowableProxyConverter"/>
     <!-- 控制台彩色日志格式，注意：%L打印行号对性能有影响，因此不建议在生产环境使用。 -->
     <property name="CONSOLE_LOG_PATTERN"
-              value="%clr([%d{HH:mm:ss}){faint} %clr(%p) %clr(%.10t]){faint} %clr(%C{39}){cyan} %clr(%M:%L){magenta}: %m%n%wEx"/>
+              value="%clr([%d{HH:mm:ss.SSS}){faint} %clr(%p) %clr(%t]){faint} %clr(%C{39}){cyan} %clr(%L){magenta}: %m%n%wEx"/>
 
     <!--输出到控制台-->
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
