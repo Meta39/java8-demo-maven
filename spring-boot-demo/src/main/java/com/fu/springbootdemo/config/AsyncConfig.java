@@ -46,4 +46,24 @@ public class AsyncConfig implements AsyncConfigurer {
         return executor;
     }
 
+    //启动失败的备选方案（bean name 必须为 taskExecutor 以覆盖默认的配置。TaskExecutionAutoConfiguration类applicationTaskExecutor方法的bean name就是taskExecutor）
+    /*@Bean
+    public ThreadPoolTaskExecutor taskExecutor() {
+        TaskExecutionProperties.Pool pool = taskExecutionProperties.getPool();
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(pool.getCoreSize());//默认线程池大小
+        executor.setMaxPoolSize(pool.getMaxSize());//最大线程池大小
+        executor.setKeepAliveSeconds((int) pool.getKeepAlive().getSeconds());//线程池存活时间单位秒s
+        executor.setQueueCapacity(pool.getQueueCapacity());//队列大小
+        executor.setThreadNamePrefix(taskExecutionProperties.getThreadNamePrefix());
+        executor.setRejectedExecutionHandler(TaskRejectedExecutionHandler.getRejectionHandler(rejectionPolicy));
+        executor.initialize();
+        log.warn("AsyncExecutor pool max size = {},ThreadNamePrefix = {},RejectedExecutionHandler = {}",
+                executor.getMaxPoolSize(),
+                executor.getThreadNamePrefix(),
+                executor.getThreadPoolExecutor().getRejectedExecutionHandler().getClass().getSimpleName()
+        );
+        return executor;
+    }*/
+
 }

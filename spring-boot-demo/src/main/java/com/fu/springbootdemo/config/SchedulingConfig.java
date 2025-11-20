@@ -40,4 +40,22 @@ public class SchedulingConfig implements SchedulingConfigurer {
         );
     }
 
+    //启动失败的备选方案（bean name 必须为taskScheduler以替换默认的配置。TaskSchedulingAutoConfiguration 类 taskScheduler 方法的 bean name 就是 taskScheduler）
+    /*@Bean
+    public ThreadPoolTaskScheduler taskScheduler() {
+        TaskSchedulingProperties.Pool pool = taskSchedulingProperties.getPool();
+        ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
+        scheduler.setPoolSize(pool.getSize());
+        scheduler.setThreadNamePrefix(taskSchedulingProperties.getThreadNamePrefix());
+        scheduler.setRejectedExecutionHandler(TaskRejectedExecutionHandler.getRejectionHandler(rejectionPolicy));
+        scheduler.setErrorHandler(t -> log.error("ScheduledTask error:", t));
+        scheduler.initialize();
+        log.warn("ScheduledTask pool size = {},ThreadNamePrefix = {},RejectedExecutionHandler = {}",
+                pool.getSize(),
+                scheduler.getThreadNamePrefix(),
+                scheduler.getScheduledThreadPoolExecutor().getRejectedExecutionHandler().getClass().getSimpleName()
+        );
+        return scheduler;
+    }*/
+
 }
