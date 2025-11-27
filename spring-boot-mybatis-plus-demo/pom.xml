@@ -75,7 +75,6 @@
         <dependency>
             <groupId>com.fu.mybatissqllog</groupId>
             <artifactId>spring-boot-starter-mybatis-sql-log</artifactId>
-            <version>${spring-boot-dependencies.version}</version>
         </dependency>
         <!-- RestTemplate 使用 Apache http client 连接池 -->
         <dependency>
@@ -90,6 +89,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven-compiler-plugin.version}</version>
                 <configuration>
                     <source>${java.version}</source>
                     <target>${java.version}</target>

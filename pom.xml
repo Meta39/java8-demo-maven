@@ -81,6 +81,11 @@
     <!-- 非必要依赖，子项目可选 -->
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>com.fu.mybatissqllog</groupId>
+                <artifactId>spring-boot-starter-mybatis-sql-log</artifactId>
+                <version>${project.version}</version>
+            </dependency>
             <!-- 如果这里填写了 spring-boot-dependencies 里包含的依赖，则会以当前配置的为准 -->
             <dependency>
                 <groupId>org.mapstruct</groupId>
