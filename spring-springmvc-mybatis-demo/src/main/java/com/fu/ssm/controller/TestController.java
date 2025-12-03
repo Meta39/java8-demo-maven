@@ -1,5 +1,6 @@
 package com.fu.ssm.controller;
 
+import com.fu.ssm.async.AsyncService;
 import com.fu.ssm.dto.TestDTO;
 import com.fu.ssm.entity.Test;
 import com.fu.ssm.service.TestService;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @RequiredArgsConstructor
 public class TestController {
     private final TestService testService;
+    private final AsyncService asyncService;
 
     /**
      * 通过test表的id获取test信息
@@ -37,6 +39,12 @@ public class TestController {
     @ResponseBody
     public PageSerializable<Test> selectTestPage(@RequestBody TestDTO testDTO) {
         return testService.selectTestPage(testDTO);
+    }
+
+    @RequestMapping(value = "async", method = RequestMethod.GET)
+    @ResponseBody
+    public void async() {
+        asyncService.testAsync();
     }
 
 }
