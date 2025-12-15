@@ -53,7 +53,7 @@ public class DynamicInvoker {
     private final Validator validator;
 
     public Object invoke(String serviceName, String methodName, String body) throws Throwable {
-        DynamicMethodRegistry.MethodMeta meta = registry.getMethodMeta(serviceName, methodName);
+        DynamicMethodRegistry.MethodHandleMeta meta = registry.getMethodMeta(serviceName, methodName);
         Object[] args = resolveArgsByMeta(serviceName, methodName, meta, body);
         validateArgs(args);
         return meta.isVoidReturn() ? null : meta.invokeWithArguments(args);
@@ -72,7 +72,7 @@ public class DynamicInvoker {
         }
     }
 
-    private Object[] resolveArgsByMeta(String serviceName, String methodName, DynamicMethodRegistry.MethodMeta meta, String body) {
+    private Object[] resolveArgsByMeta(String serviceName, String methodName, DynamicMethodRegistry.MethodHandleMeta meta, String body) {
         return resolveArgsFromJson(serviceName, methodName, meta.getParamTypesLength(), meta.getJacksonParamTypes(), meta.getParamNames(), body);
     }
 

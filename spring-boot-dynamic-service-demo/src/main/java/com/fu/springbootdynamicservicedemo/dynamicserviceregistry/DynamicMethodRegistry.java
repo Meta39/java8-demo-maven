@@ -34,7 +34,7 @@ public class DynamicMethodRegistry {
     private final ObjectMapper objectMapper;
 
     //key: bean name + method name
-    private final Map<String, MethodMeta> registry = new ConcurrentHashMap<>();
+    private final Map<String, MethodHandleMeta> registry = new ConcurrentHashMap<>();
 
     @PostConstruct
     public void init() throws IllegalAccessException {
@@ -79,8 +79,8 @@ public class DynamicMethodRegistry {
         return serviceName + "." + methodName;
     }
 
-    public MethodMeta getMethodMeta(String service, String method) {
-        MethodMeta meta = registry.get(buildKey(service, method));
+    public MethodHandleMeta getMethodMeta(String service, String method) {
+        MethodHandleMeta meta = registry.get(buildKey(service, method));
         if (meta == null) {
             throw new IllegalArgumentException("Method not found: " + service + "." + method);
         }
@@ -97,7 +97,7 @@ public class DynamicMethodRegistry {
         }
     }
 
-    private MethodMeta createMeta(Method m, MethodHandle handle, TypeFactory tf) {
+    private MethodHandleMeta createMeta(Method m, MethodHandle handle, TypeFactory tf) {
         Parameter[] params = m.getParameters();
         int len = params.length;
         String[] names = new String[len];
@@ -106,16 +106,19 @@ public class DynamicMethodRegistry {
             names[i] = params[i].getName();
             types[i] = tf.constructType(params[i].getParameterizedType());
         }
-        return new MethodMeta(handle, isVoid(m.getReturnType()), len, names, types);
+        return new MethodHandleMeta(handle, isVoid(m.getReturnType()), len, names, types);
     }
 
     public static boolean isVoid(Class<?> returnType) {
         return returnType == void.class || returnType == Void.class;
     }
 
+    /**
+     * 高性能（接近源生调用，但是会有额外的操作，适用于频繁调用的场景）
+     */
     @Getter
     @AllArgsConstructor
-    public static class MethodMeta {
+    public static class MethodHandleMeta {
         private final MethodHandle handle;
         private final boolean voidReturn;
         private final int paramTypesLength;
@@ -127,4 +130,37 @@ public class DynamicMethodRegistry {
         }
 
     }
+
+    /**
+     * 普通反射调用（依赖JVM优化）
+     */
+    @Getter
+    public static class MethodMeta {
+        private final Object bean;
+        private final Method method;
+        private final boolean voidReturn;
+        private final int paramTypesLength;
+        private final Class<?>[] paramTypes;
+        private final Class<?> returnType;
+
+        public MethodMeta(Object object, Method method) {
+            this.bean = object;
+            this.method = method;
+            this.voidReturn = isVoid(method.getReturnType());
+            this.paramTypesLength = method.getParameters().length;
+            this.paramTypes = method.getParameterTypes();
+            this.returnType = method.getReturnType();
+        }
+
+        public Object invoke(Object... args) throws Exception {
+            try {
+                return method.invoke(bean, args);
+            } catch (InvocationTargetException e) {
+                //捕获的异常必须转为Exception，防止异常被吞掉。比如：抛出的自定义异常信息为：报错了，但是invoke执行失败，抛出了异常为null，把"报错了"给顶掉了，最终返回的错误只有null。
+                throw (Exception) e.getTargetException();
+            }
+        }
+
+    }
+
 }
