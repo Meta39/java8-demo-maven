@@ -121,5 +121,10 @@ public class DynamicMethodRegistry {
         private final int paramTypesLength;
         private final String[] paramNames;
         private final JavaType[] jacksonParamTypes;
+
+        public Object invokeWithArguments(Object... arguments) throws Throwable {
+            return handle.invokeWithArguments(arguments);
+        }
+
     }
 }
