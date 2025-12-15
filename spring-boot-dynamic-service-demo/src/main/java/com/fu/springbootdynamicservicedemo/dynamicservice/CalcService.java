@@ -3,11 +3,15 @@ package com.fu.springbootdynamicservicedemo.dynamicservice;
 import com.fu.springbootdynamicservicedemo.annotation.DynamicMethod;
 import com.fu.springbootdynamicservicedemo.annotation.DynamicService;
 import com.fu.springbootdynamicservicedemo.dto.UserDTO;
+import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @DynamicService
+@RequiredArgsConstructor
 public class CalcService {
+    private final TestDynamicService testDynamicService;
 
     //同名方法，使 invokeNoCache 调用报错。因为出现了同名方法。
     public int sumList() {
@@ -15,7 +19,9 @@ public class CalcService {
     }
 
     @DynamicMethod("sumList")
+    @Transactional(rollbackFor = Exception.class)
     public int sumList(List<Integer> nums) {
+        testDynamicService.noParamMethod();
         return nums.stream().mapToInt(Integer::intValue).sum();
     }
 
