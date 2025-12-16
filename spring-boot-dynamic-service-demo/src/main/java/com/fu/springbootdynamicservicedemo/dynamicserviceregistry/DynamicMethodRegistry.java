@@ -152,12 +152,19 @@ public class DynamicMethodRegistry {
             this.returnType = method.getReturnType();
         }
 
-        public Object invoke(Object... args) throws Exception {
+        public Object invoke(Object... args) throws Throwable {
             try {
                 return method.invoke(bean, args);
             } catch (InvocationTargetException e) {
-                //捕获的异常必须转为Exception，防止异常被吞掉。比如：抛出的自定义异常信息为：报错了，但是invoke执行失败，抛出了异常为null，把"报错了"给顶掉了，最终返回的错误只有null。
-                throw (Exception) e.getTargetException();
+                /*
+                在InvocationTargetException的上下文中，getTargetException()和getCause()通常返回相同的值，
+                但getTargetException()更具语义性，InvocationTargetException 特有，明确表示这是"目标方法抛出的异常"。
+                在其他情况下，只能使用getCause()，Throwable 基类方法，通用的"原因"或"导致此异常的异常"。
+                 */
+                throw e.getTargetException();//明确表示处理反射异常
+            } catch (IllegalArgumentException e) {
+                // 参数不匹配异常
+                throw new RuntimeException("Method parameter mismatch : " + method.getName(), e);
             }
         }
 
