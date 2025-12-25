@@ -1,4 +1,6 @@
 server:
+  # http 配置
+  http-port: 99
   # https默认端口443
   port: 443
   ssl:
@@ -8,6 +10,13 @@ server:
     key-store-type: PKCS12
     key-alias: springbootssldemo
     key-store-password: meta39
+  tomcat:
+    relaxed-query-chars:
+      - "|"
+      - "{"
+      - "}"
+      - "["
+      - "]"
 
 spring:
   application:
