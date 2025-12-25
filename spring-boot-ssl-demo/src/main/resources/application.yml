@@ -1,0 +1,14 @@
+server:
+  # https默认端口443
+  port: 443
+  ssl:
+    # 使用 java keytool 生成自签名证书
+    # keytool -genkeypair -alias myapp -keyalg RSA -keysize 2048 -storetype PKCS12 -keystore keystore.p12 -validity 3650
+    key-store: classpath:keystore.p12
+    key-store-type: PKCS12
+    key-alias: springbootssldemo
+    key-store-password: meta39
+
+spring:
+  application:
+    name: springbootssldemo

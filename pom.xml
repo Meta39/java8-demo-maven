@@ -24,6 +24,7 @@
         <module>spring-boot-redis-demo</module>
         <module>spring-boot-rocketmq-demo</module>
         <module>spring-boot-security-demo</module>
+        <module>spring-boot-ssl-demo</module>
         <module>spring-boot-starter-mybatis-sql-log</module>
         <module>spring-boot-webservice-demo</module>
         <module>spring-boot-xxl-job-demo</module>
@@ -38,6 +39,7 @@
         <java.version>1.8</java.version>
         <!-- maven.compiler.source 和 maven.compiler.target 这2个参数需要引入 apache maven-compiler-plugin 插件 -->
         <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
+        <maven-resources-plugin.version>3.2.0</maven-resources-plugin.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -255,6 +257,15 @@
 
     <build>
         <finalName>${project.artifactId}</finalName>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-resources-plugin</artifactId>
+                    <version>${maven-resources-plugin.version}</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
