@@ -1,6 +1,5 @@
 package com.fu.springbootssldemo.controller;
 
-import com.fu.springbootssldemo.util.RestTemplateSkipSslUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,7 +14,8 @@ import javax.servlet.http.HttpServletRequest;
 public class TestController {
     private static final String HTTP_HOST = "http://localhost:99";
     private static final String HTTPS_HOST = "https://localhost";
-    private final RestTemplate restTemplate;
+    private final RestTemplate restTemplate;//默认配置
+    private final RestTemplate skipSslRestTemplate;//跳过SSL验证配置
     
     @GetMapping("/test")
     public String test(HttpServletRequest request) {
@@ -36,12 +36,12 @@ public class TestController {
 
     @GetMapping("/testSkip")
     public String testSkip() {
-        return RestTemplateSkipSslUtils.getInstance().getForObject(HTTP_HOST + "/test", String.class);
+        return skipSslRestTemplate.getForObject(HTTP_HOST + "/test", String.class);
     }
 
     @GetMapping("/testSkipSsl")
     public String testSkipSsl() {
-        return RestTemplateSkipSslUtils.getInstance().getForObject(HTTPS_HOST + "/test", String.class);
+        return skipSslRestTemplate.getForObject(HTTPS_HOST + "/test", String.class);
     }
 
 }
