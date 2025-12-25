@@ -33,6 +33,28 @@ import java.security.cert.X509Certificate;
 @Configuration
 public class RestTemplateConfig {
 
+    /**
+     * 默认 RestTemplate 配置，不跳过 SSL 验证，只增加 apache httpClient 连接池
+     */
+    @Bean
+    public RestTemplate restTemplate(HttpComponentsClientHttpRequestFactory httpRequestFactory) {
+        RestTemplate restTemplate = new RestTemplate(httpRequestFactory);
+        //设置请求字符串的编码格式为UTF-8，防止发送请求的字符串乱码。
+        restTemplate.getMessageConverters().set(1, new StringHttpMessageConverter(StandardCharsets.UTF_8));
+        return restTemplate;
+    }
+
+    /**
+     * RestTemplate 跳过 SSL 配置并增加 apache httpClient 连接池
+     */
+    @Bean
+    public RestTemplate skipSslRestTemplate(HttpComponentsClientHttpRequestFactory skipSslHttpRequestFactory) {
+        RestTemplate restTemplate = new RestTemplate(skipSslHttpRequestFactory);
+        //设置请求字符串的编码格式为UTF-8，防止发送请求的字符串乱码。
+        restTemplate.getMessageConverters().set(1, new StringHttpMessageConverter(StandardCharsets.UTF_8));
+        return restTemplate;
+    }
+
     @Bean
     public PoolingHttpClientConnectionManager poolingConnectionManager() {
         PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
@@ -62,22 +84,6 @@ public class RestTemplateConfig {
     @Bean
     public HttpComponentsClientHttpRequestFactory httpRequestFactory(CloseableHttpClient httpClient) {
         return new HttpComponentsClientHttpRequestFactory(httpClient);
-    }
-
-    @Bean
-    public RestTemplate restTemplate(HttpComponentsClientHttpRequestFactory httpRequestFactory) {
-        RestTemplate restTemplate = new RestTemplate(httpRequestFactory);
-        //设置请求字符串的编码格式为UTF-8，防止发送请求的字符串乱码。
-        restTemplate.getMessageConverters().set(1, new StringHttpMessageConverter(StandardCharsets.UTF_8));
-        return restTemplate;
-    }
-
-    @Bean
-    public RestTemplate skipSslRestTemplate(HttpComponentsClientHttpRequestFactory skipSslHttpRequestFactory) {
-        RestTemplate restTemplate = new RestTemplate(skipSslHttpRequestFactory);
-        //设置请求字符串的编码格式为UTF-8，防止发送请求的字符串乱码。
-        restTemplate.getMessageConverters().set(1, new StringHttpMessageConverter(StandardCharsets.UTF_8));
-        return restTemplate;
     }
 
     @Bean
