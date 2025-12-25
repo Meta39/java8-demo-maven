@@ -23,19 +23,9 @@ import java.security.cert.X509Certificate;
 
 public final class RestTemplateSkipSslUtils {
 
-    private static final RestTemplate restTemplate;
+    private static volatile RestTemplate restTemplate;
 
     private RestTemplateSkipSslUtils() {
-    }
-
-    static {
-        ClientHttpRequestFactory clientHttpRequestFactory;
-        try {
-            clientHttpRequestFactory = new HttpComponentsClientHttpRequestFactory(skipSslHttpClient());
-        } catch (NoSuchAlgorithmException | KeyManagementException e) {
-            throw new RuntimeException(e);
-        }
-        restTemplate = new RestTemplate(clientHttpRequestFactory);
     }
 
     private static CloseableHttpClient skipSslHttpClient() throws NoSuchAlgorithmException, KeyManagementException {
@@ -98,6 +88,20 @@ public final class RestTemplateSkipSslUtils {
     }
 
     public static RestTemplate getInstance() {
+        //双重检查锁定单例模式
+        if (restTemplate == null) {
+            synchronized (RestTemplateSkipSslUtils.class) {
+                if (restTemplate == null) {
+                    ClientHttpRequestFactory clientHttpRequestFactory;
+                    try {
+                        clientHttpRequestFactory = new HttpComponentsClientHttpRequestFactory(skipSslHttpClient());
+                    } catch (NoSuchAlgorithmException | KeyManagementException e) {
+                        throw new RuntimeException(e);
+                    }
+                    restTemplate = new RestTemplate(clientHttpRequestFactory);
+                }
+            }
+        }
         return restTemplate;
     }
 
