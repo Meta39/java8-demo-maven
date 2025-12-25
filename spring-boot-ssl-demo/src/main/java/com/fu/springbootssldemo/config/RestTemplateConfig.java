@@ -1,4 +1,4 @@
-package com.fu.mybatisplusdemo.config;
+package com.fu.springbootssldemo.config;
 
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -23,8 +23,8 @@ public class RestTemplateConfig {
     @Bean
     public PoolingHttpClientConnectionManager poolingConnectionManager() {
         PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
-        connectionManager.setMaxTotal(100);
-        connectionManager.setDefaultMaxPerRoute(20);
+        connectionManager.setMaxTotal(200);
+        connectionManager.setDefaultMaxPerRoute(50);
         return connectionManager;
     }
 
