@@ -53,7 +53,6 @@ public class RestTemplateConfig {
 
     @Bean
     public CloseableHttpClient httpClient(PoolingHttpClientConnectionManager poolingConnectionManager) {
-
         return HttpClients.custom()
                 .setConnectionManager(poolingConnectionManager)
                 .setDefaultRequestConfig(requestConfig())
@@ -67,21 +66,23 @@ public class RestTemplateConfig {
 
     @Bean
     public RestTemplate restTemplate(HttpComponentsClientHttpRequestFactory httpRequestFactory) {
-        RestTemplate restTemplate = new RestTemplate();
-        restTemplate.setRequestFactory(httpRequestFactory);
+        RestTemplate restTemplate = new RestTemplate(httpRequestFactory);
         //设置请求字符串的编码格式为UTF-8，防止发送请求的字符串乱码。
         restTemplate.getMessageConverters().set(1, new StringHttpMessageConverter(StandardCharsets.UTF_8));
         return restTemplate;
     }
 
     @Bean
-    public RestTemplate skipSslRestTemplate() {
-        return new RestTemplate(skipSslHttpRequestFactory());
+    public RestTemplate skipSslRestTemplate(HttpComponentsClientHttpRequestFactory skipSslHttpRequestFactory) {
+        RestTemplate restTemplate = new RestTemplate(skipSslHttpRequestFactory);
+        //设置请求字符串的编码格式为UTF-8，防止发送请求的字符串乱码。
+        restTemplate.getMessageConverters().set(1, new StringHttpMessageConverter(StandardCharsets.UTF_8));
+        return restTemplate;
     }
 
     @Bean
-    public HttpComponentsClientHttpRequestFactory skipSslHttpRequestFactory() {
-        return new HttpComponentsClientHttpRequestFactory(skipSslHttpClient());
+    public HttpComponentsClientHttpRequestFactory skipSslHttpRequestFactory(CloseableHttpClient skipSslHttpClient) {
+        return new HttpComponentsClientHttpRequestFactory(skipSslHttpClient);
     }
 
     @Bean
