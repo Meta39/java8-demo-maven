@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 /**
@@ -12,7 +13,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
  */
 public abstract class JacksonUtils {
     public static final ObjectMapper JSON;
-    public static final ObjectMapper XML;
+    public static final XmlMapper XML;
 
     /*
         静态块
@@ -28,6 +29,7 @@ public abstract class JacksonUtils {
         JSON.registerModule(new JavaTimeModule());//处理java8新日期时间类型
         // xml 配置
         XML = new XmlMapper();
+        XML.enable(ToXmlGenerator.Feature.WRITE_XML_DECLARATION);//启用XML声明（即增加：<?xml version="1.0" encoding="UTF-8"?>）
         XML.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         XML.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
         XML.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
