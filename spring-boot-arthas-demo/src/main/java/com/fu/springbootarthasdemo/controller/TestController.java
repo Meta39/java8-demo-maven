@@ -2,6 +2,7 @@ package com.fu.springbootarthasdemo.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
@@ -22,7 +23,7 @@ public class TestController {
         trace com.fu.springbootarthasdemo.controller.TestController hello params.length==1
      */
     @GetMapping("/hello2")
-    public String hello2(String name) {
+    public String hello2(@RequestParam(name = "name") String name) {
         return "hello, " + name;
     }
 
@@ -31,7 +32,7 @@ public class TestController {
         trace com.fu.springbootarthasdemo.controller.TestController hello 'params[0] instanceof Integer'
      */
     @GetMapping("/hello3")
-    public String hello3(Integer num) {
+    public String hello3(@RequestParam(name = "num") Integer num) {
         return "number: " + num;
     }
 
