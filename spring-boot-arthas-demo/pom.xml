@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>java8-demo-maven</artifactId>
+        <groupId>com.fu</groupId>
+        <version>1</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>spring-boot-arthas-demo</artifactId>
+
+    <properties>
+        <!-- openjdk已经停止维护8、11，因此改用 eclipse-temurin 的镜像 https://github.com/docker-library/openjdk/issues/505 -->
+        <jdk.image>eclipse-temurin:8u472-b08-jdk</jdk.image>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>compile</scope>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.spotify</groupId>
+                <artifactId>dockerfile-maven-plugin</artifactId>
+                <configuration>
+                    <repository>${project.build.finalName}</repository>
+                    <tag>latest</tag>
+                    <buildArgs>
+                        <JDK_IMAGE>${jdk.image}</JDK_IMAGE>
+                        <APP_NAME>${project.build.finalName}</APP_NAME>
+                    </buildArgs>
+                    <noCache>true</noCache>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

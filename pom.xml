@@ -12,6 +12,7 @@
     <!-- 子模块 -->
     <modules>
         <module>base-demo</module>
+        <module>spring-boot-arthas-demo</module>
         <module>spring-boot-demo</module>
         <module>spring-boot-dynamic-service-demo</module>
         <module>spring-boot-feign-seata-demo</module>
@@ -37,6 +38,7 @@
     <properties>
         <my.property>defaultValue</my.property>
         <java.version>1.8</java.version>
+        <dockerfile-maven-plugin.version>1.4.13</dockerfile-maven-plugin.version>
         <!-- maven.compiler.source 和 maven.compiler.target 这2个参数需要引入 apache maven-compiler-plugin 插件 -->
         <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
         <maven-resources-plugin.version>3.2.0</maven-resources-plugin.version>
@@ -263,6 +265,11 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-resources-plugin</artifactId>
                     <version>${maven-resources-plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>com.spotify</groupId>
+                    <artifactId>dockerfile-maven-plugin</artifactId>
+                    <version>${dockerfile-maven-plugin.version}</version>
                 </plugin>
             </plugins>
         </pluginManagement>

@@ -1,0 +1,6 @@
+server:
+  port: 100
+
+spring:
+  application:
+    name: springbootarthasdemo
