@@ -20,7 +20,7 @@ public class SpringBootArthasDemoApplication {
             把 arthas-boot.jar 复制到容器里面：
                 docker cp D:\softwareWork\arthas\arthas-boot.jar spring-boot-arthas-demo:/opt/arthas/
         5.诊断 Docker 里的 Java 进程【出现对话框直接敲回车】：
-            docker exec -it spring-boot-arthas-demo /bin/bash -c "java -jar arthas-boot.jar"
+            docker exec -it spring-boot-arthas-demo /bin/bash -c "java -jar /opt/arthas/arthas-boot.jar"
         6.通过 watch 命令来查看 com.fu.springbootarthasdemo.controller.TestController#hello 函数的返回值：
             watch com.fu.springbootarthasdemo.controller.TestController hello returnObj
             打开浏览器输入：
