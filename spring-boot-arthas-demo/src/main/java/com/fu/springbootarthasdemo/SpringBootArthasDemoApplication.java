@@ -15,8 +15,8 @@ public class SpringBootArthasDemoApplication {
         3.查看是否启动成功：
             http://localhost:100/hello
         4.创建一个文件夹存放arthas zip 包，然后解压缩：
-            如：D:\softwareWork\arthas
-            把 arthas-boot.jar 复制到容器里面：
+            4.1如：D:\softwareWork\arthas，把从 https://github.com/alibaba/arthas/releases/download/arthas-all-4.1.5/arthas-bin.zip 下载到的zip放到里面，然后解压缩并删除arthas-bin.zip文件
+            4.2把 arthas-boot.jar 复制到容器里面：
                 docker cp D:\softwareWork\arthas\ spring-boot-arthas-demo:/opt/
         5.诊断 Docker 里的 Java 进程【出现对话框直接敲回车】：
             docker exec -it spring-boot-arthas-demo /bin/bash -c "java -jar /opt/arthas/arthas-boot.jar"
