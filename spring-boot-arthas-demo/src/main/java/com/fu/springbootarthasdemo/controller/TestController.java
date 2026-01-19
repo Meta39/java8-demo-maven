@@ -8,9 +8,31 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class TestController {
 
+    /*
+        解决方法重载参数个数问题 params.length==0
+        trace com.fu.springbootarthasdemo.controller.TestController hello params.length==0
+     */
     @GetMapping("/hello")
     public String hello() {
         return "hello";
+    }
+
+    /*
+        解决方法重载参数个数问题 params.length==1
+        trace com.fu.springbootarthasdemo.controller.TestController hello params.length==1
+     */
+    @GetMapping("/hello2")
+    public String hello2(String name) {
+        return "hello, " + name;
+    }
+
+    /*
+        解决方法重载参数类型问题 'params[0] instanceof Integer'
+        trace com.fu.springbootarthasdemo.controller.TestController hello 'params[0] instanceof Integer'
+     */
+    @GetMapping("/hello3")
+    public String hello3(Integer num) {
+        return "number: " + num;
     }
 
 }
