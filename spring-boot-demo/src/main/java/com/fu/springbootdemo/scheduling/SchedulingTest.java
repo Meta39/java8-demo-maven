@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 public class SchedulingTest {
     private final AsyncThread asyncThread;
 
-    @Scheduled(fixedDelay = 5000L)
+    @Scheduled(fixedDelay = 60_000L)
     public void scheduled() {
         log.info("scheduled invoke...");
         asyncThread.asyncThread();
