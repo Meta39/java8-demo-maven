@@ -56,7 +56,11 @@ public class DynamicInvoker {
         DynamicMethodRegistry.MethodHandleMeta meta = registry.getMethodMeta(serviceName, methodName);
         Object[] args = resolveArgsByMeta(serviceName, methodName, meta, body);
         validateArgs(args);
-        return meta.isVoidReturn() ? null : meta.invokeWithArguments(args);
+        if (meta.isVoidReturn()) {
+            meta.invokeWithArguments(args);
+            return null;
+        }
+        return meta.invokeWithArguments(args);
     }
 
     private void validateArgs(Object[] args) {
