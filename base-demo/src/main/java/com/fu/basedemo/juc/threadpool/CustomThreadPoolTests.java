@@ -11,7 +11,7 @@ import java.util.concurrent.*;
 public class CustomThreadPoolTests {
 
     //自定义线程池。建议：应当根据系统硬件去设置具体的大小，太大可能导致OOM，太小无法充分利用系统资源。
-    private static final ExecutorService customThreadPool = new ThreadPoolExecutor(
+    public static final ExecutorService THREAD_POOL_EXECUTOR = new ThreadPoolExecutor(
             8, //corePoolSize线程池基础线程大小。
             16, //maximumPoolSize线程池最大线程数量。
             60L, //keepAliveTime线程池空闲线程存活时间
@@ -35,13 +35,13 @@ public class CustomThreadPoolTests {
         try {
             for (int i = 0; i <= 20; i++) {
                 //执行
-                customThreadPool.execute(() -> System.out.println(Thread.currentThread().getName() + "号窗口办理业务"));
+                THREAD_POOL_EXECUTOR.execute(() -> System.out.println(Thread.currentThread().getName() + "号窗口办理业务"));
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
         } finally {
             //关闭
-            customThreadPool.shutdown();
+            THREAD_POOL_EXECUTOR.shutdown();
         }
     }
 
