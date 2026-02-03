@@ -18,7 +18,7 @@ public class BatchParallelProcessorTests {
      */
     @Test
     public void test() {
-        List<TaskResult<List<Integer>, Boolean>> taskResultList = BatchParallelProcessorUtils.parallelProcess(list, 2, (subList) -> {
+        List<TaskResult<Integer, Boolean>> taskResultList = BatchParallelProcessorUtils.parallelProcess(list, 2, (subList) -> {
             for (int i : subList) {
                 if (i == 5 || i == 9) {
                     throw new RuntimeException("我是会报错的:" + i);
@@ -28,9 +28,9 @@ public class BatchParallelProcessorTests {
             return true;
         });
         log.info("部分取消开始....");
-        for (TaskResult<List<Integer>, Boolean> taskResult : taskResultList) {
+        for (TaskResult<Integer, Boolean> taskResult : taskResultList) {
             if (!taskResult.getSuccess()) {
-                cancel(taskResult.getUuid(), taskResult.getBatch());
+                cancel(taskResult.getUuid(), taskResult.getBatchData());
             }
         }
         log.info("部分取消结束....");
@@ -41,7 +41,7 @@ public class BatchParallelProcessorTests {
      */
     @Test
     public void test2() {
-        List<TaskResult<List<Integer>, Boolean>> taskResultList = BatchParallelProcessorUtils.parallelProcess(list, 2, (subList) -> {
+        List<TaskResult<Integer, Boolean>> taskResultList = BatchParallelProcessorUtils.parallelProcess(list, 2, (subList) -> {
             for (int i : subList) {
                 if (i == 5 || i == 9) {
                     throw new RuntimeException("我是会报错的:" + i);
@@ -52,10 +52,12 @@ public class BatchParallelProcessorTests {
         });
         boolean hasFail = taskResultList.stream().anyMatch(t -> Objects.equals(false, t.getSuccess()));
         if (hasFail) {
+            //不管成功还是失败，都调取消接口。
             log.info("全部取消开始....");
-            for (TaskResult<List<Integer>, Boolean> taskResult : taskResultList) {
-                cancel(taskResult.getUuid(), taskResult.getBatch());
-            }
+            BatchParallelProcessorUtils.parallelProcess(list, 2, (subList) -> {
+                cancel(null, subList);
+                return true;
+            });
             log.info("全部取消结束....");
         }
     }

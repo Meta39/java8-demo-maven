@@ -13,32 +13,20 @@ import java.util.List;
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public final class TaskResult<T, R> {
+    //批次ID
     private final String uuid;
+    //成功
     private final Boolean success;
-    private final T batch;
-    private final R result;
-    private final Exception exception;
+    private final R result;//结果
+    //失败
+    private final List<T> batchData;//批次数据
+    private final Exception exception;//异常信息
 
-    /**
-     * 成功也记录这一批次的入参（用于全部取消）
-     *
-     * @param batch  当前批次数据
-     * @param result 当前批次结果
-     */
-    public static <T, R> TaskResult<T, R> ok(T batch, R result) {
-        return new TaskResult<>(UuidUtils.getUUID(), true, batch, result, null);
+    public static <T, R> TaskResult<T, R> ok(R result) {
+        return new TaskResult<>(UuidUtils.getUUID(), true, result, null, null);
     }
 
-    /**
-     * 异常
-     *
-     * @param exception 异常信息（不包括Error）
-     * @param batch     当前批次数据
-     * @param <T>
-     * @param <R>
-     * @return
-     */
-    public static <T, R> TaskResult<List<T>, R> failure(List<T> batch, Exception exception) {
-        return new TaskResult<>(UuidUtils.getUUID(), false, batch, null, exception);
+    public static <T, R> TaskResult<T, R> failure(List<T> batchData, Exception exception) {
+        return new TaskResult<>(UuidUtils.getUUID(), false, null, batchData, exception);
     }
 }
