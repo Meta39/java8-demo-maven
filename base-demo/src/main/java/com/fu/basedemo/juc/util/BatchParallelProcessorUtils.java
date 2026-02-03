@@ -5,7 +5,9 @@ import com.fu.basedemo.juc.threadpool.CustomThreadPoolTests;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.*;
+import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -13,15 +15,11 @@ import java.util.stream.IntStream;
  * 并行批处理工具类
  */
 public final class BatchParallelProcessorUtils {
+    private static final Logger log = Logger.getLogger(BatchParallelProcessorUtils.class.getName());
     /**
      * 默认每批处理数据的数量
      */
     private static final int DEFAULT_BATCH_SIZE = 1000;
-
-    /**
-     * 默认最大并发批次数
-     */
-    private static final int DEFAULT_MAX_CONCURRENT_BATCHES = 10;
 
     /**
      * 默认获取全部结果的超时时间（秒）
@@ -32,120 +30,74 @@ public final class BatchParallelProcessorUtils {
         throw new AssertionError("Utility class should not be instantiated");
     }
 
-    /**
-     * 批处理（使用默认参数）
-     *
-     * @param dataList       数据集合
-     * @param batchProcessor 批处理方法
-     * @param <T>            数据类型
-     * @param <R>            结果类型
-     * @return 结果集合
-     */
     public static <T, R> List<R> parallelProcess(List<T> dataList, Function<List<T>, R> batchProcessor) {
         return parallelProcess(dataList, DEFAULT_BATCH_SIZE, batchProcessor);
     }
 
-    /**
-     * 批处理（指定批次大小）
-     *
-     * @param dataList       数据集合
-     * @param batchSize      每批处理数据的数量
-     * @param batchProcessor 批处理方法
-     * @param <T>            数据类型
-     * @param <R>            结果类型
-     * @return 结果集合
-     */
-    public static <T, R> List<R> parallelProcess(List<T> dataList,
-                                                 int batchSize,
-                                                 Function<List<T>, R> batchProcessor) {
+    public static <T, R> List<R> parallelProcess(List<T> dataList, int batchSize, Function<List<T>, R> batchProcessor) {
         return parallelProcess(dataList, batchSize, batchProcessor, DEFAULT_TIMEOUT);
     }
 
-    /**
-     * 批处理（指定批次大小和超时时间）
-     *
-     * @param dataList       数据集合
-     * @param batchSize      每批处理数据的数量
-     * @param batchProcessor 批处理方法
-     * @param timeout        获取全部结果的超时时间（秒）
-     * @param <T>            数据类型
-     * @param <R>            结果类型
-     * @return 结果集合
-     */
-    public static <T, R> List<R> parallelProcess(List<T> dataList,
-                                                 int batchSize,
-                                                 Function<List<T>, R> batchProcessor,
-                                                 long timeout) {
+    public static <T, R> List<R> parallelProcess(List<T> dataList, Function<List<T>, R> batchProcessor, Consumer<Exception> exceptionHandler) {
+        return parallelProcess(dataList, DEFAULT_BATCH_SIZE, batchProcessor, exceptionHandler);
+    }
+
+    public static <T, R> List<R> parallelProcess(List<T> dataList, int batchSize, Function<List<T>, R> batchProcessor, long timeout) {
         return parallelProcess(dataList, batchSize, batchProcessor, timeout, null);
     }
 
-    /**
-     * 批处理（指定批次大小、超时时间和线程池）
-     *
-     * @param dataList       数据集合
-     * @param batchSize      每批处理数据的数量
-     * @param batchProcessor 批处理方法
-     * @param timeout        获取全部结果的超时时间（秒）
-     * @param executor       自定义线程池，如果为null则使用默认线程池
-     * @param <T>            数据类型
-     * @param <R>            结果类型
-     * @return 结果集合
-     */
-    public static <T, R> List<R> parallelProcess(List<T> dataList,
-                                                 int batchSize,
-                                                 Function<List<T>, R> batchProcessor,
-                                                 long timeout,
-                                                 Executor executor) {
-        return parallelProcess(dataList, batchSize, batchProcessor, timeout, executor, DEFAULT_MAX_CONCURRENT_BATCHES);
+    public static <T, R> List<R> parallelProcess(List<T> dataList, int batchSize, Function<List<T>, R> batchProcessor, Consumer<Exception> exceptionHandler) {
+        return parallelProcess(dataList, batchSize, batchProcessor, DEFAULT_TIMEOUT, exceptionHandler);
+    }
+
+    public static <T, R> List<R> parallelProcess(List<T> dataList, int batchSize, Function<List<T>, R> batchProcessor, long timeout, Consumer<Exception> exceptionHandler) {
+        return parallelProcess(null, dataList, batchSize, batchProcessor, timeout, exceptionHandler);
+    }
+
+    public static <T, R> List<R> parallelProcess(Executor executor, List<T> dataList, int batchSize, Function<List<T>, R> batchProcessor, long timeout) {
+        return parallelProcess(executor, dataList, batchSize, batchProcessor, timeout, null);
+    }
+
+    public static <T, R> List<R> parallelProcess(Executor executor, List<T> dataList, int batchSize, Function<List<T>, R> batchProcessor) {
+        return parallelProcess(executor, dataList, batchSize, batchProcessor,null);
+    }
+
+    public static <T, R> List<R> parallelProcess(Executor executor, List<T> dataList, int batchSize, Function<List<T>, R> batchProcessor, Consumer<Exception> exceptionHandler) {
+        return parallelProcess(executor, dataList, batchSize, batchProcessor,DEFAULT_TIMEOUT, exceptionHandler);
     }
 
     /**
      * 完整的批处理方法（所有参数可配置）
      *
-     * @param dataList             数据集合
-     * @param batchSize            每批处理数据的数量
-     * @param batchProcessor       批处理方法
-     * @param timeout              获取全部结果的超时时间（秒）
-     * @param executor             自定义线程池，如果为null则使用默认线程池
-     * @param maxConcurrentBatches 最大并发批次数
-     * @param <T>                  数据类型
-     * @param <R>                  结果类型
+     * @param executor         自定义线程池，如果为null则使用默认线程池
+     * @param dataList         数据集合
+     * @param batchSize        每批处理数据的数量
+     * @param batchProcessor   批处理方法
+     * @param timeout          获取全部结果的超时时间（秒）
+     * @param exceptionHandler 异常处理器
+     * @param <T>              数据类型
+     * @param <R>              结果类型
      * @return 结果集合
      */
-    public static <T, R> List<R> parallelProcess(List<T> dataList,
-                                                 int batchSize,
-                                                 Function<List<T>, R> batchProcessor,
-                                                 long timeout,
-                                                 Executor executor,
-                                                 int maxConcurrentBatches
-    ) {
-        if (dataList.isEmpty()
-                || batchProcessor == null
-                || batchSize <= 0
-                || batchSize > maxConcurrentBatches
-                || timeout <= 0L
-        ) {
-            System.err.println("Parallel process requires at least 1 data or batch size.");
+    public static <T, R> List<R> parallelProcess(Executor executor, List<T> dataList, int batchSize, Function<List<T>, R> batchProcessor, long timeout, Consumer<Exception> exceptionHandler) {
+        if (dataList.isEmpty() || batchProcessor == null || batchSize <= 0 || timeout <= 0L) {
+            log.warning("Batch parallel process has invalid parameters.");
             return Collections.emptyList();
         }
 
         // 如果未提供线程池，使用默认线程池
-        Executor actualExecutor = (executor != null) ? executor : getDefaultExecutor();
+        if (executor == null) {
+            executor = getDefaultExecutor();
+        }
 
-        // 根据数据集大小和并发限制选择处理策略
-
-        return processAllConcurrently(dataList, batchSize, batchProcessor, timeout, actualExecutor);
+        return processAllConcurrently(executor, dataList, batchSize, batchProcessor, timeout, exceptionHandler);
     }
 
     /**
      * 处理所有批次（适合数据集较小的情况）
      * 如果返回的数据是空的，则说明这一批次执行失败了。
      */
-    private static <T, R> List<R> processAllConcurrently(List<T> dataList,
-                                                         int batchSize,
-                                                         Function<List<T>, R> batchProcessor,
-                                                         long timeout,
-                                                         Executor executor) {
+    private static <T, R> List<R> processAllConcurrently(Executor executor, List<T> dataList, int batchSize, Function<List<T>, R> batchProcessor, long timeout, Consumer<Exception> exceptionHandler) {
         // 1. 数据分批次
         List<List<T>> batches = splitIntoBatches(dataList, batchSize);
 
@@ -155,8 +107,14 @@ public final class BatchParallelProcessorUtils {
                         () -> {
                             try {
                                 return batchProcessor.apply(batch);
-                            } catch (Exception ex) {
-                                System.err.println(Thread.currentThread().getName() + ex.getMessage());
+                            } catch (Exception e) {
+                                //如果有异常处理器，则交由调用方进行处理
+                                if (exceptionHandler != null) {
+                                    exceptionHandler.accept(e);
+                                    return null;
+                                }
+                                //没有异常处理，则记录异常。TODO 一般不用 printStackTrace ，而是用log.error(e);
+                                e.printStackTrace();
                                 return null;
                             }
                         },
@@ -171,9 +129,7 @@ public final class BatchParallelProcessorUtils {
     /**
      * 收集结果
      */
-    private static <R> List<R> collectResults(
-            List<CompletableFuture<R>> futures,
-            long timeout) {
+    private static <R> List<R> collectResults(List<CompletableFuture<R>> futures, long timeout) {
 
         // 3. 等待所有任务完成并收集结果
         CompletableFuture<Void> allFutures = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
@@ -198,7 +154,11 @@ public final class BatchParallelProcessorUtils {
             futures.forEach(future -> future.cancel(true));
             throw new RuntimeException("Batch processing interrupted", e);
         } catch (ExecutionException e) {
-            throw new RuntimeException("Batch processing failed", e);
+            //绝大数情况下都是运行时异常，所以如果是运行时异常，则直接强转，不用重新new。
+            if (e.getCause() instanceof RuntimeException) {
+                throw (RuntimeException) e.getCause();
+            }
+            throw new RuntimeException(e.getCause());
         }
     }
 

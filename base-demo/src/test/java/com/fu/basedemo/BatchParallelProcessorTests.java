@@ -16,10 +16,15 @@ public class BatchParallelProcessorTests {
         List<Integer> list = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
         List<Boolean> taskResultList = BatchParallelProcessorUtils.parallelProcess(list, 2, (subList) -> {
             for (int i : subList) {
-                if (i % 2 == 0) {
-                    throw new RuntimeException(String.valueOf(i));
+                if (i == 5 || i == 7 || i == 9) {
+                    try {
+                        Thread.sleep(3000L);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                    throw new RuntimeException("我是会报错的:" + i);
                 }
-                System.out.println("我是" + i);
+                System.out.println(Thread.currentThread().getName() + "我是" + i);
             }
             return true;
         });
