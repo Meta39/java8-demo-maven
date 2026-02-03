@@ -169,10 +169,10 @@ public final class BatchParallelProcessorUtils {
                 .map(batch -> CompletableFuture.supplyAsync(
                         () -> {
                             try {
-                                return TaskResult.<List<T>, R>success(batchProcessor.apply(batch));
+                                return TaskResult.ok(batch, batchProcessor.apply(batch));
                             } catch (Exception e) {
                                 //记录异常日志
-                                TaskResult<List<T>, R> failure = TaskResult.failure(e, batch);
+                                TaskResult<List<T>, R> failure = TaskResult.failure(batch, e);
                                 log.log(Level.SEVERE, "parallelProcess UUID:" + failure.getUuid(), e);
                                 return failure;
                             }

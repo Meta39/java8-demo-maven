@@ -15,15 +15,30 @@ import java.util.List;
 public final class TaskResult<T, R> {
     private final String uuid;
     private final Boolean success;
+    private final T batch;
     private final R result;
     private final Exception exception;
-    private final T batch;
 
-    public static <T, R> TaskResult<T, R> success(R result) {
-        return new TaskResult<>(UuidUtils.getUUID(), true, result, null, null);
+    /**
+     * 成功也记录这一批次的入参（用于全部取消）
+     *
+     * @param batch  当前批次数据
+     * @param result 当前批次结果
+     */
+    public static <T, R> TaskResult<T, R> ok(T batch, R result) {
+        return new TaskResult<>(UuidUtils.getUUID(), true, batch, result, null);
     }
 
-    public static <T, R> TaskResult<List<T>, R> failure(Exception exception, List<T> data) {
-        return new TaskResult<>(UuidUtils.getUUID(), false, null, exception, data);
+    /**
+     * 异常
+     *
+     * @param exception 异常信息（不包括Error）
+     * @param batch     当前批次数据
+     * @param <T>
+     * @param <R>
+     * @return
+     */
+    public static <T, R> TaskResult<List<T>, R> failure(List<T> batch, Exception exception) {
+        return new TaskResult<>(UuidUtils.getUUID(), false, batch, null, exception);
     }
 }
