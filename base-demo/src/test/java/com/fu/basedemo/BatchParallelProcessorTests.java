@@ -1,6 +1,7 @@
 package com.fu.basedemo;
 
 import com.fu.basedemo.juc.util.BatchParallelProcessorUtils;
+import com.fu.basedemo.juc.util.TaskResult;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
@@ -16,24 +17,24 @@ public class BatchParallelProcessorTests {
     @Test
     public void test() {
         List<Integer> list = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
-        List<Boolean> taskResultList = BatchParallelProcessorUtils.parallelProcess(list, 2, (subList) -> {
+        List<TaskResult<List<Integer>, Boolean>> taskResultList = BatchParallelProcessorUtils.parallelProcess(list, 2, (subList) -> {
             for (int i : subList) {
-                if (i == 5) {
+                if (i == 5 || i == 9) {
                     throw new RuntimeException("我是会报错的:" + i);
                 }
                 log.info("我是" + i);
             }
             return true;
         });
-        for (int i = 0; i < taskResultList.size(); i++) {
-            if (taskResultList.get(i) == null) {
-                log.info("第" + (i + 1) + "批次执行失败");
+        for (TaskResult<List<Integer>, Boolean> taskResult : taskResultList) {
+            if (!taskResult.getSuccess()) {
+                cancel(taskResult.getUuid(), taskResult.getBatch());
             }
         }
     }
 
-    private void cancel() {
-
+    private void cancel(String uuid, List<Integer> batch) {
+        log.warning("批次ID：" + uuid + "，执行失败，调用取消接口，取消这一批次的数据:" + batch);
     }
 
 }

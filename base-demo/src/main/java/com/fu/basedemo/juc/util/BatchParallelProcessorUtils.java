@@ -33,116 +33,116 @@ public final class BatchParallelProcessorUtils {
     /**
      * 基本的批处理方法（使用默认线程池、默认批大小、默认超时时间）
      *
-     * @param dataList         数据集合（必填）
-     * @param batchProcessor   批处理方法（必传）
-     * @param <T>              数据类型
-     * @param <R>              结果类型
+     * @param dataList       数据集合（必填）
+     * @param batchProcessor 批处理方法（必传）
+     * @param <T>            数据类型
+     * @param <T,            R>            结果类型
      * @return 结果集合
      */
-    public static <T, R> List<R> parallelProcess(List<T> dataList, Function<List<T>, R> batchProcessor) {
+    public static <T, R> List<TaskResult<List<T>, R>> parallelProcess(List<T> dataList, Function<List<T>, R> batchProcessor) {
         return parallelProcess(null, dataList, DEFAULT_BATCH_SIZE, batchProcessor, DEFAULT_TIMEOUT);
     }
 
     /**
      * 批处理方法（使用默认线程池、指定批大小、默认超时时间）
      *
-     * @param dataList         数据集合（必填）
-     * @param batchSize        每批处理数据的数量
-     * @param batchProcessor   批处理方法（必传）
-     * @param <T>              数据类型
-     * @param <R>              结果类型
+     * @param dataList       数据集合（必填）
+     * @param batchSize      每批处理数据的数量
+     * @param batchProcessor 批处理方法（必传）
+     * @param <T>            数据类型
+     * @param <T,            R>            结果类型
      * @return 结果集合
      */
-    public static <T, R> List<R> parallelProcess(List<T> dataList, int batchSize, Function<List<T>, R> batchProcessor) {
+    public static <T, R> List<TaskResult<List<T>, R>> parallelProcess(List<T> dataList, int batchSize, Function<List<T>, R> batchProcessor) {
         return parallelProcess(null, dataList, batchSize, batchProcessor, DEFAULT_TIMEOUT);
     }
 
     /**
      * 批处理方法（使用默认线程池、默认批大小、指定超时时间）
      *
-     * @param dataList         数据集合（必填）
-     * @param batchProcessor   批处理方法（必传）
-     * @param timeout          获取全部结果的超时时间[单位：秒]
-     * @param <T>              数据类型
-     * @param <R>              结果类型
+     * @param dataList       数据集合（必填）
+     * @param batchProcessor 批处理方法（必传）
+     * @param timeout        获取全部结果的超时时间[单位：秒]
+     * @param <T>            数据类型
+     * @param <T,            R>            结果类型
      * @return 结果集合
      */
-    public static <T, R> List<R> parallelProcess(List<T> dataList, Function<List<T>, R> batchProcessor, long timeout) {
+    public static <T, R> List<TaskResult<List<T>, R>> parallelProcess(List<T> dataList, Function<List<T>, R> batchProcessor, long timeout) {
         return parallelProcess(null, dataList, DEFAULT_BATCH_SIZE, batchProcessor, timeout);
     }
 
     /**
      * 批处理方法（使用默认线程池、指定批大小和超时时间）
      *
-     * @param dataList         数据集合（必填）
-     * @param batchSize        每批处理数据的数量
-     * @param batchProcessor   批处理方法（必传）
-     * @param timeout          获取全部结果的超时时间[单位：秒]
-     * @param <T>              数据类型
-     * @param <R>              结果类型
+     * @param dataList       数据集合（必填）
+     * @param batchSize      每批处理数据的数量
+     * @param batchProcessor 批处理方法（必传）
+     * @param timeout        获取全部结果的超时时间[单位：秒]
+     * @param <T>            数据类型
+     * @param <T,            R>            结果类型
      * @return 结果集合
      */
-    public static <T, R> List<R> parallelProcess(List<T> dataList, int batchSize, Function<List<T>, R> batchProcessor, long timeout) {
+    public static <T, R> List<TaskResult<List<T>, R>> parallelProcess(List<T> dataList, int batchSize, Function<List<T>, R> batchProcessor, long timeout) {
         return parallelProcess(null, dataList, batchSize, batchProcessor, timeout);
     }
 
     /**
      * 批处理方法（指定线程池、使用默认批大小和超时时间）
      *
-     * @param executor         自定义线程池
-     * @param dataList         数据集合（必填）
-     * @param batchProcessor   批处理方法（必传）
-     * @param <T>              数据类型
-     * @param <R>              结果类型
+     * @param executor       自定义线程池
+     * @param dataList       数据集合（必填）
+     * @param batchProcessor 批处理方法（必传）
+     * @param <T>            数据类型
+     * @param <T,            R>            结果类型
      * @return 结果集合
      */
-    public static <T, R> List<R> parallelProcess(Executor executor, List<T> dataList, Function<List<T>, R> batchProcessor) {
+    public static <T, R> List<TaskResult<List<T>, R>> parallelProcess(Executor executor, List<T> dataList, Function<List<T>, R> batchProcessor) {
         return parallelProcess(executor, dataList, DEFAULT_BATCH_SIZE, batchProcessor, DEFAULT_TIMEOUT);
     }
 
     /**
      * 批处理方法（指定线程池、批大小，使用默认超时时间）
      *
-     * @param executor         自定义线程池
-     * @param dataList         数据集合（必填）
-     * @param batchSize        每批处理数据的数量
-     * @param batchProcessor   批处理方法（必传）
-     * @param <T>              数据类型
-     * @param <R>              结果类型
+     * @param executor       自定义线程池
+     * @param dataList       数据集合（必填）
+     * @param batchSize      每批处理数据的数量
+     * @param batchProcessor 批处理方法（必传）
+     * @param <T>            数据类型
+     * @param <T,            R>            结果类型
      * @return 结果集合
      */
-    public static <T, R> List<R> parallelProcess(Executor executor, List<T> dataList, int batchSize, Function<List<T>, R> batchProcessor) {
+    public static <T, R> List<TaskResult<List<T>, R>> parallelProcess(Executor executor, List<T> dataList, int batchSize, Function<List<T>, R> batchProcessor) {
         return parallelProcess(executor, dataList, batchSize, batchProcessor, DEFAULT_TIMEOUT);
     }
 
     /**
      * 批处理方法（指定线程池、超时时间，使用默认批大小）
      *
-     * @param executor         自定义线程池
-     * @param dataList         数据集合（必填）
-     * @param batchProcessor   批处理方法（必传）
-     * @param timeout          获取全部结果的超时时间[单位：秒]
-     * @param <T>              数据类型
-     * @param <R>              结果类型
+     * @param executor       自定义线程池
+     * @param dataList       数据集合（必填）
+     * @param batchProcessor 批处理方法（必传）
+     * @param timeout        获取全部结果的超时时间[单位：秒]
+     * @param <T>            数据类型
+     * @param <T,            R>            结果类型
      * @return 结果集合
      */
-    public static <T, R> List<R> parallelProcess(Executor executor, List<T> dataList, Function<List<T>, R> batchProcessor, long timeout) {
+    public static <T, R> List<TaskResult<List<T>, R>> parallelProcess(Executor executor, List<T> dataList, Function<List<T>, R> batchProcessor, long timeout) {
         return parallelProcess(executor, dataList, DEFAULT_BATCH_SIZE, batchProcessor, timeout);
     }
 
     /**
      * 完整的批处理方法（所有参数可配置）
      *
-     * @param executor         自定义线程池（可选），如果不传，则使用 getDefaultExecutor()
-     * @param dataList         数据集合（必填）
-     * @param batchSize        每批处理数据的数量（可选），如果不传，则使用 DEFAULT_BATCH_SIZE
-     * @param batchProcessor   批处理方法（必传）
-     * @param timeout          获取全部结果的超时时间[单位：秒]（可选），如果不传，则使用 DEFAULT_TIMEOUT
-     * @param <T>              数据类型
-     * @param <R>              结果类型
+     * @param executor       自定义线程池（可选），如果不传，则使用 getDefaultExecutor()
+     * @param dataList       数据集合（必填）
+     * @param batchSize      每批处理数据的数量（可选），如果不传，则使用 DEFAULT_BATCH_SIZE
+     * @param batchProcessor 批处理方法（必传）
+     * @param timeout        获取全部结果的超时时间[单位：秒]（可选），如果不传，则使用 DEFAULT_TIMEOUT
+     * @param <T>            数据类型
+     * @param <T,            R>            结果类型
      * @return 结果集合
      */
-    public static <T, R> List<R> parallelProcess(Executor executor, List<T> dataList, int batchSize, Function<List<T>, R> batchProcessor, long timeout) {
+    public static <T, R> List<TaskResult<List<T>, R>> parallelProcess(Executor executor, List<T> dataList, int batchSize, Function<List<T>, R> batchProcessor, long timeout) {
         if (dataList.isEmpty() || batchProcessor == null || batchSize <= 0 || timeout <= 0L) {
             log.warning("Batch parallel process has invalid parameters.");
             return Collections.emptyList();
@@ -160,21 +160,21 @@ public final class BatchParallelProcessorUtils {
      * 处理所有批次（适合数据集较小的情况）
      * 如果返回的数据是空的，则说明这一批次执行失败了。
      */
-    private static <T, R> List<R> processAllConcurrently(Executor executor, List<T> dataList, int batchSize, Function<List<T>, R> batchProcessor, long timeout) {
+    private static <T, R> List<TaskResult<List<T>, R>> processAllConcurrently(Executor executor, List<T> dataList, int batchSize, Function<List<T>, R> batchProcessor, long timeout) {
         // 1. 数据分批次
         List<List<T>> batches = splitIntoBatches(dataList, batchSize);
 
         // 2. 创建并行任务（需要使用自定义线程池）
-        List<CompletableFuture<R>> futures = batches.stream()
+        List<CompletableFuture<TaskResult<List<T>, R>>> futures = batches.stream()
                 .map(batch -> CompletableFuture.supplyAsync(
                         () -> {
                             try {
-                                return batchProcessor.apply(batch);
+                                return TaskResult.<List<T>, R>success(batchProcessor.apply(batch));
                             } catch (Exception e) {
-                                //没有异常处理，则记录异常。
-                                // 没有异常处理，记录详细异常信息
-                                log.log(Level.SEVERE, String.format("Batch processing failed. Thread: %s", Thread.currentThread().getName()), e);
-                                return null;
+                                //记录异常日志
+                                TaskResult<List<T>, R> failure = TaskResult.failure(e, batch);
+                                log.log(Level.SEVERE, "parallelProcess UUID:" + failure.getUuid(), e);
+                                return failure;
                             }
                         },
                         executor
@@ -188,13 +188,13 @@ public final class BatchParallelProcessorUtils {
     /**
      * 收集结果
      */
-    private static <R> List<R> collectResults(List<CompletableFuture<R>> futures, long timeout) {
+    private static <T, R> List<TaskResult<List<T>, R>> collectResults(List<CompletableFuture<TaskResult<List<T>, R>>> futures, long timeout) {
 
         // 3. 等待所有任务完成并收集结果
         CompletableFuture<Void> allFutures = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
 
         // 4. 组合结果
-        CompletableFuture<List<R>> allResultsFuture = allFutures.thenApply(v ->
+        CompletableFuture<List<TaskResult<List<T>, R>>> allResultsFuture = allFutures.thenApply(v ->
                 futures.stream()
                         .map(CompletableFuture::join)
                         .collect(Collectors.toList())
