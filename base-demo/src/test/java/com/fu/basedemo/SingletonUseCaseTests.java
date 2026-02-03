@@ -11,6 +11,9 @@ import com.fu.basedemo.designpattern.singleton.usecase.async.MyServiceImpl;
 import com.fu.basedemo.entity.User;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * 单例模式使用场景测试
  *
@@ -73,6 +76,21 @@ public class SingletonUseCaseTests {
     void testLogger() {
         LoggerAsync logger = LoggerAsync.getInstance();
         logger.log("哈哈");
+    }
+
+    @Test
+    void testMethodList() {
+        List<Integer> iList = new ArrayList<>();
+        iList.add(1);
+        iList.add(2);
+        iList.add(3);
+        System.out.println("未移除前的iList: " + iList);
+        putOne(iList);
+        System.out.println("移除以后的iList: " + iList);
+    }
+
+    private void putOne(List<Integer> iList) {
+        iList.removeIf(i -> i == 2);
     }
 
 }
