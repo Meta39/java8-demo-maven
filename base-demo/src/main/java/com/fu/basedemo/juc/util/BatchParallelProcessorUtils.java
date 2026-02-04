@@ -5,6 +5,8 @@ import com.fu.basedemo.juc.threadpool.CustomThreadPoolTests;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -218,6 +220,84 @@ public final class BatchParallelProcessorUtils {
                 throw (RuntimeException) e.getCause();
             }
             throw new RuntimeException(e.getCause());
+        }
+    }
+
+
+    public static <T> void batchProcess(List<T> dataList, Consumer<List<T>> batchHandler) throws Exception {
+        batchProcess(getDefaultExecutor(), dataList, DEFAULT_BATCH_SIZE, batchHandler, DEFAULT_TIMEOUT);
+    }
+
+    public static <T> void batchProcess(List<T> dataList, Consumer<List<T>> batchHandler, long timeout) throws Exception {
+        batchProcess(getDefaultExecutor(), dataList, DEFAULT_BATCH_SIZE, batchHandler, timeout);
+    }
+
+    public static <T> void batchProcess(List<T> dataList, int batchSize, Consumer<List<T>> batchHandler) throws Exception {
+        batchProcess(getDefaultExecutor(), dataList, batchSize, batchHandler, DEFAULT_TIMEOUT);
+    }
+
+    public static <T> void batchProcess(List<T> dataList, int batchSize, Consumer<List<T>> batchHandler, long timeout) throws Exception {
+        batchProcess(getDefaultExecutor(), dataList, batchSize, batchHandler, timeout);
+    }
+
+    /**
+     * 批量处理方法
+     *
+     * @param executor     执行器
+     * @param dataList     数据列表
+     * @param batchSize    批次大小
+     * @param batchHandler 批次处理器
+     * @param timeout      超时时间（毫秒）
+     * @param <T>          数据类型
+     */
+    public static <T> void batchProcess(Executor executor,
+                                        List<T> dataList,
+                                        int batchSize,
+                                        Consumer<List<T>> batchHandler,
+                                        long timeout) {
+        if (dataList.isEmpty() || batchHandler == null || batchSize <= 0 || timeout <= 0L) {
+            log.warning("Batch parallel process has invalid parameters.");
+            return;
+        }
+        // 原子变量记录异常发生
+        AtomicBoolean fail = new AtomicBoolean(false);
+        List<List<T>> batches = splitIntoBatches(dataList, batchSize);
+        List<CompletableFuture<Void>> futures = batches.stream()
+                .map(batch -> CompletableFuture.runAsync(
+                        () -> {
+                            if (fail.get()) {
+                                return;
+                            }
+                            try {
+                                batchHandler.accept(batch);
+                            } catch (Exception e) {
+                                fail.set(true);
+                                throw e;
+                            }
+                        },
+                        executor
+                ))
+                .collect(Collectors.toList());
+
+        // 3. 等待所有任务完成并收集结果
+        CompletableFuture<Void> allFutures = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
+        // 4. 组合结果
+        CompletableFuture<List<Void>> allResultsFuture = allFutures.thenApply(v ->
+                futures.stream()
+                        .map(CompletableFuture::join)
+                        .collect(Collectors.toList())
+        );
+        try {
+            // 5. 获取结果并设置超时
+            allResultsFuture.get(timeout, TimeUnit.SECONDS);
+        } catch (TimeoutException | InterruptedException | ExecutionException e) {
+            // 取消未完成的任务
+            futures.forEach(future -> future.cancel(true));
+            Thread.currentThread().interrupt();
+            if (e.getCause() instanceof RuntimeException) {
+                throw (RuntimeException) e.getCause();
+            }
+            throw new RuntimeException(e);
         }
     }
 

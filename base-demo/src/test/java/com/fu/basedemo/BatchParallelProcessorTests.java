@@ -4,6 +4,7 @@ import com.fu.basedemo.juc.util.BatchParallelProcessorUtils;
 import com.fu.basedemo.juc.util.TaskResult;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -60,6 +61,29 @@ public class BatchParallelProcessorTests {
             });
             log.info("全部取消结束....");
         }
+    }
+
+    /**
+     * 批处理任务如果发生异常，则中断其它未完成的任务
+     */
+    @Test
+    void test3() throws Exception {
+        final int total = 10_000;
+        List<Integer> batchProcessList = new ArrayList<>(total);
+        for (int i = 1; i < total; i++) {
+            batchProcessList.add(i);
+        }
+        int errI = 200;
+        BatchParallelProcessorUtils.batchProcess(batchProcessList, 1000, (subList) -> {
+                if (subList.contains(errI)) {
+                    throw new RuntimeException(Thread.currentThread().getName() + "我是会报错的:" + errI);
+                }
+            long endTime = System.currentTimeMillis() + 1000;
+            while (System.currentTimeMillis() < endTime) {
+
+            }
+            System.out.println(Thread.currentThread().getName() + "我正常执行完了" + subList);
+        });
     }
 
     private void cancel(String uuid, List<Integer> batch) {
