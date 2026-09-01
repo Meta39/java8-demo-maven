@@ -1,0 +1,6 @@
+server:
+  port: 101
+
+spring:
+  application:
+    name: springbootzookeeperdemo

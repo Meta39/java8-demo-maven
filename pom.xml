@@ -29,6 +29,7 @@
         <module>spring-boot-starter-mybatis-sql-log</module>
         <module>spring-boot-webservice-demo</module>
         <module>spring-boot-xxl-job-demo</module>
+        <module>spring-boot-zookeeper-demo</module>
         <module>spring-springmvc-mybatis-demo</module>
         <module>velocity-generate-code-demo</module>
         <module>spring-boot-jta-mybatis-plus-demo</module>
@@ -75,6 +76,8 @@
         <!-- Lombok 尽量跟 Spring Boot 的版本一致 -->
         <lombok.version>1.18.42</lombok.version>
         <lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
+        <zookeeper.version>3.4.5</zookeeper.version>
+        <curator-framework.version>4.3.0</curator-framework.version>
     </properties>
 
     <!-- 必要依赖 -->
@@ -229,6 +232,24 @@
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-spring-boot-starter-jaxws</artifactId>
                 <version>${cxf-spring-boot-starter-jaxws.version}</version>
+            </dependency>
+            <!-- zookeeper -->
+            <dependency>
+                <groupId>org.apache.zookeeper</groupId>
+                <artifactId>zookeeper</artifactId>
+                <version>${zookeeper.version}</version>
+            </dependency>
+            <!-- . 添加 Curator Framework，并排除其自带的 ZooKeeper -->
+            <dependency>
+                <groupId>org.apache.curator</groupId>
+                <artifactId>curator-framework</artifactId>
+                <version>${curator-framework.version}</version>
+            </dependency>
+            <!-- 添加 Curator Recipes（包含分布式锁实现），同样排除 ZooKeeper -->
+            <dependency>
+                <groupId>org.apache.curator</groupId>
+                <artifactId>curator-recipes</artifactId>
+                <version>${curator-framework.version}</version>
             </dependency>
             <!-- Spring Boot 【放到最后面，因为前面定义了版本的话，就会覆盖Spring Boot自带的版本号】-->
             <dependency>
